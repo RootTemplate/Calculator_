@@ -62,7 +62,7 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
      * @return the stringed value
      */
     public String stringValue() {
-        return Util.doubleToString(doubleValue());
+        return Util.doubleToString(doubleValue(), 10);
     }
     
     /**

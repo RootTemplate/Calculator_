@@ -18,7 +18,10 @@
  */
 package roottemplate.calculator.evaluator;
 
-/** SOURCE: https://github.com/Xlythe/Arity/blob/master/src/org/javia/arity/MoreMath.java; arity project by javia.org */
+/* !!!SOME!!! OF THE CODE BELOW HAS BEEN TAKEN FROM Arity PROJECT BY Javia */
+/* PREVIOUS CLASS LOCATION: org.javia.arity.MoreMath. License: Apache License v. 2 */
+/* Javia's Copyright (C) 2007-2008 Mihai Preda. */
+/* http://javia.org. SOURCE: https://github.com/Xlythe/Arity/blob/master/src/org/javia/arity/MoreMath.java */
 public class MoreMath {
     static final double GAMMA[] = {
         57.156235665862923517,
@@ -97,27 +100,6 @@ public class MoreMath {
         }
         return Math.exp(lgamma(x));
     }
-    
-    /*public static double sin(double x) {
-        double result = Math.sin(x);
-        if(Math.abs(result) < 1E-15)
-            return 0;
-        return result;
-    }
-    
-    public static double cos(double x) {
-        double result = Math.cos(x);
-        if(Math.abs(result) < 1E-15)
-            return 0;
-        return result;
-    }
-    
-    public static double tan(double x) {
-        double result = Math.tan(x);
-        if(Math.abs(result) > 1)
-            return result > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-        return result;
-    }*/
     
     private static boolean isPiMultiple(double x) {
         // x % y == 0
