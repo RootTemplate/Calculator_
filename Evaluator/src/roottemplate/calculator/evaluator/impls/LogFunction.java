@@ -40,7 +40,7 @@ public class LogFunction extends Function {
         if(numbers.length > 2)
             throw new EvaluatorException("Log function expects up to 2 arguments, found " + numbers.length);
         if(numbers.length == 1)
-            return numbers[0].applyOperation("log", new RealNumber(2));
+            return numbers[0].applyOperation("ln");
         return numbers[1].applyOperation("log", numbers[0]);
     }
 

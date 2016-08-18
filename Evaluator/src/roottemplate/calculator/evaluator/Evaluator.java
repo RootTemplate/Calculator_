@@ -141,7 +141,7 @@ public class Evaluator {
         l.add(new NativeFunction(priorityManagerOperators, "toDegrees", "todeg"));
         l.add(new NativeFunction(priorityManagerOperators, "log10", "lg"));
         l.add(new NativeFunction(priorityManagerOperators, "log", "ln"));
-        l.add(new LogFunction(priorityManagerOperators)); // log. Base-2 if 1 arg. Args: "n" or "base, n"
+        l.add(new LogFunction(priorityManagerOperators)); // log. Base-e if 1 arg. Args: "n" or "base, n"
         l.add(new NativeFunction(priorityManagerOperators, "abs"));
         l.add(new NativeFunction(priorityManagerOperators, "round"));
         l.add(new NativeFunction(priorityManagerOperators, "sqrt"));
