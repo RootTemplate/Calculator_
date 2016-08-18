@@ -28,8 +28,8 @@ public class BracketsEnum implements ExpressionElement {
     public int size() {
         return enum_.length;
     }
-    public Brackets[] getEnum() {
-        Brackets[] result = new Brackets[enum_.length];
+    public ExpressionElement[] getEnum() {
+        ExpressionElement[] result = new ExpressionElement[enum_.length];
         System.arraycopy(enum_, 0, result, 0, enum_.length);
         return result;
     }
