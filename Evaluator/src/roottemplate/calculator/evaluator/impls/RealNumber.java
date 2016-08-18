@@ -87,7 +87,10 @@ public class RealNumber extends Number {
             case "toRadians": return new RealNumber(Math.toRadians(number));
             case "toDegrees": return new RealNumber(Math.toDegrees(number));
             case "log10": return new RealNumber(Math.log10(number));
-            case "log": return new RealNumber(Math.log(number));
+            case "log":
+                if(with == null)
+                    return new RealNumber(Math.log(number));
+                return new RealNumber(MoreMath.log(number, n));
             case "abs": return new RealNumber(Math.abs(number));
             case "round": return new RealNumber(Math.round(number));
             case "floor": return new RealNumber(Math.floor(number));
