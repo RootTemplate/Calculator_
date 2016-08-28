@@ -185,7 +185,7 @@ public class Evaluator {
      * Clears namespace and nameless readers (and parent's if got parent) from user's objects.
      * @return The number of removed objects
      */
-    public synchronized int clear() {
+    public int clear() {
         int result = 0;
         Evaluator cur = this;
         while(cur != null) {
@@ -206,7 +206,7 @@ public class Evaluator {
     /**
      * Trims namespace. (Trims every ArrayList to their size)
      */
-    public synchronized void trim() {
+    public void trim() {
         Evaluator cur = this;
         while(cur != null) {
             Iterator<CharacterLine> it;
@@ -222,7 +222,7 @@ public class Evaluator {
      * @param obj The object to check
      * @return true if object is standard, false otherwise
      */
-    public synchronized boolean isStandard(Object obj) {
+    public boolean isStandard(Object obj) {
         Evaluator cur = this;
         while(cur != null) {
             if(cur.standardsMap.contains(obj)) return true;
@@ -242,7 +242,7 @@ public class Evaluator {
      * @param l The list with nameables
      */
     public void addAll(List<? extends Named> l) { addAll(l, false); }
-    synchronized boolean add(Named n, boolean isStandard) {
+    boolean add(Named n, boolean isStandard) {
         if(isStandard(n)) return false;
         
         String name = n.getName();
@@ -251,13 +251,13 @@ public class Evaluator {
         if(isStandard) standardsMap.add(n);
         return true;
     }
-    private synchronized void addAll(List<? extends Named> l, boolean isStandard) {
+    private void addAll(List<? extends Named> l, boolean isStandard) {
         ListIterator<? extends Named> it;
         for(it = l.listIterator(l.size()); it.hasPrevious();) // saving priority
             add(it.previous(), isStandard);
     }
     
-    private synchronized Named get(String name, Operator.Uses uses, byte what) {
+    private Named get(String name, Operator.Uses uses, byte what) {
         if(name.isEmpty()) return null;
         Evaluator cur = this;
         CharacterLine line;
@@ -313,7 +313,7 @@ public class Evaluator {
      * @param c The character
      * @return found nameables or empty array if there is no such
      */
-    public synchronized Collection<Named> getAllStartingWith(char c) {
+    public Collection<Named> getAllStartingWith(char c) {
         if(parent == null) {
             return Collections.<Named>unmodifiableCollection(getCharLineNoCreation(c));
         }
@@ -329,7 +329,7 @@ public class Evaluator {
         return getOperator("*", Operator.Uses.TWO_NUMBERS);
     }
     
-    private synchronized Collection<Named> getNamespace(boolean usersOnly) {
+    private Collection<Named> getNamespace(boolean usersOnly) {
         CharacterLine result = new CharacterLine();
         Evaluator cur = this;
         while(cur != null) {
@@ -352,7 +352,7 @@ public class Evaluator {
     /**
      * @return The clone of modificators list
      */
-    public synchronized Collection<Modificator> getModificators() {
+    public Collection<Modificator> getModificators() {
         if(parent == null)
             return Collections.<Modificator>unmodifiableList(modificators.list);
         
@@ -369,7 +369,7 @@ public class Evaluator {
      * @param friendlyName The friendly name
      * @return Found nameless reader or null, if nothing found
      */
-    public synchronized Modificator getModificatorByFriendlyName(String friendlyName) {
+    public Modificator getModificatorByFriendlyName(String friendlyName) {
         Evaluator cur = this;
         Modificator elem;
         StandardList<Modificator> list;
@@ -385,7 +385,7 @@ public class Evaluator {
         return getModificatorByFriendlyName("NUMBERS");
     }
     
-    private synchronized boolean remove(String name, Named remove, Operator.Uses uses, byte what) {
+    private boolean remove(String name, Named remove, Operator.Uses uses, byte what) {
         if(name.isEmpty()) return false;
         char starting = name.charAt(0);
         
@@ -446,32 +446,6 @@ public class Evaluator {
      * @return true if nameable was removed successfully
      */
     public boolean removeOther(String name) { return remove(name, null, null, (byte) 3); }
-    /* * #onlystandardmodificators
-     * Removes given modificator from the list
-     * @param m The modificator
-     * @return true if modificator was removed successfully
-     * /
-    public synchronized boolean removeModificator(Modificator m) {
-        Evaluator cur = this;
-        while(cur != null) {
-            if(cur.modificators.remove(m)) return true;
-            cur = cur.parent;
-        }
-        return false;
-    }
-    /* *
-     * Removes modificator with given friendly name from the list
-     * @param friendlyName Friendly name
-     * @return true if modificator was removed successfully
-     * /
-    public synchronized boolean removeModificatorByFriendlyName(String friendlyName) {
-        Evaluator cur = this;
-        while(cur != null) {
-            if(cur.modificators.remove(friendlyName)) return true;
-            cur = cur.parent;
-        }
-        return false;
-    }//*/
     
     /**
      * Evaluates or defines expression. See eval(String) and define(String).
