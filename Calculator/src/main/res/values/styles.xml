@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textAppearanceButton">@style/AppTheme.TextAppearanceButton</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -26,7 +27,17 @@
         <item name="background">@color/colorDialogActionBarBackground</item>
     </style>
 
+    <style name="AppTheme.TextAppearanceButton">
+        <item name="android:textStyle">normal</item>
+        <item name="android:typeface">sans</item>
+    </style>
 
+
+
+    <style name="button_noCaps">
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
 
     <style name="inputEditText">
         <item name="android:gravity">bottom|right</item>
@@ -69,6 +80,7 @@
 
     <style name="panelElem.button" parent="panelElem">
         <item name="android:onClick">onPadButtonClick</item>
+        <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
     </style>
     <style name="panelElem.button.base" parent="panelElem.button">
@@ -133,10 +145,5 @@
         <item name="android:background">#777777</item>
         <item name="android:padding">6dp</item>
         <item name="android:layout_margin">5dp</item>
-    </style>
-
-
-    <style name="about_logo_parent">
-        <item name="android:orientation">vertical</item>
     </style>
 </resources>
