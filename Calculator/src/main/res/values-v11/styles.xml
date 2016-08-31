@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="panelElem.button.system" parent="panelElem.button">
+        <item name="android:background">@drawable/background_symbol_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+</resources>

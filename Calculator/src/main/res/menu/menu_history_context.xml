@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuItem_history_copyExpr"
+        android:title="@string/menuItem_history_copyExpr" />
+
+    <item
+        android:id="@+id/menuItem_history_copyResult"
+        android:title="@string/menuItem_history_copyResult" />
+
+    <item
+        android:id="@+id/menuItem_history_copyAll"
+        android:title="@string/menuItem_history_copyAll" />
+
+    <item
+        android:id="@+id/menuItem_history_pasteExpr"
+        android:title="@string/menuItem_history_pasteExpr" />
+
+    <item
+        android:id="@+id/menuItem_history_pasteResult"
+        android:title="@string/menuItem_history_pasteResult" />
+</menu>
