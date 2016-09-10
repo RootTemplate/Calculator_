@@ -52,7 +52,7 @@
     <!-- Strings related to Settings -->
 
     <string name="pref_def_brClosingType" translatable="false">1</string>
-    <string name="pref_def_storingHistory" translatable="false">0</string>
+    <string name="pref_def_storingHistory" translatable="false">30</string>
 
     <string name="pref_header_general">General</string>
 
@@ -155,7 +155,7 @@
     <string name="guide_5_e">This is Euler\'s number, approximately equal to 2.718.</string>
     <string name="guide_6_title">\'.\' &amp; \',\' Buttons</string>
     <string name="guide_6_comma">A comma splits function arguments. Example: \"f(x,y)=x^y\", \"f(4.5,6)\".</string>
-    <string name="guide_6_point">A point is a decimecal point.</string>
+    <string name="guide_6_point">A point is a decimal dot.</string>
     <string name="guide_7_title">Operator Precedence</string>
     <string name="guide_7_text">\tOur app uses some non-standard operators, that\'s why we put here a
         table of operator precedence (decreases from top to bottom).</string>

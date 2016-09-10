@@ -83,7 +83,6 @@ public class HistoryDatabase extends SQLiteOpenHelper {
     }
 
     public Cursor getHistoryElements() {
-        updateDatabase(false, false);
         return getReadableDatabase().query(
                 HistoryContract.TABLE_NAME,
                 new String[]{

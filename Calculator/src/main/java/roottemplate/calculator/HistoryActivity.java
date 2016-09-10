@@ -218,6 +218,7 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
 
         @Override
         public Cursor loadInBackground() {
+            mDatabase.updateDatabase(false, false);
             return mDatabase.getHistoryElements();
         }
     }

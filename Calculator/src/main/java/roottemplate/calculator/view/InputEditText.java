@@ -28,7 +28,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.text.Layout;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ActionMode;
 import android.view.ContextMenu;
@@ -38,11 +37,44 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.EditText;
 
-import roottemplate.calculator.MainActivity;
 import roottemplate.calculator.R;
 import roottemplate.calculator.util.Util;
 
 public class InputEditText extends EditText {
+    /*public static final char DIGIT_DELIMITER = ' ';
+
+    private static String addDigitDelimiters(String str) {
+        return str;
+        str = str.replace(new String(new char[] {DIGIT_DELIMITER}), "");
+        StringBuilder sb = new StringBuilder(str.length());
+        byte number = -1; // -1 - not found; 0 - found but searching for point; 1 - processing number
+        int toPoint = 0;
+        int numberStart = -1;
+        for(int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if(number == 0 && (!Character.isDigit(c) || i == str.length() - 1)) {
+                toPoint = i - numberStart;
+                i = numberStart - 1; // And after that i++ will be invoked
+                number = 1;
+            } else if(!Character.isDigit(c)) {
+                sb.append(c);
+                number = -1;
+            } else {
+                if(number == -1) {
+                    numberStart = i;
+                    number = 0;
+                } else if(number == 1) {
+                    sb.append(c);
+                    if(toPoint-- % 3 == 0)
+                        sb.append(DIGIT_DELIMITER);
+                }
+            }
+        }
+        return sb.toString();
+    }*/
+
+
+
     private TextType mTextType;
     private MenuHandler mHandler = new MenuHandler();
     private int mMaxDigitsToFit = -1;
@@ -105,15 +137,19 @@ public class InputEditText extends EditText {
             setTextType(TextType.INPUT);
 
         int select = getSelectionStart();
-        setText(getEditableText().insert(select, str));
+        setText(getEditableText().insert(select, str).toString());
         setSelection(select + str.length());
     }
     public void setText(String str) {
         setTextType(TextType.INPUT);
 
+        //str = addDigitDelimiters(str);
         super.setText(str);
         setSelection(str.length());
     }
+    /*public String getExprText() {
+        return super.getText().toString().replace(new String(new char[] {DIGIT_DELIMITER}), "");
+    }*/
     public void clearText() {
         super.setText("");
         setTextType(TextType.INPUT);
@@ -169,6 +205,8 @@ public class InputEditText extends EditText {
         }
     }
 
+
+
     private boolean isFromMakeBlink() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         for(StackTraceElement elem : stack) {
@@ -197,6 +235,39 @@ public class InputEditText extends EditText {
         if(isFromMakeBlink()) return;
         super.invalidate(l, t, r, b);
     }
+
+    /*Rect r = new Rect();
+    Rect r2 = new Rect();
+    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(0x90FFFFFF);
+        paint.setTextSize(spToPx(35));
+        paint.setTextAlign(Paint.Align.LEFT);
+
+
+        getLineBounds(0, r);
+        //canvas.drawRect(r.right - 20, r.top, r.right, r.top + 20, paint);
+
+        String text = getText().toString();
+        for(int i = text.length() - 1; i >= 0; i--) {
+            if(text.charAt(i) == DIGIT_DELIMITER || i == 3) {
+                getPaint().getTextBounds(text, i, text.length(), r2);
+                //canvas.drawRect(r.right - r2.width(), r.top, r.right - r2.width() + 20, r.top + 20, paint);
+                canvas.drawText("’", r.right - r2.width() - spToPx(9), r.top + spToPx(29), paint);
+            }
+        }
+
+
+        super.onDraw(canvas);
+    }
+
+    private float spToPx(int sp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
+                getResources().getDisplayMetrics());
+    }*/
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {

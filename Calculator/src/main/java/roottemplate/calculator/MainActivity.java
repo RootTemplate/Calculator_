@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // INIT HISTORY DATABASE IF NEEDED
         if(mPrefs.enabledHistory()) {
             mHistory = new HistoryDatabase(this, mPrefs);
+            mHistory.updateDatabase(savedInstanceState == null, true);
             mHistoryClearingThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // UPDATE VERSION
         updateVersion();
 
-        // MISCELLANEOUS INITS
+        // MISCELLANEOUS INITIALIZATIONS
         mTipsPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt("tipsPageIndex");
     }
 
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if(mHistoryClearingThread != null)
                 mHistoryClearingThread.interrupt();
             if(mHistory != null)
-                mHistory.updateDatabase(true, true); // This will also close db
+                mHistory.close();
         }
     }
 
@@ -401,8 +402,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
             if (n != null) {
                 if(mPrefs.doRound()) {
-                    result = roottemplate.calculator.evaluator.util.Util.doubleToStringWithTruncating(
-                            n.doubleValue(), mInputText.getMaxDigitsToFit());
+                    result = EvaluatorBridge.doubleToString(n.doubleValue(),
+                            mInputText.getMaxDigitsToFit());
                 } else {
                     result = Double.toString(n.doubleValue());
                 }

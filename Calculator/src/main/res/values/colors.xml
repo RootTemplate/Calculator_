@@ -6,6 +6,7 @@
 
     <color name="colorBackground_mainActivity">#000000</color>
     <color name="colorInputText">#FFFFFF</color>
+    <color name="colorInputTextApostrophe">#FF00AA</color>
 
     <color name="colorEquals">#FB9D31</color>
     <color name="colorErrorDetail">#BFBFBF</color>

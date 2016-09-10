@@ -78,4 +78,10 @@ public class EvaluatorBridge {
     public static Number eval(Evaluator namespace, String expr) throws EvaluatorException {
         return namespace.process(replaceAppToEngine(expr));
     }
+
+    public static String doubleToString(double x, int maxLen) {
+        int md = Math.round(maxLen * 0.8F);
+        return roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen,
+                md, md);
+    }
 }
