@@ -1,13 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="@string/pref_category_calcAndRes">
-
-        <CheckBoxPreference
-            android:key="doRound"
-            android:defaultValue="@bool/pref_def_doRound"
-            android:title="@string/pref_doRound_title"
-            android:summary="@string/pref_doRound_summary"/>
+        android:title="@string/pref_category_calc">
 
         <ListPreference
             android:key="bracketClosingType"
@@ -22,6 +16,30 @@
             android:entries="@array/pref_amu_list_titles"
             android:entryValues="@array/pref_amu_list_values"
             android:defaultValue="2" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_result" >
+
+        <CheckBoxPreference
+            android:key="doRound"
+            android:defaultValue="@bool/pref_def_doRound"
+            android:title="@string/pref_doRound_title"
+            android:summary="@string/pref_doRound_summary"/>
+
+        <ListPreference
+            android:key="digitGrouping"
+            android:title="@string/pref_digitGrouping_title"
+            android:entries="@array/pref_digitGrouping_titles"
+            android:entryValues="@array/pref_digitGrouping_values"
+            android:defaultValue="@string/pref_def_digitGrouping" />
+
+        <CheckBoxPreference
+            android:key="replaceEWithLowerCaseInResult"
+            android:defaultValue="@bool/pref_def_replaceEWithLowerCaseInResult"
+            android:title="@string/pref_replaceE_title"
+            android:summary="@string/pref_replaceE_summary" />
 
     </PreferenceCategory>
 

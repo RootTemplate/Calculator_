@@ -242,6 +242,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("amu"));
         bindPreferenceSummaryToValue(findPreference("bracketClosingType"));
         bindPreferenceSummaryToValue(findPreference("storingHistory"));
+        bindPreferenceSummaryToValue(findPreference("digitGrouping"));
 
         setupClearPreference("clearHistory", getIntent().getIntExtra("historySize", -1) == 0,
                 R.string.pref_clearHistory_empty, new Runnable() {

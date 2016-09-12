@@ -21,9 +21,11 @@ package roottemplate.calculator.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.evaluator.Evaluator;
 import roottemplate.calculator.evaluator.EvaluatorException;
 import roottemplate.calculator.evaluator.Number;
+import roottemplate.calculator.view.InputEditText;
 
 public class EvaluatorBridge {
     public static final int BRACKET_CLOSING_TYPE_NO = 0;
@@ -79,9 +81,52 @@ public class EvaluatorBridge {
         return namespace.process(replaceAppToEngine(expr));
     }
 
-    public static String doubleToString(double x, int maxLen) {
-        int md = Math.round(maxLen * 0.8F);
-        return roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen,
-                md, md);
+    public static String doubleToPreferableString(double x, int maxLen, PreferencesManager prefs) {
+        String res;
+        int digitGrouping = prefs.digitGroupingWhenResult();
+        if(prefs.doRound()) {
+            int md = Math.round(maxLen * 0.8F);
+            res = roottemplate.calculator.evaluator.util.Util.doubleToString(x,
+                    maxLen - (digitGrouping > 0 ? 1 : 0), // Reserve 1 digit for commas and stuff
+                    md, md
+            );
+        } else
+            res = Double.toString(x);
+
+        if(digitGrouping > 0) {
+            res = roottemplate.calculator.evaluator.util.Util.addDigitDelimiters(res, ",", ",", digitGrouping == 2);
+        }
+        if(prefs.replaceEWithLowerCaseInResult()) {
+            res = res.replace('E', 'e');
+        }
+
+        return res;
+    }
+
+    public static StringAndIndex preferableStringToNormal(String str, int selection) {
+        if(str.indexOf(',') != -1) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                if (c != ',')
+                    sb.append(c);
+                else if (selection >= i) {
+                    selection--;
+                }
+            }
+            str = sb.toString();
+        }
+        str = str.replace('e', 'E');
+
+        return new StringAndIndex(str, selection);
+    }
+    public static class StringAndIndex {
+        public final String str;
+        public final int index;
+
+        public StringAndIndex(String str, int index) {
+            this.str = str;
+            this.index = index;
+        }
     }
 }

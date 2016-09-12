@@ -68,4 +68,14 @@ public class PreferencesManager {
     public boolean enabledTips() {
         return mPrefs.getBoolean("enabledTips", mResources.getBoolean(R.bool.pref_def_enabledTips));
     }
+
+    public int digitGroupingWhenResult() {
+        return Integer.parseInt(mPrefs.getString("digitGrouping",
+                mResources.getString(R.string.pref_def_digitGrouping)));
+    }
+
+    public boolean replaceEWithLowerCaseInResult() {
+        return mPrefs.getBoolean("replaceEWithLowerCaseInResult",
+                mResources.getBoolean(R.bool.pref_def_replaceEWithLowerCaseInResult));
+    }
 }

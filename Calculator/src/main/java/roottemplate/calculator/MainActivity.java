@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if(requestCode == REQUEST_CODE_HISTORY && resultCode == RESULT_OK) {
             String paste = data.getStringExtra("paste");
             if(paste != null) {
+                paste = EvaluatorBridge.preferableStringToNormal(paste, 0).str;
                 mInputText.appendText(paste, true);
             }
         } else if(requestCode == REQUEST_CODE_SETTINGS) {
@@ -401,12 +402,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             roottemplate.calculator.evaluator.Number n = EvaluatorBridge.eval(mData.mEvaluator, text);
 
             if (n != null) {
-                if(mPrefs.doRound()) {
-                    result = EvaluatorBridge.doubleToString(n.doubleValue(),
-                            mInputText.getMaxDigitsToFit());
-                } else {
-                    result = Double.toString(n.doubleValue());
-                }
+                result = EvaluatorBridge.doubleToPreferableString(n.doubleValue(),
+                        mInputText.getMaxDigitsToFit(), mPrefs);
                 result = EvaluatorBridge.replaceEngineToApp(result); // For Infinity -> symbol
 
                 type = InputEditText.TextType.RESULT_NUMBER;

@@ -188,7 +188,7 @@ public class Util {
             return String.valueOf(n);
         
         double absN = Math.abs(n);
-        boolean withE = (absN >= 1) ? absN > Math.pow(10, maxNonEDigits) : absN < Math.pow(10, -minNonEDigits);
+        boolean withE = (absN >= 1 || absN == 0) ? absN > Math.pow(10, maxNonEDigits) : absN < Math.pow(10, -minNonEDigits);
         
         return withE ? doubleToStringWithE(n, maxLen) : doubleToStringNoE(n, maxLen);
         
@@ -310,6 +310,19 @@ public class Util {
                 digitCuttable--;
             }
             
+            i = result.length() - 1;
+            while(i >= 1 && digitCuttable > 0) {
+                char c = result.charAt(i);
+                if(c == '0') {
+                    result.deleteCharAt(i);
+                    digitCuttable--;
+                    i--;
+                } else
+                    break;
+            }
+            if(result.charAt(result.length() - 1) == '.')
+                result.deleteCharAt(result.length() - 1);
+            
             if(oneUp) {
                 result.insert(0, '1');
                 digitsAppended++;
@@ -322,7 +335,7 @@ public class Util {
         return doubleToString(n, maxLen, 7, 7, maxLen);
     }*/
     
-    /**
+    /* *
      * Converts double to string.
      * @param value The number
      * @param minExponent if value is less then this, then it's guaranteed no
@@ -380,4 +393,30 @@ public class Util {
     public static String doubleToString(double value) {
         return doubleToString(value, 15);
     }*/
+    
+    
+    public static String addDigitDelimiters(String number, String separatorLeft, String separatorFractional,
+            boolean fractionalPart) {
+        String s = number, e = "";
+        int eIndex = s.indexOf('E');
+        if(eIndex != -1) {
+            s = number.substring(0, eIndex);
+            e = number.substring(eIndex);
+        }
+        
+        int point = s.indexOf('.') - 1;
+        if(point == -2)
+            point = s.length() - 1;
+        
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < s.length(); i++) {
+            sb.append(s.charAt(i));
+            if(point % 3 == 0 && i != s.length() - 1 && (point > 0 || fractionalPart && point < 0))
+                sb.append(point > 0 ? separatorLeft : separatorFractional);
+            point--;
+            if(s.charAt(i) == '.') point = -1;
+        }
+        
+        return sb.toString() + e;
+    }
 }

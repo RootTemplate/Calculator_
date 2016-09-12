@@ -38,14 +38,15 @@ import android.view.MotionEvent;
 import android.widget.EditText;
 
 import roottemplate.calculator.R;
+import roottemplate.calculator.util.EvaluatorBridge;
 import roottemplate.calculator.util.Util;
 
 public class InputEditText extends EditText {
-    /*public static final char DIGIT_DELIMITER = ' ';
+    /*public static final String DIGIT_DELIMITER_SPACE = " ";
 
     private static String addDigitDelimiters(String str) {
         return str;
-        str = str.replace(new String(new char[] {DIGIT_DELIMITER}), "");
+        str = str.replace(new String(new char[] {DIGIT_DELIMITER_SPACE}), "");
         StringBuilder sb = new StringBuilder(str.length());
         byte number = -1; // -1 - not found; 0 - found but searching for point; 1 - processing number
         int toPoint = 0;
@@ -66,7 +67,7 @@ public class InputEditText extends EditText {
                 } else if(number == 1) {
                     sb.append(c);
                     if(toPoint-- % 3 == 0)
-                        sb.append(DIGIT_DELIMITER);
+                        sb.append(DIGIT_DELIMITER_SPACE);
                 }
             }
         }
@@ -78,6 +79,7 @@ public class InputEditText extends EditText {
     private TextType mTextType;
     private MenuHandler mHandler = new MenuHandler();
     private int mMaxDigitsToFit = -1;
+    private long mTimeSinceDown;
 
     public InputEditText(Context context) {
         super(context);
@@ -148,7 +150,7 @@ public class InputEditText extends EditText {
         setSelection(str.length());
     }
     /*public String getExprText() {
-        return super.getText().toString().replace(new String(new char[] {DIGIT_DELIMITER}), "");
+        return super.getText().toString().replace(new String(new char[] {DIGIT_DELIMITER_SPACE}), "");
     }*/
     public void clearText() {
         super.setText("");
@@ -177,6 +179,15 @@ public class InputEditText extends EditText {
             setTextColor(getResources().getColor(R.color.colorEquals));
             setCursorVisible(false);
         }
+
+        if(mTextType == TextType.RESULT_NUMBER) {
+            EvaluatorBridge.StringAndIndex res = EvaluatorBridge.preferableStringToNormal(getText().toString(),
+                    getSelectionStart() // Currently it cannot be selection of text, just a cursor
+            );
+            super.setText(res.str);
+            setSelection(res.index);
+        }
+
         mTextType = type;
     }
     public TextType getTextType() {
@@ -253,7 +264,7 @@ public class InputEditText extends EditText {
 
         String text = getText().toString();
         for(int i = text.length() - 1; i >= 0; i--) {
-            if(text.charAt(i) == DIGIT_DELIMITER || i == 3) {
+            if(text.charAt(i) == DIGIT_DELIMITER_SPACE || i == 3) {
                 getPaint().getTextBounds(text, i, text.length(), r2);
                 //canvas.drawRect(r.right - r2.width(), r.top, r.right - r2.width() + 20, r.top + 20, paint);
                 canvas.drawText("’", r.right - r2.width() - spToPx(9), r.top + spToPx(29), paint);
@@ -274,21 +285,25 @@ public class InputEditText extends EditText {
         if(!hasWindowFocus())
             return true;
 
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+        if(event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            mTimeSinceDown = System.currentTimeMillis();
+        } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
             // Hack to prevent keyboard and insertion handle from showing.
             cancelLongPress();
 
-            setTextType(TextType.INPUT);
+            if(System.currentTimeMillis() <= mTimeSinceDown + 1000) {
+                // This is used to set cursor position for API > 10 (approximately)
+                Layout layout = getLayout();
+                float x = event.getX() + getScrollX();
+                float y = event.getY() + getScrollY();
+                int line = layout.getLineForVertical((int) y);
+                int offset = layout.getOffsetForHorizontal(line, x);
 
-            // This is used to set cursor position for API > 10 (approximately)
-            Layout layout = getLayout();
-            float x = event.getX() + getScrollX();
-            float y = event.getY() + getScrollY();
-            int line = layout.getLineForVertical((int) y);
-            int offset = layout.getOffsetForHorizontal(line, x);
+                if (offset < 0) offset = 0;
+                setSelection(offset);
 
-            if (offset < 0) offset = 0;
-            setSelection(offset);
+                setTextType(TextType.INPUT);
+            }
         }
 
         return super.onTouchEvent(event);
