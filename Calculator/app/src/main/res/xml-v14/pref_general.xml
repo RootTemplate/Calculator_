@@ -94,22 +94,37 @@
     <PreferenceCategory
         android:title="@string/pref_category_namespace">
 
-        <Preference
-            android:key="clearNamespace"
-            android:title="@string/pref_clearNamespace_title"
-            android:summary="@string/pref_clearNamespace_summary" />
+        <SwitchPreference
+            android:key="separateNamespace"
+            android:title="@string/pref_separateNamespace_title"
+            android:summary="@string/pref_separateNamespace_summary"
+            android:defaultValue="@bool/pref_def_separateNamespace" />
+
+        <ListPreference
+            android:key="storingNamespace"
+            android:title="@string/pref_storingNamespace_title"
+            android:entries="@array/pref_storingNamespace_list_titles"
+            android:entryValues="@array/pref_storingNamespace_list_values"
+            android:defaultValue="@string/pref_def_storingNamespace" />
 
         <Preference
+            android:key="clearAllNamespaces"
+            android:title="@string/pref_clearAllNamespaces_title"
+            android:summary="@string/pref_clearAllNamespaces_summary" />
+
+        <Preference
+            android:key="editNamespace"
             android:title="@string/pref_editNamespace_title"
-            android:summary="@string/pref_editNamespace_summary" />
+            android:summary="@string/pref_editNamespace_summary"
+            android:persistent="false"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/pref_category_theme">
 
-        <Preference
-            android:title="@string/pref_editColors_title" />
+        <!--<Preference
+            android:title="@string/pref_editColors_title" />-->
 
         <Preference
             android:title="@string/pref_editButtonKits_title" />

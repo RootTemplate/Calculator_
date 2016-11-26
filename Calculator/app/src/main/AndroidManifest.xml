@@ -32,7 +32,11 @@
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_activity_about"
-            android:theme="@style/AppTheme.Dialog"/>
+            android:theme="@style/AppTheme.Dialog" />
+        <activity
+            android:name=".NamespaceActivity"
+            android:label="@string/title_activity_namespace"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

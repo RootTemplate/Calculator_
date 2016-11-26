@@ -31,10 +31,13 @@ import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import java.util.List;
 
+import roottemplate.calculator.data.AppDatabase;
 import roottemplate.calculator.util.AppCompatPreferenceActivity;
+import roottemplate.calculator.view.IfDialogFragment;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -47,7 +50,10 @@ import roottemplate.calculator.util.AppCompatPreferenceActivity;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity implements IfDialogFragment.OnDialogResultListener {
+    private static final int REQUEST_EDIT_NAMESPACE = 0;
+    private static final int DIALOG_CLEAR_NAMESPACES = 0;
+
     /**
      * Determines whether to always show the simplified settings UI, where
      * settings are presented in a single list. When false, settings are shown
@@ -160,6 +166,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         mResultIntent = new Intent();
         mResultIntent.putExtra("historyCleared", false);
         setResult(-1, mResultIntent);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Fix of annoying top/bottom padding in landscape orientation
+            // Issue noted on phones (android versions 4 - 6)
+            ViewGroup parent = (ViewGroup) getListView().getParent();
+            parent.setPadding(parent.getPaddingLeft(), 0, parent.getPaddingRight(), 0);
+        }
     }
 
     /**
@@ -244,6 +257,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("storingHistory"));
         bindPreferenceSummaryToValue(findPreference("digitGroupingSeparatorLeft"));
         bindPreferenceSummaryToValue(findPreference("digitGroupingSeparatorFract"));
+        bindPreferenceSummaryToValue(findPreference("storingNamespace"));
 
         Preference digitGrouping = findPreference("digitGrouping");
         digitGrouping.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -265,18 +279,71 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 R.string.pref_clearHistory_empty, new Runnable() {
                     @Override
                     public void run() {
-                        new HistoryDatabase(SettingsActivity.this, null).clear();
+                        new AppDatabase(SettingsActivity.this, null).getHistory().clear();
                     }
                 });
 
-        setupClearPreference("clearNamespace", false,
-                R.string.pref_clearNamespace_summary_empty, new Runnable() {
-                    @Override
-                    public void run() {
-                        mResultIntent.putExtra("clearNamespace", true);
-                    }
-                });
+        findPreference("clearAllNamespaces").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if(Build.VERSION.SDK_INT >= 11) {
+                    Bundle args = new Bundle();
+                    args.putInt("id", DIALOG_CLEAR_NAMESPACES);
+                    args.putInt("title", R.string.pref_clearAllNamespaces_title);
+                    args.putInt("message", R.string.pref_clearAllNamespaces_message);
+                    args.putInt("positiveBtn", R.string.yes);
+                    args.putInt("negativeBtn", R.string.no);
+                    IfDialogFragment dialog = new IfDialogFragment();
+                    dialog.setArguments(args);
+                    getFragmentManager().beginTransaction()
+                            .add(dialog, "dialog")
+                            .commit();
+                } else {
+                    onDialogPositiveClick(DIALOG_CLEAR_NAMESPACES);
+                }
+                return true;
+            }
+        });
+
+        findPreference("separateNamespace").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mResultIntent.putExtra("updateSelectedKit", true);
+                return true;
+            }
+        });
+
+        findPreference("editNamespace").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(SettingsActivity.this, NamespaceActivity.class);
+                intent.putExtra("kitNames", getIntent().getStringArrayExtra("kitNames"));
+                // This is how kitNames should NOT be passed to NamespaceActivity
+                startActivityForResult(intent, REQUEST_EDIT_NAMESPACE);
+                return true;
+            }
+        });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_EDIT_NAMESPACE) {
+            mResultIntent.putExtra("updateSelectedKit", data.getBooleanExtra("selectedKitChanged", false));
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(int dialogId) {
+        if(dialogId == DIALOG_CLEAR_NAMESPACES) {
+            Preference pref = findPreference("clearAllNamespaces");
+            pref.setEnabled(false);
+            pref.setSummary(R.string.pref_clearAllNamespaces_summary_empty);
+            mResultIntent.putExtra("clearAllNamespaces", true);
+        }
+    }
+
+    @Override public void onDialogNegativeClick(int dialogId) {}
 
     /**
      * {@inheritDoc}

@@ -38,8 +38,8 @@
 
         <LinearLayout
             style="@style/panelRow"
-            android:layout_height="wrap_content"
-            android:layout_weight="0">
+            android:layout_weight="0"
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="2dp"

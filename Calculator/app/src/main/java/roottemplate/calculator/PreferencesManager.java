@@ -18,12 +18,19 @@
 
 package roottemplate.calculator;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.icu.text.DateFormat;
+import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 
 public class PreferencesManager {
     private final SharedPreferences mPrefs;
     private final Resources mResources;
+    public PreferencesManager(Context c) {
+        this(PreferenceManager.getDefaultSharedPreferences(c), c.getResources());
+    }
     public PreferencesManager(SharedPreferences prefs, Resources resources) {
         mPrefs = prefs;
         mResources = resources;
@@ -82,6 +89,16 @@ public class PreferencesManager {
     public int digitSeparatorFract() {
         return Integer.parseInt(mPrefs.getString("digitGroupingSeparatorFract",
                 mResources.getString(R.string.pref_def_digitGrouping_separator_fract)));
+    }
+
+    public int storingNamespace() {
+        return Integer.parseInt(mPrefs.getString("storingNamespace",
+                mResources.getString(R.string.pref_def_storingNamespace)));
+    }
+
+    public boolean separateNamespace() {
+        return mPrefs.getBoolean("separateNamespace",
+                mResources.getBoolean(R.bool.pref_def_separateNamespace));
     }
 
     public boolean highlightE() {

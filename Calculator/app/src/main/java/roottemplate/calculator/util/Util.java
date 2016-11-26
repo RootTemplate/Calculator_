@@ -24,6 +24,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.ClipboardManager;
 
 import java.util.Locale;
+import java.util.Objects;
+
+import roottemplate.calculator.view.FatalErrorDialogFragment;
 
 public class Util {
     public static final String LOG_TAG = "Calculator_";
@@ -66,6 +69,10 @@ public class Util {
 
     public static long getTime() {
         return System.nanoTime() / 1000000L;
+    }
+
+    public static boolean equals(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
     }
 
 

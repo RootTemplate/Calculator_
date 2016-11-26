@@ -6,32 +6,26 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textAppearanceButton">@style/AppTheme.TextAppearanceButton</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    
+
     <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.DialogAppBarOverlay" parent="AppTheme.AppBarOverlay">
         <item name="android:background">@color/colorDialogActionBarBackground</item>
         <item name="background">@color/colorDialogActionBarBackground</item>
     </style>
-
-    <style name="AppTheme.TextAppearanceButton">
-        <item name="android:textStyle">normal</item>
-        <item name="android:typeface">sans</item>
-    </style>
-
 
 
     <style name="button_noCaps">
@@ -62,6 +56,7 @@
         <item name="android:layout_margin">0dp</item>
         <item name="android:orientation">horizontal</item>
     </style>
+
     <style name="panelRowLand" parent="panelRow">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -81,16 +76,21 @@
         <item name="android:onClick">onPadButtonClick</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:typeface">sans</item>
     </style>
+
     <style name="panelElem.button.base" parent="panelElem.button">
         <item name="android:background">@drawable/background_digit_button</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:tag">digit</item>
     </style>
+
     <style name="panelElem.button.equals" parent="panelElem.button">
         <item name="android:background">@drawable/background_equals_button</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
     <style name="panelElem.button.system" parent="panelElem.button">
         <item name="android:background">@color/colorButtonSymbol</item>
         <item name="android:textColor">@android:color/white</item>
@@ -119,12 +119,14 @@
         <item name="android:orientation">vertical</item>
         <item name="android:visibility">gone</item>
     </style>
+
     <style name="guide_text">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
+
     <style name="guide_title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -132,6 +134,7 @@
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
         <item name="android:layout_marginBottom">5dp</item>
     </style>
+
     <style name="guide_text_table">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -139,6 +142,7 @@
         <item name="android:textSize">17sp</item>
         <item name="android:gravity">center</item>
     </style>
+
     <style name="guide_text_math" parent="guide_text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:background">#777777</item>

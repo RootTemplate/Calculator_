@@ -20,11 +20,9 @@ package roottemplate.calculator;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +39,8 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import roottemplate.calculator.data.AppDatabase;
+import roottemplate.calculator.data.HistoryContract;
 import roottemplate.calculator.util.ParcelableBinder;
 import roottemplate.calculator.util.Util;
 
@@ -291,9 +291,8 @@ public class GuideActivity extends AppCompatActivity {
     }
 
     public void onOpenHistory(View view) {
-        PreferencesManager prefs = new PreferencesManager(PreferenceManager.getDefaultSharedPreferences(this),
-                getResources());
-        HistoryDatabase db = new HistoryDatabase(this, prefs);
+        PreferencesManager prefs = new PreferencesManager(this);
+        HistoryContract db = new AppDatabase(this, prefs).getHistory();
         if(db.getElementCount() == 0) {
             db.addHistoryElement("1−2", "-1", null);
             db.addHistoryElement("x=5", null, null);

@@ -52,15 +52,22 @@
         <item>Запятая</item>
         <item>Апостроф</item>
     </string-array>
+    <string-array name="pref_storingNamespace_list_titles">
+        <item>До закрытия приложения</item>
+        <item>1 день после определения</item>
+        <item>3 дня после определения</item>
+        <item>1 неделю после определения</item>
+        <item>Навсегда</item>
+    </string-array>
     <string name="pref_category_namespace">Именное пространство</string>
     <string name="pref_category_theme">Стиль</string>
     <string name="pref_clearHistory_title">Очистить историю</string>
-    <string name="pref_clearNamespace_summary">Забыть все введённые переменные и функции</string>
-    <string name="pref_clearNamespace_title">Очистить именное пространство</string>
+    <string name="pref_clearAllNamespaces_summary">Забыть все введённые переменные и функции</string>
+    <string name="pref_clearAllNamespaces_title">Очистить все им. пространства</string>
     <string name="pref_editButtonKits_title">Редактировать наборы кнопок</string>
     <string name="pref_editColors_title">Редактировать цвета</string>
-    <string name="pref_editNamespace_summary">Добавить переменные/функции, доступные по умолчанию</string>
-    <string name="pref_editNamespace_title">Редактировать именное пространство</string>
+    <string name="pref_editNamespace_summary">Просмотреть введенные переменные/функции</string>
+    <string name="pref_editNamespace_title">Редактировать именные пространства</string>
     <string name="title_activity_history">История</string>
     <string name="pref_clearHistory_empty">История пуста</string>
     <string name="menuItem_history_copyAll">Скопировать всё</string>
@@ -72,7 +79,7 @@
     <string name="pref_category_tips">Советы</string>
     <string name="pref_enabledTips_summary">Показывать советы в меню параметров</string>
     <string name="pref_enabledTips_title">Советы</string>
-    <string name="pref_clearNamespace_summary_empty">Именное пространство пусто</string>
+    <string name="pref_clearAllNamespaces_summary_empty">Именные пространства пусты</string>
 
     <string name="guide_1_title">Добро пожаловать в Calculator_!</string>
     <string name="guide_1_text">\tПрочитав все советы, вы узнаете о всех возможностях этого приложения.
@@ -152,8 +159,8 @@
     <string name="guide_14_title">Настройки — ваш друг</string>
     <string name="guide_14_text">\tЭто просто страница-напоминание, что, если вам что-то хочется изменить, проверьте,
         можно ли это изменить в настройках.
-        \n\tНужно ли вам выключить округление, поменять единицы измерения угла на радианы или изменить срок
-        хранения истории — откройте настройки!</string>
+        \n\tНужно ли вам поменять единицы измерения угла на градусы, изменить срок хранения истории
+        или посмотреть введённые переменные — откройте настройки!</string>
     <string name="guide_15_title">Двойные клики</string>
     <string name="guide_15_text">\tСтраницы (на заднем плане) устроены так: есть главная страница и \"побочные\".
         Главная страница открывается сразу же после открытия приложения.
@@ -185,4 +192,17 @@
     <string name="pref_digitGrouping_separator_left_title">Разделитель целой части</string>
     <string name="pref_highlightE_summary">Чтобы ВИДЕТЬ</string>
     <string name="pref_highlightE_title">Подсвечивать E</string>
+    <string name="pref_storingNamespace_title">Хранить записи им. пространства</string>
+    <string name="pref_separateNamespace_title">Разделять простран.</string>
+    <string name="pref_separateNamespace_summary">Если включено, переменные/функции, введенные в одном наборе, не будут доступны в другом</string>
+    <string name="title_activity_namespace">Редактировать пространства</string>
+    <string name="yes">Да</string>
+    <string name="pref_clearAllNamespaces_message">Вы уверены, что хотите очистить все именные пространства?</string>
+    <string name="no">Нет</string>
+    <string name="namespace_common_ns">Общее (используется когда пространства не разделены)</string>
+    <string name="namespace_clear">Очистить простр.</string>
+    <string name="namespace_summary">Если вы используете опцию \'Хранить записи им. пространства\', но не хотите, чтобы какой-то элемент был удален, поставьте галочку справа, и он не будет удален</string>
+    <string name="ok">OK</string>
+    <string name="dialog_kitsUpdated_title">Наборы кнопок были обновлены</string>
+    <string name="dialog_kitsUpdated_message">Новый набор распаковали только что</string>
 </resources>

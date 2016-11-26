@@ -21,38 +21,49 @@ package roottemplate.calculator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ActionMenuItemView;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewParent;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Random;
 
-import roottemplate.calculator.evaluator.Evaluator;
-import roottemplate.calculator.evaluator.EvaluatorException;
-import roottemplate.calculator.pads.ButtonKits;
-import roottemplate.calculator.pads.ButtonKitsXmlFile;
-import roottemplate.calculator.util.EvaluatorBridge;
-import roottemplate.calculator.util.FirstLaunchDialogFragment;
+import roottemplate.calculator.data.AppDatabase;
+import roottemplate.calculator.data.KeyboardKits;
+import roottemplate.calculator.data.KeyboardKitsXmlManager;
+import roottemplate.calculator.view.FirstLaunchDialogFragment;
 import roottemplate.calculator.util.ParcelableBinder;
 import roottemplate.calculator.util.Util;
 import roottemplate.calculator.view.InputEditText;
 import roottemplate.calculator.view.KitViewPager;
+import roottemplate.calculator.view.NotifyDialogFragment;
+import roottemplate.calculator.view.ShiftButton;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private static final int REQUEST_CODE_HISTORY = 0;
@@ -61,11 +72,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     private static final int GROUP_KIT_MAGIC = 11;
 
-    private Data mData;
-    private ButtonKits mButtonKits;
-    private ButtonKits.KitVersion mCurrentButtonKitVersion;
+
+    private KeyboardKits mKeyboardKits;
+    private KeyboardKits.KitVersion mCurrentKeyboardKitVersion;
+
     private PreferencesManager mPrefs;
-    private HistoryDatabase mHistory;
+    private EvaluatorManager mEvalManager;
+    private AppDatabase mDatabase;
     private int mTipsPageIndex;
     private Messenger mActivityMessenger = null;
 
@@ -81,20 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // INIT Data FRAGMENT
-        FragmentManager fm = getSupportFragmentManager();
-        mData = (Data) fm.findFragmentByTag("data");
-        if (mData == null) {
-            mData = new Data();
-            fm.beginTransaction().add(mData, "data").commit();
-        }
-        mPrefs = new PreferencesManager(PreferenceManager.getDefaultSharedPreferences(this), getResources());
-
-        if(mData.mEvaluator == null) {
-            mData.mEvaluator = new Evaluator();
-            mData.mEvaluator.options.ENABLE_HASH_COMMANDS = false;
-        }
+        mPrefs = new PreferencesManager(this);
 
         // SET CONTENT VIEW
         setContentView(R.layout.activity_main);
@@ -107,13 +107,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         });
 
-        // INIT BUTTON KITS
+        // INIT KEYBOARD KITS
         try {
-            mButtonKits = ButtonKitsXmlFile.parse(this);
-            if (mButtonKits.mKits.length == 0) {
+            mKeyboardKits = KeyboardKitsXmlManager.parse(this);
+            if (mKeyboardKits.mKits.length == 0) {
                 Log.e(Util.LOG_TAG, "ButtonKits xml file has 0 kits. Restoring default xml");
-                ButtonKitsXmlFile.restoreDefaultButtonKitsXml(this);
-                mButtonKits = ButtonKitsXmlFile.parse(this);
+                KeyboardKitsXmlManager.restoreDefaultButtonKitsXml(this);
+                mKeyboardKits = KeyboardKitsXmlManager.parse(this);
             }
         } catch (IOException | XmlPullParserException e) {
             Log.e(Util.LOG_TAG, "Exception while parsing ButtonKits. Restoring default xml", e);
@@ -121,21 +121,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             return;
         }
 
-        // INIT ACTION BAR (after INIT BUTTON KITS as mButtonKits is used in actionBar)
+        // INIT ACTION BAR (after INIT KEYBOARD KITS as mKeyboardKits is used in actionBar)
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getWindowManager().getDefaultDisplay().getHeight() < 500) {
             getSupportActionBar().hide();
         }
 
-        // INIT KitViewPager
-        mViewPager = (KitViewPager) findViewById(R.id.activity_main_viewPager);
-        invalidateCurrentButtonKit();
-
-        // INIT HISTORY DATABASE IF NEEDED
+        // INIT DATABASES
+        mDatabase = new AppDatabase(this, mPrefs);
         if(mPrefs.enabledHistory()) {
-            mHistory = new HistoryDatabase(this, mPrefs);
-            mHistory.updateDatabase(savedInstanceState == null, true);
+            mDatabase.getHistory().updateDatabase(savedInstanceState == null, true);
             mHistoryClearingThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -145,11 +141,26 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                         } catch (InterruptedException e) {
                             return;
                         }
-                        mHistory.updateDatabase(false, false);
+                        mDatabase.getHistory().updateDatabase(false, false);
                     }
                 }
             });
         }
+
+        // INIT NAMESPACE
+        FragmentManager fm = getSupportFragmentManager();
+        EvaluatorManager.NamespaceFragment nsFragment = (EvaluatorManager.NamespaceFragment)
+                fm.findFragmentByTag(EvaluatorManager.NamespaceFragment.FRAGMENT_NAME);
+        if (nsFragment == null) {
+            nsFragment = new EvaluatorManager.NamespaceFragment();
+            fm.beginTransaction().add(nsFragment, EvaluatorManager.NamespaceFragment.FRAGMENT_NAME)
+                    .commit();
+        }
+        mEvalManager = new EvaluatorManager(this, nsFragment, mPrefs, mDatabase, savedInstanceState == null);
+
+        // INIT KitViewPager
+        mViewPager = (KitViewPager) findViewById(R.id.activity_main_viewPager);
+        invalidateCurrentKeyboardKit();
 
         // UPDATE VERSION
         updateVersion();
@@ -162,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onResume() {
         super.onResume();
 
-        mData.mEvaluator.options.ANGLE_MEASURING_UNITS = mPrefs.getAMU();
+        mEvalManager.updateEvaluatorOptions(); // In case if they have just been changed in settings
         mInputText.initDigitFormatting(mPrefs.digitGrouping(), mPrefs.digitSeparatorLeft(),
                 mPrefs.digitSeparatorFract()/*, mPrefs.highlightE()*/);
     }
@@ -180,8 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if(mPrefs.enabledHistory()) {
             if(mHistoryClearingThread != null)
                 mHistoryClearingThread.interrupt();
-            if(mHistory != null)
-                mHistory.close();
+            mDatabase.close();
         }
     }
 
@@ -189,8 +199,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        if(hasFocus)
+        if(hasFocus) {
             mInputText.calcMaxDigits();
+            invalidateActionBarMenu();
+        }
     }
 
     @Override
@@ -203,8 +215,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 mInputText.appendText(paste, true);
             }
         } else if(requestCode == REQUEST_CODE_SETTINGS) {
-            if(data.getBooleanExtra("clearNamespace", false))
-                mData.mEvaluator.clear();
+            if(data.getBooleanExtra("clearAllNamespaces", false)) {
+                mEvalManager.clearAllNamespace();
+                if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
+                    mInputText.clearText();
+            }
+            if(data.getBooleanExtra("updateSelectedKit", false)) {
+                mEvalManager.invalidateEvaluator();
+                // Setting the same to cause Evaluator updating
+                if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
+                    mInputText.clearText();
+            }
         } else if(requestCode == REQUEST_CODE_GUIDES) {
             mTipsPageIndex = data.getIntExtra("guideIndex", 0);
         }
@@ -215,12 +236,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        ButtonKits.Kit[] kits = mButtonKits.mKits;
+        KeyboardKits.Kit[] kits = mKeyboardKits.mKits;
         if(kits.length >= 2) {
+            Random random = new Random();
             for(int i = 0; i < kits.length; i++) {
-                ButtonKits.Kit kit = kits[i];
+                KeyboardKits.Kit kit = kits[i];
                 if(kit.mActionBarAccess) {
-                    MenuItem item = menu.add(GROUP_KIT_MAGIC, Menu.NONE, i, kit.mShortName);
+                    MenuItem item = menu.add(GROUP_KIT_MAGIC, random.nextInt(), i, kit.mShortName);
                     MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
                 }
             }
@@ -246,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // as you specify a mParent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -258,9 +280,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             showTips();
             return true;
         } else if (id == R.id.action_settings) {
+            int i = 0;
+            String[] kitNames = new String[mKeyboardKits.mKits.length * 2];
+            for(KeyboardKits.Kit kit : mKeyboardKits.mKits) {
+                kitNames[i++] = kit.mName;
+                kitNames[i++] = kit.mShortName;
+            }
             startActivityForResult(
                     new Intent(this, SettingsActivity.class)
-                            .putExtra("historySize", mHistory.getElementCount()),
+                            .putExtra("historySize", mDatabase.getHistory().getElementCount())
+                            .putExtra("kitNames", kitNames),
                     REQUEST_CODE_SETTINGS
             );
             return true;
@@ -270,8 +299,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if(item.getGroupId() == GROUP_KIT_MAGIC) {
-            mPrefs.kitName(mButtonKits.mKits[item.getOrder()].mName);
-            invalidateCurrentButtonKit();
+            mPrefs.kitName(mKeyboardKits.mKits[item.getOrder()].mName);
+            invalidateCurrentKeyboardKit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -280,16 +309,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     // LOGIC METHODS
 
-    public Data getData() {
-        return mData;
+    public KeyboardKits getKeyboardKits() {
+        return mKeyboardKits;
     }
 
-    public ButtonKits getButtonKits() {
-        return mButtonKits;
-    }
-
-    public ButtonKits.KitVersion getPreferredButtonKitVersion() {
-        return mCurrentButtonKitVersion;
+    public KeyboardKits.KitVersion getPreferredKeyboardKitVersion() {
+        return mCurrentKeyboardKitVersion;
     }
 
     public Messenger getMessenger() {
@@ -316,36 +341,98 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             return;
         }
         if(latestVer == thisVer) return;
+        boolean hasNewKKits = latestVer == 2;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
                     FirstLaunchDialogFragment.FRAGMENT_TAG);
-        } else {
-            /* TODO. Update ButtonKits if new version provides new default kits.
-                If user has already specified custom ButtonKits, ask to try new default;
-                also provide button in options menu to roll back to custom.
-             */
+        } else if(hasNewKKits) {
+            if(mKeyboardKits.mIsDefault) {
+                NotifyDialogFragment dialog = new NotifyDialogFragment();
+                Bundle args = new Bundle();
+                args.putInt("title", R.string.dialog_kitsUpdated_title);
+                args.putInt("message", R.string.dialog_kitsUpdated_message);
+                dialog.setArguments(args);
+                dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
+
+                KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
+                invalidateCurrentKeyboardKit();
+            } else {
+                /* TODO. Update KeyboardKits if new version provides new default kits.
+                    If user has already specified custom ButtonKits, ask to try new default;
+                    also provide button in options menu to roll back to custom.
+                 */
+            }
         }
         mPrefs.version(latestVer);
     }
 
-    public void invalidateCurrentButtonKit() {
-        ButtonKits.KitVersion kitVersion = ButtonKitsXmlFile.getPreferredKitVersion(mButtonKits.mKits,
+    public void invalidateCurrentKeyboardKit() {
+        KeyboardKits.KitVersion kitVersion = KeyboardKitsXmlManager.getPreferredKitVersion(mKeyboardKits.mKits,
                 mPrefs.kitName(), getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
-        if(kitVersion == mCurrentButtonKitVersion) return;
-        mCurrentButtonKitVersion = kitVersion;
+        if(kitVersion == mCurrentKeyboardKitVersion) return;
+        mCurrentKeyboardKitVersion = kitVersion;
+        mPrefs.kitName(mCurrentKeyboardKitVersion.mParent.mName); // To set the kit name if it was null
 
         mViewPager.init(getSupportFragmentManager(),
                 kitVersion.mPages.length,
                 kitVersion.mMainPageIndex);
+        mEvalManager.setKit(kitVersion.mParent.mName);
+
+        if(mPrefs.separateNamespace())
+            mInputText.clearText();
+
+        invalidateActionBarMenu();
+    }
+
+    private void invalidateActionBarMenu() {
+        // Hacks to set selected MenuItem bold
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        KeyboardKits.Kit[] kits = mKeyboardKits.mKits;
+        KeyboardKits.Kit currentKit = mCurrentKeyboardKitVersion.mParent;
+        if(kits.length < 2) return;
+
+        ActionMenuView menuView = null;
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            View view = toolbar.getChildAt(i);
+            if (view instanceof ActionMenuView) {
+                menuView = (ActionMenuView) view;
+                break;
+            }
+        }
+
+        Menu menu = toolbar.getMenu();
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if(item.getGroupId() == GROUP_KIT_MAGIC) {
+                boolean typefaceSet = false;
+                int typeface = (kits[item.getOrder()] == currentKit) ? Typeface.BOLD : Typeface.NORMAL;
+
+                // For buttons in the action bar
+                if(menuView != null && i < menuView.getChildCount()) {
+                    View itemView = menuView.getChildAt(i);
+                    if(itemView instanceof ActionMenuItemView) {
+                        ((ActionMenuItemView) itemView).setTypeface(null, typeface);
+                        typefaceSet = true;
+                    }
+                }
+
+                // For items in the overflow menu
+                if(!typefaceSet) {
+                    SpannableString s = new SpannableString(item.getTitle().toString());
+                    s.setSpan(new StyleSpan(typeface), 0, s.length(), 0);
+                    item.setTitle(s);
+                }
+            }
+        }
     }
 
     public void showTips() {
         Intent intent = new Intent(this, GuideActivity.class);
         intent.putExtra("guideIndex", mTipsPageIndex);
         intent.putExtra("messengerBinder", new ParcelableBinder(getMessenger().getBinder()));
-        intent.putExtra("pagesCount", mCurrentButtonKitVersion.mPages.length);
+        intent.putExtra("pagesCount", mCurrentKeyboardKitVersion.mPages.length);
         intent.putExtra("pagesCurrent", mViewPager.getCurrentItem());
         startActivityForResult(intent, REQUEST_CODE_GUIDES);
     }
@@ -366,35 +453,43 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         return true;
     }
 
+    public void onShiftButtonClick(View view) {
+        mViewPager.getCurrentPageFragment().onShiftButtonClicked();
+    }
+
     public void onPadButtonClick(View view) {
         onPadButtonClick(view, false);
     }
 
     public void onPadButtonClick(View view, boolean inverseTextCase) {
-        ButtonKits.Button btn = mButtonKits.mButtons[(int) view.getTag()];
-        if (btn.mType == ButtonKits.ButtonType.EQUALS) {
+        KeyboardKits.Button btn = mKeyboardKits.mButtons[(int) view.getTag()];
+        if (btn.mType == KeyboardKits.ButtonType.EQUALS) {
             eval();
             return;
         }
 
-        ButtonKits.PageReturnType returnType =
-                mCurrentButtonKitVersion.mPages[mViewPager.getCurrentItem()].mMoveToMain;
+        KeyboardKits.PageReturnType returnType =
+                mCurrentKeyboardKitVersion.mPages[mViewPager.getCurrentItem()].mMoveToMain;
         long time = System.currentTimeMillis();
         boolean doubleClick = (view == mLastClickedView && (time - mLastClickedTime) <= 400);
-        boolean returnByDoubleClick = (returnType == ButtonKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
+        boolean returnByDoubleClick = (returnType == KeyboardKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
         mLastClickedView = view;
         mLastClickedTime = time;
 
         if(!returnByDoubleClick) {
             if (mInputText.getTextType() != InputEditText.TextType.INPUT &&
-                    btn.mType == ButtonKits.ButtonType.DIGIT)
+                    btn.mType == KeyboardKits.ButtonType.DIGIT)
                 mInputText.clearText();
+
+            KitViewPager.PageFragment fragment = mViewPager.getCurrentPageFragment();
+            if(fragment.onPadButtonClicked() != ShiftButton.STATE_DISABLED)
+                inverseTextCase = !inverseTextCase;
             mInputText.appendText(inverseTextCase ? Util.inverseTextCase(btn.mText) : btn.mText,
                     false);
         }
 
-        if(returnType == ButtonKits.PageReturnType.ALWAYS || returnByDoubleClick)
-            mViewPager.setCurrentItem(mCurrentButtonKitVersion.mMainPageIndex);
+        if(returnType == KeyboardKits.PageReturnType.ALWAYS || returnByDoubleClick)
+            mViewPager.setCurrentItem(mCurrentKeyboardKitVersion.mMainPageIndex);
     }
 
     private void eval() {
@@ -402,57 +497,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         String text = mInputText.getExprText();
         if(text.isEmpty()) return;
 
-        text = EvaluatorBridge.closeUnclosedBrackets(text, mPrefs.bracketClosingType());
-        String result, error = null;
-        InputEditText.TextType type;
-        boolean historyRightIsNull = false;
-
-        try {
-            roottemplate.calculator.evaluator.Number n = EvaluatorBridge.eval(mData.mEvaluator, text);
-
-            if (n != null) {
-                result = EvaluatorBridge.doubleToPreferableString(n.doubleValue(),
-                        mInputText.getMaxDigitsToFit(), mPrefs);
-                result = EvaluatorBridge.replaceEngineToApp(result); // To convert "Infinity" -> symbol
-
-                type = InputEditText.TextType.RESULT_NUMBER;
-            } else {
-                type = InputEditText.TextType.RESULT_MESSAGE;
-                result = mInputText.getText().toString();
-                historyRightIsNull = true;
-            }
-        } catch (EvaluatorException e) {
-            error = EvaluatorBridge.replaceEngineToApp(e.getLocalizedMessage());
-            Snackbar.make(findViewById(R.id.coordinator), error, Snackbar.LENGTH_LONG).show();
-            result = getResources().getString(R.string.error);
-            type = InputEditText.TextType.RESULT_MESSAGE;
-        }
-
-        if(mPrefs.enabledHistory()) {
-            mHistory.addHistoryElement(text, historyRightIsNull ? null : result, error);
-        }
-
-        try {
-            // TODO. Remove this lines
-            mInputText.setText(result);
-            mInputText.setTextType(type);
-        } catch(Exception e) {
-            Log.e(Util.LOG_TAG, "Error setting text [" + result + "] to inputText", e);
-            Toast.makeText(this, "Error: " + result, Toast.LENGTH_LONG).show();
+        EvaluatorManager.EvalResult res = mEvalManager.eval(text, mInputText.getMaxDigitsToFit());
+        if(res.mText != null)
+            mInputText.setText(res.mText);
+        if(res.mTextType != null)
+            mInputText.setTextType(res.mTextType);
+        if(res.mMessage != null) {
+            Snackbar.make(findViewById(R.id.coordinator), res.mMessage, Snackbar.LENGTH_LONG).show();
         }
     }
 
-
-
-    public static class Data extends Fragment {
-        public Evaluator mEvaluator = null;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setRetainInstance(true);
-        }
-    }
 
     public static class ActivityHandler extends Handler {
         public static final int MSG_PAGE_SCROLL_TO = 0;

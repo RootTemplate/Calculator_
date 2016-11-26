@@ -21,30 +21,28 @@ package roottemplate.calculator;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import roottemplate.calculator.data.AppDatabase;
+import roottemplate.calculator.data.HistoryContract;
 import roottemplate.calculator.util.Util;
 
 public class HistoryActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-    private HistoryDatabase mHistory;
+    private HistoryContract mHistory;
     private SimpleCursorAdapter mAdapter;
 
     @Override
@@ -57,8 +55,7 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setResult(RESULT_CANCELED);
-        mHistory = new HistoryDatabase(this,
-                new PreferencesManager(PreferenceManager.getDefaultSharedPreferences(this), getResources()));
+        mHistory = new AppDatabase(this, new PreferencesManager(this)).getHistory();
 
         getSupportLoaderManager().initLoader(0, null, this);
     }
@@ -76,7 +73,7 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
 
             mAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, cursor,
                     new String[] {
-                            HistoryDatabase.HistoryContract.COLUMN_NAME_LEFT
+                            HistoryContract.HistoryEntry.COLUMN_NAME_LEFT
                     }, new int[] {
                             android.R.id.text1
                     }
@@ -90,7 +87,7 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
                     StringBuilder sb = new StringBuilder();
                     sb.append("<font color=\"#ffffff\">").append(cursor.getString(columnIndex));
 
-                    int rightColumn = cursor.getColumnIndex(HistoryDatabase.HistoryContract.COLUMN_NAME_RIGHT);
+                    int rightColumn = cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_RIGHT);
                     boolean rightNull = cursor.isNull(rightColumn);
                     if(!rightNull)
                         sb.append(" = ");
@@ -100,7 +97,7 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
                         sb.append("<font color=\"").append(colorEquals).append("\">").append(right).append("</font>");
                     }
 
-                    int errorColumn = cursor.getColumnIndex(HistoryDatabase.HistoryContract.COLUMN_NAME_ERROR);
+                    int errorColumn = cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_ERROR);
                     if(!cursor.isNull(errorColumn))
                         sb.append(" <font color=\"").append(colorError).append("\">(")
                                 .append(cursor.getString(errorColumn)).append(")</font>");
@@ -141,11 +138,11 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
         Cursor cursor = mAdapter.getCursor();
         cursor.moveToPosition(position);
 
-        int rightColumn = cursor.getColumnIndex(HistoryDatabase.HistoryContract.COLUMN_NAME_RIGHT);
-        int errorColumn = cursor.getColumnIndex(HistoryDatabase.HistoryContract.COLUMN_NAME_ERROR);
+        int rightColumn = cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_RIGHT);
+        int errorColumn = cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_ERROR);
 
         return new String[] {
-                cursor.getString(cursor.getColumnIndex(HistoryDatabase.HistoryContract.COLUMN_NAME_LEFT)),
+                cursor.getString(cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_LEFT)),
                 cursor.isNull(rightColumn) ? null : cursor.getString(rightColumn),
                 cursor.isNull(errorColumn) ? null : cursor.getString(errorColumn)
         };
@@ -209,9 +206,9 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
 
 
     private static class HistoryLoader extends CursorLoader {
-        private final HistoryDatabase mDatabase;
+        private final HistoryContract mDatabase;
 
-        public HistoryLoader(Context context, HistoryDatabase database) {
+        public HistoryLoader(Context context, HistoryContract database) {
             super(context);
             mDatabase = database;
         }
