@@ -70,7 +70,8 @@ public class Evaluator {
         add(new Operator(priorityManager.createPriority("* /", true), "*"), true);
         add(new Operator(priorityManager.createPriority("* /", true), "/"), true);
         higherMultiplyOp = new Operator(priorityManager.createPriority("HIGH_MULTIPLY", true), "*", Operator.Uses.TWO_NUMBERS);
-        add(new Operator(priorityManager.createPriority("^", false), "^", false), true);
+        add(new Operator(priorityManager.createPriority(Function.PRIORITY_FRIENDLY_NAME, Function.PRIORITY_LEFT_DIRECTION),
+                "^", false), true);
 
         add(new TrigonometricFunction(priorityManager, "sin", options), true);
         add(new TrigonometricFunction(priorityManager, "cos", options), true);

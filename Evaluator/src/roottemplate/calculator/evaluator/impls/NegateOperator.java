@@ -29,8 +29,11 @@ public class NegateOperator extends Operator {
                 "-", Operator.Uses.ONE_RIGHT_NUMBER);
     }
 
-    @Override
+    /*@Override
     public boolean checkUses(Object before, IndexedString expr, boolean exactlyThis) {
+        // Overriding this method is deprecated
+        // Using this code, Evaluator will calculate "-2^2" = "4", should be "-4".
+
         if(exactlyThis || expr.isEmpty()) return true;
         char[] acceptable = new char[] {'.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}; // real numbers; not complex
         char at = expr.charAt(0);
@@ -38,5 +41,5 @@ public class NegateOperator extends Operator {
             if (symbol == at)
                 return false;
         return true;
-    }
+    }*/
 }
