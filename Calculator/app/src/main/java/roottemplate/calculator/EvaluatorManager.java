@@ -194,8 +194,12 @@ public class EvaluatorManager {
 
     public void updateEvaluatorOptions() {
         if(mFragment.mEvaluator != null) {
-            mFragment.mEvaluator.options.ANGLE_MEASURING_UNITS = mPrefs.getAMU();
+            updateEvaluatorOptions(mFragment.mEvaluator);
         }
+    }
+    private void updateEvaluatorOptions(Evaluator e) {
+        e.options.ANGLE_MEASURING_UNITS = mPrefs.getAMU();
+        e.options.ENABLE_HASH_COMMANDS = false;
     }
 
     public void clearAllNamespace() {
@@ -226,6 +230,7 @@ public class EvaluatorManager {
             if(isInterrupted()) return;
 
             Evaluator eval = new Evaluator();
+            updateEvaluatorOptions(eval);
             Cursor cursor = mDb.getNamespace().getNamespace(getKitName());
             while(cursor.moveToNext()) {
                 if(isInterrupted()) return;
@@ -234,7 +239,6 @@ public class EvaluatorManager {
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_NAME));
                 String expr = cursor.getString(cursor.getColumnIndex(
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
-                Log.d(Util.LOG_TAG, "Processing " + name + " = " + expr); // TODO: clear this
 
                 Named n;
                 switch (cursor.getInt(cursor.getColumnIndex(
