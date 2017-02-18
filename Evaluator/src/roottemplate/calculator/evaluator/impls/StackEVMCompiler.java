@@ -32,9 +32,11 @@ public abstract class StackEVMCompiler implements EVMCompiler {
 
     protected ExpressionElement compileExprElems(ListStruct list, Object kit) throws EvaluatorException {
         if(list.startNode == null)
-            throw new EvaluatorException("Empty brackets");
+            throw new EvaluatorException("Empty expression", 0);
         while(list.startNode == list.endNode && list.startNode.data.getElementType() == ExpressionElement.ElementType.BRACKETS) {
             list = ((Brackets) list.startNode.data).getElements();
+            if(list.startNode == null)
+                throw new EvaluatorException("Empty brackets", -1);
         }
         
         Deque<ListStruct.ListNode> opStack = new ArrayDeque<>();
@@ -56,7 +58,7 @@ public abstract class StackEVMCompiler implements EVMCompiler {
         }
         
         if(list.startNode != list.endNode)
-            throw new EvaluatorException("All operators evaluated but some elements (like Numbers) were not used");
+            throw new EvaluatorException("All operators evaluated but some elements (like Numbers) were not used", -1);
         return list.startNode.data;
     }
     
@@ -90,7 +92,10 @@ public abstract class StackEVMCompiler implements EVMCompiler {
 
         for(int i = 0; i < ns.length; i++) {
             if(ns[i].getElementType() == ExpressionElement.ElementType.BRACKETS) {
-                ns[i] = compileExprElems(  ((Brackets) ns[i]).getElements(), kit  );
+                Brackets brks = (Brackets) ns[i];
+                if(brks.isEmpty())
+                    throw new EvaluatorException("Empty brackets", brks.exprIndex);
+                ns[i] = compileExprElems(brks.getElements(), kit);
             }
         }
         
@@ -103,12 +108,12 @@ public abstract class StackEVMCompiler implements EVMCompiler {
     private ExpressionElement checkAndRemoveSideForUses(ListStruct.ListNode sideNode, ListStruct list, Operator op, String sideName)
             throws EvaluatorException {
         if(sideNode == null)
-            throw new EvaluatorException(op.toString() + " uses " + sideName + " object but there is no such");
+            throw new EvaluatorException(op.toString() + " uses " + sideName + " object but there is no such", -1);
         ExpressionElement sideElem = sideNode.data;
         
         boolean successCast = op.getUses().doesUseExprEnum() || sideElem.getElementType() != ExpressionElement.ElementType.BRACKETS_ENUM;
         if(!successCast)
-            throw new EvaluatorException(op.toString() + " uses " + sideName + " " + op.getUses() + " but there is " + sideElem.getElementType());
+            throw new EvaluatorException(op.toString() + " uses " + sideName + " " + op.getUses() + " but there is " + sideElem.getElementType(), -1);
         
         // removing side
         if(sideNode.prev != null) sideNode.prev.next = sideNode.next; else list.startNode = sideNode.next;

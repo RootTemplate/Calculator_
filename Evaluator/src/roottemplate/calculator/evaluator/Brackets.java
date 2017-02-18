@@ -22,10 +22,12 @@ import roottemplate.calculator.evaluator.util.ListStruct;
 import roottemplate.calculator.evaluator.util.ListStruct.ListNode;
 
 public class Brackets implements ExpressionElement {
+    public final int exprIndex;
     private final ListStruct elements;
-    
-    public Brackets(ListStruct elements) {
+
+    public Brackets(ListStruct elements, int exprIndex) {
         this.elements = elements;
+        this.exprIndex = exprIndex;
     }
     
     public ListStruct getElements() {

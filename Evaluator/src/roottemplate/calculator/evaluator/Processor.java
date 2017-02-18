@@ -90,7 +90,7 @@ public class Processor {
         }
         
         // Any function above should return something
-        throw new EvaluatorException("Bad number sign command");
+        throw new EvaluatorException("Bad number sign command", 0);
     }
     
     /**
@@ -115,7 +115,7 @@ public class Processor {
         // TODO: rewrite method
         String[] def = expr.split("=");
         if(def.length < 2) // non definition
-            throw new EvaluatorException("Given expression is not a definition");
+            throw new EvaluatorException("Given expression is not a definition", -1);
         
         try {
             int indexOf = expr.indexOf('(');

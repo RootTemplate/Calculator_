@@ -62,7 +62,7 @@ public class StandardEVMCompiler extends StackEVMCompiler {
                     refCount++;
                     break;
                 default:
-                    throw new EvaluatorException(ns[i] + " found in the Expression, which is illegal");
+                    throw new EvaluatorException(ns[i] + " found in the Expression, which is illegal", -1);
             }
             if(hasResult) hasModifiableNumbers = true;
         }

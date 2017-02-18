@@ -144,9 +144,9 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
                     gotSign = true;
                 } else if(at == '.') {
                     if(gotPoint)
-                        throw new EvaluatorException("Two points in one number. At: " + i);
+                        throw new EvaluatorException("Two points in one number. At: " + i, i);
                     else if(gotE)
-                        throw new EvaluatorException("In exponent section points are prohibited");
+                        throw new EvaluatorException("In exponent section points are prohibited", i);
                     else {
                         gotPoint = true;
                     }
@@ -157,7 +157,7 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
                     return null; // Not a number
                 else if(at == 'E') {
                     if(gotE)
-                        throw new EvaluatorException("Two E in one number. At: " + i);
+                        throw new EvaluatorException("Two E in one number. At: " + i, i);
                     gotE = true;
                     gotSign = false;
                 } else

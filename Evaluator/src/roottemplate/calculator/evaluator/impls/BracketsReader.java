@@ -49,12 +49,12 @@ public class BracketsReader extends Reader implements Named {
 
             if(newEntry) {
                 ListStruct ls = Reader.readExpressionElements(expr.substring(lastExprEnd, j), namespace, i + lastExprEnd);
-                list.add(new Brackets(ls));
+                list.add(new Brackets(ls, i + lastExprEnd));
                 lastExprEnd = j + 1;
             }
         }
         
-        if(bracketsOpen != 0) throw new EvaluatorException("Found " + bracketsOpen + " unclosed bracket(s)");
+        if(bracketsOpen != 0) throw new EvaluatorException("Found " + bracketsOpen + " unclosed bracket(s)", i);
         
         if(list.size() == 1)
             return new ReadResult<>(list.get(0), j);

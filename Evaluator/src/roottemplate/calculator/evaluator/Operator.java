@@ -86,7 +86,7 @@ public class Operator implements Named {
     
     public void compile(ExpressionElement[] elems, EVMCompiler evmc, Object kit,
             Object... args) throws EvaluatorException {
-        throw new EvaluatorException(toString() + " cannot be compiled");
+        throw new EvaluatorException(toString() + " cannot be compiled"); // TODO
     }
     
     /* Analyzing methods */
@@ -163,7 +163,7 @@ public class Operator implements Named {
         private final boolean left;
         private final boolean right;
         private final boolean number;
-        private Uses(boolean left, boolean right, boolean number) {
+        Uses(boolean left, boolean right, boolean number) {
             this.left = left;
             this.right = right;
             this.number = number;

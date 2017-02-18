@@ -177,7 +177,7 @@ public abstract class Reader implements ExpressionElement {
         expr.index = startIndex;
         if(result == null)
             if(throws_)
-                throw new EvaluatorException("Unknown char found at " + (i + 1) + ": " + at);
+                throw new EvaluatorException("Unknown char found at " + (i + 1) + ": " + at, i);
             else
                 return new ReadNextResult<>(null, iOffset, null);
 

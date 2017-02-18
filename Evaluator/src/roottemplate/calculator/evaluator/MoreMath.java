@@ -40,7 +40,7 @@ public class MoreMath {
         .36899182659531622704e-5
     };
  
-    public static final double lgamma(double x) {
+    public static double lgamma(double x) {
         double tmp = x + 5.2421875; //== 607/128. + .5;
         double sum = 0.99999999999999709182;
         for (int i = 0; i < GAMMA.length; ++i) {
@@ -78,7 +78,7 @@ public class MoreMath {
         2.5260757449731984E302,
     };
 
-    public static final double factorial(double x) {
+    public static double factorial(double x) {
         if (x < 0) { // x <= -1 ?
             return Double.NaN;
         }
@@ -107,15 +107,15 @@ public class MoreMath {
         return d == Math.floor(d);
     }
 
-    public static final double sin(double x) {
+    public static double sin(double x) {
         return isPiMultiple(x) ? 0 : Math.sin(x);
     }
 
-    public static final double cos(double x) {
+    public static double cos(double x) {
         return isPiMultiple(x-Math.PI/2) ? 0 : Math.cos(x);
     }
 
-    public static final double tan(double x) {
+    public static double tan(double x) {
         if(isPiMultiple(x)) return 0;
         if(isPiMultiple(x-Math.PI/2))
             return x > 0 ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;

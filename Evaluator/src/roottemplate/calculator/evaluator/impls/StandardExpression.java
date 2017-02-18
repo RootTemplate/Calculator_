@@ -57,7 +57,7 @@ public class StandardExpression extends Expression {
      * WARNING: after executing this method, <code>list</code> become empty!
      */
     public static StandardExpression createFromListStruct(ListStruct list) throws EvaluatorException {
-        if(list.startNode == null || list.endNode == null) throw new EvaluatorException("Empty string given");
+        if(list.startNode == null || list.endNode == null) throw new EvaluatorException("Empty string given", 0);
         
         StandardEVMCompiler.Kit kit = EVMCOMPILER.compileToKit(list);
         return new StandardExpression(  kit.insns.toArray(new Instruction[kit.insns.size()]),
@@ -72,11 +72,11 @@ public class StandardExpression extends Expression {
     StandardExpression(Instruction[] instrs, ExpressionElement result, int bufferLength) throws EvaluatorException {
         ExpressionElement.ElementType resultType = result.getElementType();
         if(resultType != ExpressionElement.ElementType.SYSTEM_REFERENCE && resultType != ExpressionElement.ElementType.NUMBER)
-            throw new EvaluatorException("Result is not a number");
+            throw new EvaluatorException("Result is not a number", -1);
         if(bufferLength == 0 && result.getElementType() != ExpressionElement.ElementType.NUMBER)
-            throw new EvaluatorException("Buffer is empty but result is not a number");
+            throw new EvaluatorException("Buffer is empty but result is not a number", -1);
         if(bufferLength > 0 && result.getElementType() != ExpressionElement.ElementType.SYSTEM_REFERENCE)
-            throw new EvaluatorException("Buffer is not empty but result is not a reference");
+            throw new EvaluatorException("Buffer is not empty but result is not a reference", -1);
         
         this.instructions = instrs;
         this.result = result;

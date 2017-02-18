@@ -63,6 +63,9 @@ public class Evaluator {
     }
 
     private void setupStandardNamespace() {
+        PriorityManager priorityManager = this.priorityManager;
+        Evaluator.Options options = this.options;
+
         Operator higherMultiplyOp;
         add(new BracketsReader(), true);
         add(new Operator(priorityManager.createPriority("+-", true), "+"), true);
@@ -77,10 +80,14 @@ public class Evaluator {
         add(new TrigonometricFunction(priorityManager, "cos", options), true);
         add(new TrigonometricFunction(priorityManager, "tan", options), true); // tan
         add(new TrigonometricFunction(priorityManager, "tan", "tg", options), true); // tg
+        add(new CotangentFunctions.CtgFunction(priorityManager, "cot", options), true);
+        add(new CotangentFunctions.CtgFunction(priorityManager, "ctg", options), true); // ctg
         add(new TrigonometricFunction(priorityManager, "asin", options), true);
         add(new TrigonometricFunction(priorityManager, "acos", options), true);
         add(new TrigonometricFunction(priorityManager, "atan", options), true); // atan
         add(new TrigonometricFunction(priorityManager, "atan", "atg", options), true); // atg
+        add(new CotangentFunctions.ArcctgFunction(priorityManager, "acot", options), true);
+        add(new CotangentFunctions.ArcctgFunction(priorityManager, "actg", options), true); // actg
 
         add(new NativeFunction(priorityManager, "toRadians", "torad"), true);
         add(new NativeFunction(priorityManager, "toDegrees", "todeg"), true);

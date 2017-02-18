@@ -19,15 +19,24 @@
 package roottemplate.calculator.evaluator;
 
 public class EvaluatorException extends Exception {
+    public final int errorIndex;
+
     public EvaluatorException(String message) {
-        super(message);
+        this(message, -1);
     }
 
-    public EvaluatorException(String message, Throwable cause) {
+    public EvaluatorException(String message, int errorIndex) {
+        super(message);
+        this.errorIndex = errorIndex;
+    }
+
+    public EvaluatorException(String message, int errorIndex, Throwable cause) {
         super(message, cause);
+        this.errorIndex = errorIndex;
     }
     
     public EvaluatorException(Throwable cause) {
         super(cause.getMessage(), cause);
+        errorIndex = -1;
     }
 }
