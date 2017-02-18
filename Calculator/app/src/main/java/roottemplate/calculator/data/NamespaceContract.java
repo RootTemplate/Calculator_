@@ -131,7 +131,7 @@ public class NamespaceContract {
         @Override
         protected Void doInBackground(Object... params) {
             AppDatabase db_ = (AppDatabase) params[0];
-            int storingNs = db_.getPrefs().storingNamespace();
+            //int storingNs = db_.getPrefs().storingNamespace();
             String kit = (String) params[1], name = (String) params[2];
             int type = (int) params[3];
 
@@ -145,7 +145,7 @@ public class NamespaceContract {
             values.put(NamespaceEntry.COLUMN_NAME_TYPE, type);
             values.put(NamespaceEntry.COLUMN_NAME_EXPRESSION, (String) params[4]);
             values.put(NamespaceEntry.COLUMN_NAME_IS_STANDARD, (Boolean) params[5]);
-            if(storingNs > 0)
+            //if(storingNs > 0)
                 values.put(NamespaceEntry.COLUMN_NAME_TIME, System.currentTimeMillis() / 1000 / 60 / 60);
 
             String[] selectionArgs = kit == null ?

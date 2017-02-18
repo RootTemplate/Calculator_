@@ -18,10 +18,10 @@
 
 package roottemplate.calculator;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,41 +29,40 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
+import android.widget.LinearLayout;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.lang.reflect.Method;
 import java.util.Random;
 
 import roottemplate.calculator.data.AppDatabase;
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
-import roottemplate.calculator.view.FirstLaunchDialogFragment;
+import roottemplate.calculator.evaluator.util.ExpressionFormatUpdater;
 import roottemplate.calculator.util.ParcelableBinder;
 import roottemplate.calculator.util.Util;
+import roottemplate.calculator.view.FirstLaunchDialogFragment;
 import roottemplate.calculator.view.InputEditText;
 import roottemplate.calculator.view.KitViewPager;
 import roottemplate.calculator.view.NotifyDialogFragment;
 import roottemplate.calculator.view.ShiftButton;
+import roottemplate.calculator.view.SystemButton;
+import roottemplate.calculator.view.UpdateDialogFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private static final int REQUEST_CODE_HISTORY = 0;
@@ -90,11 +89,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     private Thread mHistoryClearingThread;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         mPrefs = new PreferencesManager(this);
+        int dayNightTheme = mPrefs.dayNightTheme();
+        //noinspection WrongConstant
+        AppCompatDelegate.setDefaultNightMode(PreferencesManager.dayNightThemeIdToMode(this, dayNightTheme));
+        if(dayNightTheme == PreferencesManager.THEME_LEGACY)
+            setTheme(R.style.AppTheme_Legacy_NoActionBar);
+
+        super.onCreate(savedInstanceState);
 
         // SET CONTENT VIEW
         setContentView(R.layout.activity_main);
@@ -106,20 +110,20 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 return true;
             }
         });
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // TODO: normal margin fix
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)
+                    findViewById(R.id.inputTextParent).getLayoutParams();
+            params.topMargin = 0;
+            params.leftMargin = 0;
+            params = (LinearLayout.LayoutParams) findViewById(R.id.activity_main_del).getLayoutParams();
+            params.topMargin = 0;
+            params.rightMargin = 0;
+        }
 
         // INIT KEYBOARD KITS
-        try {
-            mKeyboardKits = KeyboardKitsXmlManager.parse(this);
-            if (mKeyboardKits.mKits.length == 0) {
-                Log.e(Util.LOG_TAG, "ButtonKits xml file has 0 kits. Restoring default xml");
-                KeyboardKitsXmlManager.restoreDefaultButtonKitsXml(this);
-                mKeyboardKits = KeyboardKitsXmlManager.parse(this);
-            }
-        } catch (IOException | XmlPullParserException e) {
-            Log.e(Util.LOG_TAG, "Exception while parsing ButtonKits. Restoring default xml", e);
-            Util.fatalError(this, R.string.message_bad_kits_xml, e);
+        if(!readKeyboardKits())
             return;
-        }
 
         // INIT ACTION BAR (after INIT KEYBOARD KITS as mKeyboardKits is used in actionBar)
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -164,6 +168,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         // UPDATE VERSION
         updateVersion();
+        if(UpdateDialogFragment.shouldAskForUpdate(mPrefs)) {
+            new UpdateDialogFragment().show(getSupportFragmentManager(),
+                    UpdateDialogFragment.FRAGMENT_TAG);
+        }
 
         // MISCELLANEOUS INITIALIZATIONS
         mTipsPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt("tipsPageIndex");
@@ -173,9 +181,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onResume() {
         super.onResume();
 
-        mEvalManager.updateEvaluatorOptions(); // In case if they have just been changed in settings
-        mInputText.initDigitFormatting(mPrefs.digitGrouping(), mPrefs.digitSeparatorLeft(),
-                mPrefs.digitSeparatorFract()/*, mPrefs.highlightE()*/);
+        if(mEvalManager != null) { // Can be false if readKeyboardKits() went unsuccessful
+            mEvalManager.updateEvaluatorOptions(); // In case if they have just been changed in settings
+            mInputText.initDigitFormatting(mPrefs.digitGrouping(), mPrefs.digitSeparatorLeft(),
+                    mPrefs.digitSeparatorFract()/*, mPrefs.highlightE()*/);
+        }
     }
 
     @Override
@@ -324,6 +334,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         return mActivityMessenger;
     }
 
+    public PreferencesManager getPrefs() {
+        return mPrefs;
+    }
+
     public int getViewPagerCurrentItem() {
         return mViewPager.getCurrentItem();
     }
@@ -332,16 +346,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
 
-    private void updateVersion() {
-        int latestVer, thisVer = mPrefs.version();
+    private boolean readKeyboardKits() {
         try {
-            latestVer = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(Util.LOG_TAG, "Unable to get version", e);
-            return;
+            mKeyboardKits = KeyboardKitsXmlManager.parse(this);
+            if (mKeyboardKits.mKits.length == 0) {
+                Log.e(Util.LOG_TAG, "ButtonKits xml file has 0 kits. Restoring default xml");
+                KeyboardKitsXmlManager.restoreDefaultButtonKitsXml(this);
+                mKeyboardKits = KeyboardKitsXmlManager.parse(this);
+            }
+        } catch (IOException | XmlPullParserException e) {
+            Log.e(Util.LOG_TAG, "Exception while parsing ButtonKits. Restoring default xml", e);
+            Util.fatalError(this, R.string.message_bad_kits_xml, e);
+            return false;
         }
+        return true;
+    }
+
+    private void updateVersion() {
+        int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
+        if(latestVer == -1) return; // Error
         if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2;
+        UpdateDialogFragment.onAppUpdated(mPrefs);
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
@@ -356,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
 
                 KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
+                readKeyboardKits();
                 invalidateCurrentKeyboardKit();
             } else {
                 /* TODO. Update KeyboardKits if new version provides new default kits.
@@ -428,6 +455,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     }
 
+    public void invalidateEvaluatorOptions() {
+        mEvalManager.updateEvaluatorOptions();
+    }
+
     public void showTips() {
         Intent intent = new Intent(this, GuideActivity.class);
         intent.putExtra("guideIndex", mTipsPageIndex);
@@ -457,6 +488,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         mViewPager.getCurrentPageFragment().onShiftButtonClicked();
     }
 
+    public void onSystemButtonClick(View view) {
+        mViewPager.getCurrentPageFragment().onSystemButtonClick(((SystemButton) view).getProperty());
+    }
+
     public void onPadButtonClick(View view) {
         onPadButtonClick(view, false);
     }
@@ -475,18 +510,41 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         boolean returnByDoubleClick = (returnType == KeyboardKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
         mLastClickedView = view;
         mLastClickedTime = time;
+        // TODO: icon, edit keyboard kits button, as fractional (?)
+        // TODO: tips <- (double clicks on shift ?, asin = arcsin ?, editing keyboard kits,
+        //       namespaces in keyboard kits)
+        // TODO: delete configChanges="..." from manifest when this bug will be fixed. Links:
+        //       https://code.google.com/p/android/issues/detail?id=206394
+        //       https://code.google.com/p/android/issues/detail?id=225911
+        /* DONE:
+         *    history repeating
+         *    fix input field
+         *    error - do not display in input field
+         *    tips <- scroll bar show on move
+         *    sin/cos move in keyboard kits
+         *    DEG/RAD
+         *    fixed bug: f(x) incorrect output in Edit Namespace activity
+         *    shift disabled after double click
+         *    designs
+         *    update checker
+         *    tips updated
+         *    Copyright year updated
+         */
 
+        KitViewPager.PageFragment fragment = mViewPager.getCurrentPageFragment();
         if(!returnByDoubleClick) {
             if (mInputText.getTextType() != InputEditText.TextType.INPUT &&
                     btn.mType == KeyboardKits.ButtonType.DIGIT)
                 mInputText.clearText();
 
-            KitViewPager.PageFragment fragment = mViewPager.getCurrentPageFragment();
             if(fragment.onPadButtonClicked() != ShiftButton.STATE_DISABLED)
                 inverseTextCase = !inverseTextCase;
-            mInputText.appendText(inverseTextCase ? Util.inverseTextCase(btn.mText) : btn.mText,
-                    false);
-        }
+            String str = inverseTextCase ? Util.inverseTextCase(btn.mText) : btn.mText;
+            //String suffix = mPrefs.autoBracketClosing() ? Util.generateClosingBrackets(str) : null;
+            mInputText.appendText(str, false/*, suffix*/);
+        } else
+            fragment.setCurrentShiftState(ShiftButton.STATE_DISABLED);
+            // To set shift state from CAPSLOCK to DISABLED
 
         if(returnType == KeyboardKits.PageReturnType.ALWAYS || returnByDoubleClick)
             mViewPager.setCurrentItem(mCurrentKeyboardKitVersion.mMainPageIndex);
@@ -498,12 +556,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if(text.isEmpty()) return;
 
         EvaluatorManager.EvalResult res = mEvalManager.eval(text, mInputText.getMaxDigitsToFit());
-        if(res.mText != null)
+        if(res.mText != null && res.mMessage == null)
             mInputText.setText(res.mText);
         if(res.mTextType != null)
             mInputText.setTextType(res.mTextType);
         if(res.mMessage != null) {
-            Snackbar.make(findViewById(R.id.coordinator), res.mMessage, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(findViewById(R.id.coordinator), res.mText + "\n" + res.mMessage,
+                    Snackbar.LENGTH_SHORT).show();
+            if(res.mErrorIndex != -1)
+                mInputText.setCursor(res.mErrorIndex + 1);
         }
     }
 

@@ -18,16 +18,20 @@
 
 package roottemplate.calculator;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,6 +65,18 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        int currentNightMode = getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK;
+
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES)
+            newConfig.uiMode = (newConfig.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | Configuration.UI_MODE_NIGHT_YES;
+
+        super.onConfigurationChanged(newConfig);
+
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bndl) {
         return new HistoryLoader(this, mHistory);
     }
@@ -79,13 +95,15 @@ public class HistoryActivity extends AppCompatActivity implements LoaderManager.
                     }
             );
 
+            final String colorMain = Util.intToHexColor(getResources().getColor(R.color.colorInputText));
             final String colorEquals = Util.intToHexColor(getResources().getColor(R.color.colorEquals));
             final String colorError = Util.intToHexColor(getResources().getColor(R.color.colorErrorDetail));
             mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
                 @Override
                 public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("<font color=\"#ffffff\">").append(cursor.getString(columnIndex));
+                    sb.append("<font color=\"").append(colorMain).append("\">")
+                            .append(cursor.getString(columnIndex));
 
                     int rightColumn = cursor.getColumnIndex(HistoryContract.HistoryEntry.COLUMN_NAME_RIGHT);
                     boolean rightNull = cursor.isNull(rightColumn);

@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import roottemplate.calculator.MainActivity;
+import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
 import roottemplate.calculator.util.Util;
@@ -105,9 +106,11 @@ public class KitViewPager extends ViewPager {
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             MainActivity activity = (MainActivity) getActivity();
             boolean isEastLocale = !Util.isWestLocale(this.getContext());
+            PreferencesManager prefs = activity.getPrefs();
+
             return KeyboardKitsXmlManager.createContentViewFromPage(this.getContext(),
                     activity.getKeyboardKits().mButtons, activity.getPreferredKeyboardKitVersion().mPages[mPageIndex],
-                    inflater, isEastLocale, activity);
+                    inflater, isEastLocale, prefs.getAppTheme(activity), prefs.darkOrangeEquals(), activity);
         }
 
         @Override
@@ -130,12 +133,13 @@ public class KitViewPager extends ViewPager {
                 for (int j = 0; j < buttonsCount; j++) {
                     View view = line.getChildAt(j);
                     if(view instanceof Button) {
-                        if(!changeText) continue;
                         Button btn = (Button) view;
+                        KeyboardKits.Button btnInfo = buttons[(int) btn.getTag()];
+                        if(!changeText || !btnInfo.mEnableCaseInverse) continue;
                         if (doInverse)
                             btn.setText(Util.inverseTextCase(btn.getText().toString()));
                         else
-                            btn.setText(buttons[(int) btn.getTag()].mName);
+                            btn.setText(btnInfo.mName);
                     } else if(view instanceof ShiftButton)
                         ((ShiftButton) view).setState(shiftState);
                 }
@@ -146,6 +150,9 @@ public class KitViewPager extends ViewPager {
 
         public int getCurrentShiftState() {
             return mShiftState;
+        }
+        public void setCurrentShiftState(int state) {
+            setShiftState(state, false);
         }
 
         public int onPadButtonClicked() {
@@ -160,6 +167,24 @@ public class KitViewPager extends ViewPager {
             if(newState > ShiftButton.STATE_CAPSLOCK)
                 newState = ShiftButton.STATE_DISABLED;
             setShiftState(newState, false);
+        }
+
+        public void onSystemButtonClick(int property) {
+            MainActivity activity = (MainActivity) getActivity();
+            ViewGroup root = (ViewGroup) getView();
+            int lines = root.getChildCount();
+            for (int i = 0; i < lines; i++) {
+                ViewGroup line = (ViewGroup) root.getChildAt(i);
+                int buttonsCount = line.getChildCount();
+                for (int j = 0; j < buttonsCount; j++) {
+                    View view = line.getChildAt(j);
+                    if(view instanceof SystemButton) {
+                        SystemButton btn = (SystemButton) view;
+                        if(btn.getProperty() == property)
+                            btn.onButtonClicked(activity);
+                    }
+                }
+            }
         }
     }
 }

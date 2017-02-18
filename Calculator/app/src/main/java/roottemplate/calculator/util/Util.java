@@ -18,14 +18,23 @@
 
 package roottemplate.calculator.util;
 
+import android.app.UiModeManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.ClipboardManager;
+import android.util.Log;
+import android.widget.TextView;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Objects;
 
+import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.view.FatalErrorDialogFragment;
 
 public class Util {
@@ -63,8 +72,26 @@ public class Util {
     }
 
     public static String inverseTextCase(String str) {
-        String upper = str.toUpperCase();
-        return upper.equals(str) ? str.toLowerCase() : upper;
+        String t = str.toUpperCase();
+        t = t.equals(str) ? str.toLowerCase() : t;
+        char[] charArray = t.toCharArray();
+        for(int i = 0; i < charArray.length; i++) {
+            char setTo;
+            switch (charArray[i]) {
+                case '(': setTo = ')'; break;
+                case ')': setTo = '('; break;
+                case '[': setTo = ']'; break;
+                case ']': setTo = '['; break;
+                case '{': setTo = '}'; break;
+                case '}': setTo = '{'; break;
+                case '<': setTo = '>'; break;
+                case '>': setTo = '<'; break;
+                default:
+                    continue; // continue 'for' loop
+            }
+            charArray[i] = setTo;
+        }
+        return new String(charArray);
     }
 
     public static long getTime() {
@@ -76,6 +103,7 @@ public class Util {
     }
 
 
+    /** APP DEPENDENT **/
 
     public static void fatalError(final AppCompatActivity activity, int dialogMessage, Exception e) {
         Bundle args = new Bundle();
@@ -87,5 +115,29 @@ public class Util {
         FatalErrorDialogFragment df = new FatalErrorDialogFragment();
         df.setArguments(args);
         df.show(activity.getSupportFragmentManager(), FatalErrorDialogFragment.FRAGMENT_TAG);
+    }
+
+    public static int getAppVersion(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(Util.LOG_TAG, "Unable to get version", e);
+            return -1;
+        }
+    }
+
+    public static int twilightManager_isNight(Context context) {
+        try {
+            Class c = Class.forName("android.support.v7.app.TwilightManager");
+            Method inst = c.getDeclaredMethod("getInstance", Context.class);
+            inst.setAccessible(true);
+            Object instance = inst.invoke(null, context);
+            Method m = c.getDeclaredMethod("isNight");
+            m.setAccessible(true);
+            return ((boolean) m.invoke(instance)) ? 1 : 0;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Unable to call android.support.v7.app.TwilightManager.isNight()", e);
+            return -1;
+        }
     }
 }

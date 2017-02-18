@@ -20,10 +20,12 @@ package roottemplate.calculator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.icu.text.DateFormat;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
+import android.support.v7.app.AppCompatDelegate;
+
+import roottemplate.calculator.util.Util;
 
 public class PreferencesManager {
     private final SharedPreferences mPrefs;
@@ -50,9 +52,21 @@ public class PreferencesManager {
         mPrefs.edit().putInt("version", ver).apply();
     }
 
+    public long nextUpdateCheckTime() {
+        return mPrefs.getLong("nextUpdateCheckTime", -1);
+    }
+    public void nextUpdateCheckTime(long time) {
+        mPrefs.edit().putLong("nextUpdateCheckTime", time).apply();
+    }
+
     public int bracketClosingType() {
         return Integer.parseInt(mPrefs.getString(
                 "bracketClosingType", mResources.getString(R.string.pref_def_brClosingType)));
+    }
+
+    public boolean autoBracketClosing() {
+        return mPrefs.getBoolean("autoBracketClosing",
+                mResources.getBoolean(R.bool.pref_def_autoBracketClosing));
     }
 
     public boolean doRound() {
@@ -70,6 +84,9 @@ public class PreferencesManager {
 
     public int getAMU() {
         return Integer.parseInt(mPrefs.getString("amu", "2"));
+    }
+    public void amu(int amu) {
+        mPrefs.edit().putString("amu", String.valueOf(amu)).apply();
     }
 
     public boolean enabledTips() {
@@ -103,5 +120,42 @@ public class PreferencesManager {
 
     public boolean highlightE() {
         return mPrefs.getBoolean("highlightE", mResources.getBoolean(R.bool.pref_def_highlightE));
+    }
+
+    public static final int THEME_DAY = 1;
+    public static final int THEME_NIGHT = 2;
+    public static final int THEME_LEGACY = 3;
+    public int dayNightTheme() {
+        return Integer.parseInt(mPrefs.getString("dayNightTheme",
+                mResources.getString(R.string.pref_def_dayNightTheme)));
+    }
+    public static int dayNightThemeIdToMode(Context context, int themeId) {
+        switch(themeId) {
+            case 0: return AppCompatDelegate.MODE_NIGHT_AUTO;
+            case 1: return AppCompatDelegate.MODE_NIGHT_NO;
+            case 2: return AppCompatDelegate.MODE_NIGHT_YES;
+            case 3: return AppCompatDelegate.MODE_NIGHT_YES;
+            case -1:
+                int result = Util.twilightManager_isNight(context);
+                if(result == 1)
+                    return AppCompatDelegate.MODE_NIGHT_NO;
+                else if(result == 0)
+                    return AppCompatDelegate.MODE_NIGHT_YES;
+                else
+                    return AppCompatDelegate.MODE_NIGHT_AUTO;
+        }
+        return AppCompatDelegate.MODE_NIGHT_AUTO;
+    }
+    public int getAppTheme(Context context) {
+        boolean isDay = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                != Configuration.UI_MODE_NIGHT_YES;
+        if(isDay) return THEME_DAY;
+        if(dayNightTheme() == THEME_LEGACY)
+            return THEME_LEGACY;
+        return THEME_NIGHT;
+    }
+
+    public boolean darkOrangeEquals() {
+        return mPrefs.getBoolean("darkOrangeEquals", mResources.getBoolean(R.bool.pref_def_darkOrangeEquals));
     }
 }

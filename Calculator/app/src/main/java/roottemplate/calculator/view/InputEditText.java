@@ -182,6 +182,17 @@ public class InputEditText extends EditText {
      *                      previously cleared
      */
     public void appendText(String str, boolean clearIfResult) {
+        appendText(str, clearIfResult, null);
+    }
+    /**
+     * Appends <code>str</code> to expression in this text field
+     * @param str The string to append
+     * @param clearIfResult If current TextType is RESULT(_NUMBER or _MESSAGE) then expression is
+     *                      previously cleared
+     * @param suffix The string to append (like {@code str}) but will be appended <i>after</i> new
+     *               cursor position
+     */
+    public void appendText(String str, boolean clearIfResult, String suffix) {
         if(clearIfResult && mTextType != TextType.INPUT)
             clearText();
         else
@@ -193,6 +204,8 @@ public class InputEditText extends EditText {
 
         text.insert(cursor, str);
         cursor += str.length();
+        if(suffix != null)
+            text.insert(cursor, suffix);
         setSelection(cursor);
 
         updateDigitGrouping(cursor - str.length(), cursor - 1, false);
@@ -228,6 +241,9 @@ public class InputEditText extends EditText {
         getEditableText().delete(cursor - 1, cursor);
         setSelection(--cursor);
         updateDigitGrouping(cursor, cursor - 1, false);
+    }
+    public void setCursor(int cursor) {
+        setSelection(cursor);
     }
 
     public void setTextType(TextType type) {
@@ -277,10 +293,10 @@ public class InputEditText extends EditText {
         return mTextType;
     }
 
-    private int getEHighlightColor(TextType type) {
+    /*private int getEHighlightColor(TextType type) {
         return getResources().getColor(type == TextType.INPUT ? R.color.colorInputHighlightE :
                 R.color.colorInputHighlightEResult);
-    }
+    }*/
 
     @Override
     protected void onCreateContextMenu(ContextMenu menu) {
@@ -341,7 +357,7 @@ public class InputEditText extends EditText {
         getLineBounds(0, r);
 
         String text = super.getText().toString();
-        float xOffset = 0, yOffset = -spToPx(17);
+        float xOffset = 0, yOffset = -spToPx(29);
         boolean point = false;
         for(int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
@@ -360,6 +376,12 @@ public class InputEditText extends EditText {
     }
 
     @Override
+    protected void onScrollChanged(int horiz, int vert, int oldHoriz, int oldVert) {
+        super.onScrollChanged(horiz, vert, oldHoriz, oldVert);
+        mTimeSinceDown = 0;
+    }
+
+    @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         if(!hasWindowFocus())
             return true;
@@ -370,7 +392,7 @@ public class InputEditText extends EditText {
             // Hack to prevent keyboard and insertion handle from showing.
             cancelLongPress();
 
-            if(System.currentTimeMillis() <= mTimeSinceDown + 1000) {
+            if(System.currentTimeMillis() <= mTimeSinceDown + 500) {
                 Layout layout = getLayout();
                 float x = event.getX() + getScrollX();
                 float y = event.getY() + getScrollY();

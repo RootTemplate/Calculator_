@@ -20,6 +20,9 @@
                                  (e.g. abs, pow or plus, multiplication (although they are not))
                        - SHIFT. This button case-inverses all other buttons in the Page with
                                 ENABLE_CASE_INVERSE flag.
+                       - SYSTEM. This button toggles system properties. Property name is written in
+                                 "name" field.
+                                 - "amu". Toggles measurement units of angle.
                 LOCALE_EAST. Explanation requires an example. In western literature tangent's abbreviation
                              is tan, while in eastern - tg. So this attribute specifies id of a button
                              that should be used instead if the locale is eastern.
@@ -40,8 +43,8 @@
         <Button id="11" text="," type="symbol"/>
         <Button id="12" text="e" type="symbol" enableCaseInverse="true"/>
         <Button id="13" text="&#x3c0;" type="symbol" enableCaseInverse="true"/> <!-- PI -->
-        <Button id="14" text="(" type="symbol"/>
-        <Button id="15" text=")" type="symbol"/>
+        <Button id="14" text="(" type="symbol" enableCaseInverse="true"/>
+        <Button id="15" text=")" type="symbol" enableCaseInverse="true"/>
         <Button id="16" name="|x|" text="abs(" type="symbol"/>
         <Button id="17" text="+" type="symbol"/>
         <Button id="18" text="&#x2212;" type="symbol"/> <!-- minus -->
@@ -93,6 +96,8 @@
         <Button id="62" name="ρ" type="base" enableCaseInverse="true"/>
         <Button id="63" name="i" type="base" enableCaseInverse="true"/>
         <Button id="64" name="q" type="base" enableCaseInverse="true"/>
+
+        <Button id="65" name="amu" type="system"/>
     </Buttons>
     <Kits>
         <Kit
@@ -138,7 +143,7 @@
                     <PageRow><Button id="30"/><Button id="31"/><Button id="32"/></PageRow>
                     <PageRow><Button id="33"/><Button id="34"/><Button id="35"/></PageRow>
                     <PageRow><Button id="38"/><Button id="39"/><Button id="40"/></PageRow>
-                    <PageRow><Button id="16"/><Button id="25"/><Button id="28"/><Button id="26"/></PageRow>
+                    <PageRow><Button id="16"/><Button id="25"/><Button id="28"/><Button id="26"/><Button id="65"/></PageRow>
                 </Page>
             </Version>
             <Version orientation="landscape">
@@ -166,11 +171,11 @@
                     </PageRow>
                 </Page>
                 <Page main="false" moveToMain="always" layoutOrientation="landscape">
-                    <PageRow><Button id="30"/><Button id="33"/><Button id="38"/></PageRow>
-                    <PageRow><Button id="31"/><Button id="34"/><Button id="39"/></PageRow>
-                    <PageRow><Button id="32"/><Button id="35"/><Button id="40"/></PageRow>
-                    <PageRow><Button id="12"/><Button id="28"/></PageRow>
-                    <PageRow><Button id="25"/><Button id="16"/><Button id="26"/></PageRow>
+                    <PageRow><Button id="30"/><Button id="31"/><Button id="32"/></PageRow>
+                    <PageRow><Button id="33"/><Button id="34"/><Button id="35"/></PageRow>
+                    <PageRow><Button id="38"/><Button id="39"/><Button id="40"/></PageRow>
+                    <PageRow><Button id="12"/><Button id="28"/><Button id="25"/></PageRow>
+                    <PageRow><Button id="16"/><Button id="26"/><Button id="65"/></PageRow>
                 </Page>
             </Version>
         </Kit>

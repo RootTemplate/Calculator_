@@ -38,8 +38,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.R;
 import roottemplate.calculator.util.Util;
+import roottemplate.calculator.view.SystemButton;
 
 public class KeyboardKitsXmlManager {
     public static final String PADS_FILENAME = "keyboard_kits.xml";
@@ -231,30 +233,37 @@ public class KeyboardKitsXmlManager {
 
     public static View createContentViewFromPage(Context context, KeyboardKits.Button[] buttons,
                                                  KeyboardKits.Page page, LayoutInflater inflater,
-                                                 boolean isEastLocale,
+                                                 boolean isEastLocale, int theme,
+                                                 boolean preferOrangeEquals,
                                                  View.OnLongClickListener btnLongClkListener) {
         LinearLayout root = new LinearLayout(context);
-        root.setOrientation(!page.mIsLayoutLandscape ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
-        root.setBackgroundColor(context.getResources().getColor(R.color.colorBackground_mainActivity));
+        boolean portrait = !page.mIsLayoutLandscape;
+        root.setOrientation(portrait ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+        root.setBackgroundColor(context.getResources().getColor(R.color.colorButtonSeparator));
         root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
+        boolean darkOrangeEquals = theme == PreferencesManager.THEME_NIGHT && preferOrangeEquals;
 
         int[][] table = page.mButtons;
         for (int[] aTable : table) {
             LinearLayout row = supportCreateRowLLWithStyle(context,
                     !page.mIsLayoutLandscape ? R.style.panelRow : R.style.panelRowLand);
-
-            for (int anATable : aTable) {
-                int btnId = anATable;
+            for (int aTable_ : aTable) {
+                int btnId = aTable_;
                 if (buttons[btnId].mLocaleEastId != -1 && isEastLocale)
                     btnId = buttons[btnId].mLocaleEastId;
 
                 KeyboardKits.Button btnInfo = buttons[btnId];
-                View view = inflater.inflate(getButtonLayoutByType(btnInfo.mType), row, false);
+                View view = inflater.inflate(getKeyboardButtonLayout(btnInfo.mType, darkOrangeEquals),
+                        row, false);
                 view.setTag(btnId);
-                if(view instanceof Button)
-                    ((Button) view).setText(btnInfo.mName);
-                if(btnInfo.mEnableCaseInverse) {
+                if (view instanceof SystemButton) {
+                    ((SystemButton) view).initButton(btnInfo.mName);
+                } else if (view instanceof Button) {
+                    Button btn = (Button) view;
+                    btn.setText(btnInfo.mName);
+                }
+                if (btnInfo.mEnableCaseInverse) {
                     view.setLongClickable(true);
                     view.setOnLongClickListener(btnLongClkListener);
                 }
@@ -277,13 +286,17 @@ public class KeyboardKitsXmlManager {
         return root;
     }
 
-    private static int getButtonLayoutByType(KeyboardKits.ButtonType type) {
+    private static int getKeyboardButtonLayout(KeyboardKits.ButtonType type, boolean darkOrangeEquals) {
         switch (type) {
-            case EQUALS: return R.layout.button_panelelem_equals;
+            case EQUALS:
+                if(darkOrangeEquals)
+                    return R.layout.button_equals_darkorange;
+                return R.layout.button_equals;
             case DIGIT:
-            case BASE: return R.layout.button_panelelem_base;
-            case SYMBOL: return R.layout.button_panelelem_system;
-            case SHIFT: return R.layout.button_panelelem_shift;
+            case BASE: return R.layout.button_base;
+            case SYMBOL: return R.layout.button_symbol;
+            case SHIFT: return R.layout.button_shift;
+            case SYSTEM: return R.layout.button_system;
             default: throw new RuntimeException("Unknown ButtonType: " + type.toString());
         }
     }

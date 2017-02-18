@@ -21,20 +21,23 @@ package roottemplate.calculator;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -59,9 +62,9 @@ public class NamespaceActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_namespace);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
         mDb = new AppDatabase(this, new PreferencesManager(this));
         mNamespaceContent = (ListView) findViewById(R.id.namespaceContent);
@@ -133,9 +136,10 @@ public class NamespaceActivity extends AppCompatActivity
                 null,
                 new String[] {
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_NAME,
-                        NamespaceContract.NamespaceEntry.COLUMN_NAME_IS_STANDARD
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_IS_STANDARD,
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_IS_STANDARD // Hack
                 },
-                new int[] { R.id.text, R.id.isStandard },
+                new int[] { R.id.text, R.id.isStandard, R.id.delete },
                 0
         );
         mListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
@@ -155,20 +159,39 @@ public class NamespaceActivity extends AppCompatActivity
                                 NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
                         SpannableStringBuilder ssb = new SpannableStringBuilder();
 
+                        int start = 0;
                         if(type == 0) {
                             // NUMBER
                             ssb.append(name).append(" = ");
-                            int start = ssb.length();
+                            start = ssb.length();
                             ssb.append(expr);
-                            ssb.setSpan(new ForegroundColorSpan(getResources()
-                                            .getColor(R.color.colorButtonEqualsFocused)),
-                                    start, ssb.length(), 0);
-                        }
+                        } else if(type == 1) {
+                            String[] func = expr.split(";");
+                            ssb.append(name).append("(");
+                            for(int i = 1; i < func.length; i++) {
+                                if(i != 1)
+                                    ssb.append(", ");
+                                ssb.append(func[i]);
+                            }
+                            ssb.append(") = ");
+                            start = ssb.length();
+                            ssb.append(func[0]);
+                        } else
+                            Log.e(Util.LOG_TAG, "[NamespaceActivity] Found new type but no support added: "
+                                    + type);
+
+                        ssb.setSpan(new ForegroundColorSpan(getResources()
+                                        .getColor(R.color.colorButtonEqualsFocused)),
+                                start, ssb.length(), 0);
 
                         ((TextView) view).setText(ssb);
                         break;
                     case R.id.isStandard:
                         ((CheckBox) view).setChecked(cursor.getInt(columnIndex) == 1);
+                        break;
+                    case R.id.delete:
+                        ((ImageButton) view).setColorFilter(getResources().getColor(R.color.colorButtonShiftText),
+                                PorterDuff.Mode.MULTIPLY);
                         break;
                 }
                 return true;

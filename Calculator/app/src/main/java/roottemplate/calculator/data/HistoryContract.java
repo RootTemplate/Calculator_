@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.provider.BaseColumns;
 
+import roottemplate.calculator.util.Util;
+
 public class HistoryContract {
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + HistoryEntry.TABLE_NAME + " (" +
@@ -124,12 +126,26 @@ public class HistoryContract {
         @Override
         protected Void doInBackground(Object... params) {
             HistoryContract db_ = (HistoryContract) params[0];
-            int storingHistory = db_.mDb.getPrefs().storingHistory();
+            //int storingHistory = db_.mDb.getPrefs().storingHistory();
             String left = (String) params[1];
             String right = params.length > 2 ? (String) params[2] : null;
             String error = params.length > 3 ? (String) params[3] : null;
 
             SQLiteDatabase db = db_.mDb.getWritableDatabase();
+            Cursor lastEntry = db.query(HistoryEntry.TABLE_NAME,
+                    new String[]{
+                            HistoryEntry.COLUMN_NAME_LEFT,
+                            HistoryEntry.COLUMN_NAME_RIGHT,
+                            HistoryEntry.COLUMN_NAME_ERROR
+                    },
+                    null, null, null, null, HistoryEntry._ID + " DESC", "1");
+            boolean repeating = lastEntry.moveToFirst() &&
+                    lastEntry.getString(lastEntry.getColumnIndex(HistoryEntry.COLUMN_NAME_LEFT)).equals(left) &&
+                    Util.equals(lastEntry.getString(lastEntry.getColumnIndex(HistoryEntry.COLUMN_NAME_RIGHT)), right) &&
+                    Util.equals(lastEntry.getString(lastEntry.getColumnIndex(HistoryEntry.COLUMN_NAME_ERROR)), error);
+            lastEntry.close();
+            if(repeating) return null;
+
             ContentValues values = new ContentValues();
             values.put(HistoryEntry.COLUMN_NAME_LEFT, left);
             if(right != null)
@@ -140,7 +156,7 @@ public class HistoryContract {
                 values.put(HistoryEntry.COLUMN_NAME_ERROR, error);
             else
                 values.putNull(HistoryEntry.COLUMN_NAME_ERROR);
-            if(storingHistory < 0)
+            //if(storingHistory < 0)
                 values.put(HistoryEntry.COLUMN_NAME_TIME, System.currentTimeMillis() / 1000);
 
             long row = db.insert(HistoryEntry.TABLE_NAME, null, values);

@@ -27,10 +27,10 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import roottemplate.calculator.util.Util;
+import roottemplate.calculator.view.UpdateDialogFragment;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -61,5 +61,9 @@ public class AboutActivity extends AppCompatActivity {
 
     public void onAroteClick(View view) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Util.AUTHOR_WEBSITE)));
+    }
+
+    public void onCheckForUpdatesClick(View view) {
+        UpdateDialogFragment.checkForUpdates(this, new PreferencesManager(this));
     }
 }

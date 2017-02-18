@@ -20,7 +20,7 @@ package roottemplate.calculator.data;
 
 public class KeyboardKits {
     public enum ButtonType {
-        EQUALS, DIGIT, BASE, SYMBOL, SHIFT
+        EQUALS, DIGIT, BASE, SYMBOL, SHIFT, SYSTEM
     }
     public enum PageReturnType {
         NEVER, IF_DOUBLE_CLICK, ALWAYS

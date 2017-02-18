@@ -4,7 +4,7 @@
     <string name="title_activity_guide">Tips</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">About</string>
-    <string name="title_activity_namespace">Edit Namespace</string>
+    <string name="title_activity_namespace">Edit Namespaces</string>
 
     <string name="action_history">History</string>
     <string name="action_guide">Tips</string>
@@ -18,6 +18,10 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
+    <string name="later">Later</string>
+
+    <string name="rad" translatable="false">RAD</string>
+    <string name="deg" translatable="false">DEG</string>
 
     <string name="menuItem_cut">Cut all</string>
     <string name="menuItem_copy">Copy all</string>
@@ -45,18 +49,25 @@
     <string name="dialog_kitsUpdated_title">Button kits were updated</string>
     <string name="dialog_kitsUpdated_message">The kit was unpacked moments ago</string>
 
+    <string name="dialog_update_title">Check for Updates</string>
+    <string name="dialog_update_message">Would you like to check for updates?</string>
+    <string name="dialog_update_positive" translatable="false">@string/yes</string>
+    <string name="dialog_update_neutral" translatable="false">@string/later</string>
+    <string name="dialog_update_negative" translatable="false">@string/no</string>
+
 
     <!-- String related to About -->
 
     <string name="about_arote" translatable="false">RootTemplate</string>
+    <string name="about_checkForUpdates">Check for Updates</string>
     <string name="about_calculator" translatable="false">Calculator_</string>
-    <string name="about_copyright" translatable="false">Copyright © RootTemplate Group 1, 2016</string>
+    <string name="about_copyright" translatable="false">Copyright © RootTemplate Group 1, 2016—2017</string>
     <string name="about_info">&lt;b&gt;Authors&lt;/b&gt;: RootTemplate Group 1&lt;br&gt;
         &lt;b&gt;License&lt;/b&gt;: &lt;a href=\"https://github.com/RootTemplate/Calculator_/blob/master/Calculator/COPYING\"&gt;GNU GPL v3&lt;/a&gt;&lt;br&gt;
         &lt;b&gt;Source Code&lt;/b&gt;: &lt;a href=\"https://github.com/RootTemplate/Calculator_\"&gt;on GitHub&lt;/a&gt;</string>
 
 
-    <!-- String related to Edit Namespace -->
+    <!-- String related to Edit Namespaces -->
 
     <string name="namespace_clear">Clear namespace</string>
     <string name="namespace_common_ns">Common (used when namespaces are not separated)</string>
@@ -66,13 +77,14 @@
 
     <!-- Strings related to Settings -->
 
-    <string name="pref_def_brClosingType" translatable="false">1</string>
+    <string name="pref_def_brClosingType" translatable="false">2</string>
     <string name="pref_def_amu" translatable="false">1</string>
     <string name="pref_def_storingHistory" translatable="false">30</string>
     <string name="pref_def_digitGrouping" translatable="false">0</string>
     <string name="pref_def_digitGrouping_separator_left" translatable="false">1</string>
     <string name="pref_def_digitGrouping_separator_fract" translatable="false">0</string>
     <string name="pref_def_storingNamespace" translatable="false">-1</string>
+    <string name="pref_def_dayNightTheme" translatable="false">0</string>
 
     <string name="pref_header_general">General</string>
 
@@ -82,9 +94,12 @@
     <string name="pref_category_tips">Tips</string>
     <string name="pref_category_namespace">Namespace</string>
     <string name="pref_category_theme">Theme</string>
+    <string name="pref_theme_valueChanged">Changes will be applied on the next app launch</string>
 
     <string name="pref_doRound_title">Rounding</string>
     <string name="pref_doRound_summary">Round result number to fit the screen</string>
+    <string name="pref_autoBracketClosing_title">Append closing brackets</string>
+    <string name="pref_autoBracketClosing_summary">Automatically append closing brackets in input field</string>
     <string name="pref_digitGrouping_title">Digit grouping</string>
     <string name="pref_digitGrouping_separator_left_title">Separator of left part</string>
     <string name="pref_digitGrouping_separator_fract_title">Separator of fractional part</string>
@@ -96,43 +111,46 @@
     <string name="pref_storingHistory_title">Retain history</string>
     <string name="pref_brClosingType_title">Close unclosed brackets</string>
     <string name="pref_separateNamespace_title">Separate namespaces</string>
-    <string name="pref_separateNamespace_summary">If turned on, variable/function, entered in one kit, will be not
+    <string name="pref_separateNamespace_summary">If turned on, variable/function, typed in one kit, will be not
             available in another kit.</string>
     <string name="pref_clearHistory_title">Clear history</string>
     <string name="pref_clearHistory_empty">History is empty</string>
     <string name="pref_clearAllNamespaces_title">Clear all namespaces</string>
-    <string name="pref_clearAllNamespaces_summary">Forget all entered variables and functions</string>
+    <string name="pref_clearAllNamespaces_summary">Forget all typed variables and functions</string>
     <string name="pref_clearAllNamespaces_summary_empty">Namespaces are empty</string>
     <string name="pref_clearAllNamespaces_message">Are you sure that you want to clear all namespaces?</string>
     <string name="pref_storingNamespace_title">Retain namespace entries</string>
     <string name="pref_enabledTips_title">Tips</string>
     <string name="pref_enabledTips_summary">Show tips in options menu</string>
-    <string name="pref_editNamespace_title">Edit namespace</string>
-    <string name="pref_editNamespace_summary">View entered variables/functions</string>
-    <string name="pref_editColors_title">Edit colors</string>
-    <string name="pref_editButtonKits_title">Edit button kits</string>
+    <string name="pref_editNamespace_title">Edit namespaces</string>
+    <string name="pref_editNamespace_summary">View typed variables/functions</string>
+    <string name="pref_dayNightTheme_title">Theme</string>
+    <string name="pref_darkOrangeEquals_title">Orange \"Equals\" button</string>
+    <string name="pref_darkOrangeEquals_summary">Use orange colour for \"Equals\" button in dark theme</string>
+    <string name="pref_editColors_title">Edit colours</string>
+    <string name="pref_editButtonKits_title">Edit keyboard kits</string>
 
-    <string-array name="pref_amu_list_titles">
+    <string-array name="pref_amu_list_entries">
         <item>Radians</item>
         <item>Degrees</item>
     </string-array>
-    <string-array name="pref_brClosingType_list_titles">
+    <string-array name="pref_brClosingType_list_entries">
         <item>Never</item>
         <item>Only if one unclosed</item>
         <item>Always</item>
     </string-array>
-    <string-array name="pref_digitGrouping_titles">
+    <string-array name="pref_digitGrouping_entries">
         <item>Don\'t group</item>
         <item>Group only digits in the result</item>
         <item>Always group</item>
     </string-array>
-    <string-array name="pref_digitGrouping_separator_titles">
+    <string-array name="pref_digitGrouping_separator_entries">
         <item>No</item>
         <item>Space</item>
         <item>Comma</item>
         <item>Apostrophe</item>
     </string-array>
-    <string-array name="pref_storingHistory_list_titles">
+    <string-array name="pref_storingHistory_list_entries">
         <item>Until app is closed</item>
         <item>For 15 minutes</item>
         <item>For 30 minutes</item>
@@ -143,12 +161,19 @@
         <item>Last 100 entries</item>
         <item>Last 200 entries</item>
     </string-array>
-    <string-array name="pref_storingNamespace_list_titles">
+    <string-array name="pref_storingNamespace_list_entries">
         <item>Until app is closed</item>
         <item>For 1 day since definition</item>
         <item>For 3 days since definition</item>
         <item>For 1 week since definition</item>
         <item>Forever</item>
+    </string-array>
+    <string-array name="pref_dayNightTheme_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Depends on time</item>
+        <item>Depends on time (inverse)</item>
+        <item>Legacy</item>
     </string-array>
 
     <string-array name="pref_amu_list_values" translatable="false">
@@ -189,62 +214,61 @@
         <item>7</item>
         <item>-1</item>
     </string-array>
+    <string-array name="pref_dayNightTheme_values" translatable="false">
+        <item>1</item>
+        <item>2</item>
+        <item>0</item>
+        <item>-1</item>
+        <item>3</item>
+    </string-array>
 
 
     <!-- Strings related to Guides -->
 
     <string name="guide_1_title">Welcome to Calculator_!</string>
     <string name="guide_1_text">\tHaving read all the tips, you\'ll know all features of this application.
-        \n\tNote: Turn your phone to landscape orientation.
         \n\tNow click on \"Forward\" button in the upper right corner to continue.</string>
     <string name="guide_2_title">Pages</string>
     <string name="guide_2_text">\tIn the background you see one of the pages with buttons. One of — there are
-        lots of them! You can scroll the pages by using your finger: having closed this window, slide
-        your finger to left or right.
-        \n\tTry it now, not closing the dialog, using two buttons below.</string>
+        plenty of them! You can scroll the pages by swiping your finger left or right.
+        \n\tTry to scroll the pages here, in this window, using two buttons below.</string>
     <string name="guide_2_left">Scroll left</string>
     <string name="guide_2_right">Scroll right</string>
     <string name="guide_3_title">The Same Buttons</string>
     <string name="guide_3_text">\tSome buttons, as it may seem at first, mean exactly the same things.
         \n\tAbout these buttons on the following pages.</string>
     <string name="guide_4_title">Equals Button</string>
-    <string name="guide_4_equals">Orange \'Equals\' button calculates entered expression and outputs the result
+    <string name="guide_4_equals">Orange (or blue in dark theme) button calculates typed expression and outputs the result
         to input field.</string>
-    <string name="guide_4_system">Gray \'Equals\' button appends \'=\' symbol into expression.
-        \n\nThis may be used to declare a variable or a function. To do this write into the input field,
-        for example, \"a=5\" or \"f(x)=2x+1\" and press the orange equals button. </string>
-    <string name="guide_5_title">E &amp; e buttons</string>
-    <string name="guide_5_E">Used in scientific notations. For example, &lt;br&gt;
-        \"5E3\" = \"5 × 10^3\" = 5000&lt;br&gt; and &lt;br&gt;\"2.346E-2\" = 2.346 × 10^(-2) = 0.02346.&lt;br&gt;
-        I.e. "E" means \"…times ten raised to the power of…\".
-        &lt;br&gt;&lt;br&gt;Find out more at &lt;a href="https://en.wikipedia.org/wiki/Scientific_notation"&gt;
-        wikipedia&lt;/a&gt;.</string>
+    <string name="guide_4_system">Grey button appends \"=\" symbol into expression.
+        \n\nThis may be used to declare a variable or a function. Read more on this in the following pages.</string>
+    <string name="guide_5_title">\"E\" &amp; \"e\" buttons</string>
+    <string name="guide_5_E">Used in scientific notations. Read more about it later (again).</string>
     <string name="guide_5_e">This is Euler\'s number, approximately equal to 2.718.</string>
-    <string name="guide_6_title">\'.\' &amp; \',\' Buttons</string>
+    <string name="guide_6_title">\".\" &amp; \",\" Buttons</string>
     <string name="guide_6_comma">A comma splits function arguments. Example: \"f(x,y)=x^y\", \"f(4.5,6)\".</string>
-    <string name="guide_6_point">A point is a decimal dot.</string>
+    <string name="guide_6_point">A point is a decimal mark.</string>
     <string name="guide_7_title">Operator Precedence</string>
     <string name="guide_7_text">\tOur app uses some non-standard operators, that\'s why we put here a
-        table of operator precedence (decreases from top to bottom).</string>
+        table with operator precedence (precedence decreases from top to bottom).</string>
     <string name="guide_7_operator">Operator</string>
     <string name="guide_7_order">Associativity</string>
     <string name="guide_7_order_leftRight">Left-to-right</string>
     <string name="guide_7_order_rightLeft">Right-to-left</string>
-    <string name="guide_7_functionsAndRoot">Functions, √</string>
-    <string name="guide_7_negate">− (negate)</string>
+    <string name="guide_7_functionsRootPowNegate">Functions, ^, √, −&#x00A0;(negate)</string>
     <string name="guide_8_title">log</string>
-    <string name="guide_8_text1">\tLog function can take one or two arguments.
-        \n\n\tIf only one argument is passed, then log(n) returns natural logarithm of a parameter:</string>
-    <string name="guide_8_text2">\tIf two arguments are passed, then log(b, n) returns base-b logarithm of n.</string>
-    <string name="guide_8_text3">\tAn example with two parameters. In what power 2 (this will be the first argument)
+    <string name="guide_8_text1">\tLog function can take one or two input variable(s) (also known as arguments).
+        \n\n\tIf only one argument is passed, then log(n) returns natural logarithm of the input:</string>
+    <string name="guide_8_text2">\tIf two arguments are passed, then log(b,&#x00A0;n) returns base-b logarithm of n.</string>
+    <string name="guide_8_text3">\tAn example with two inputs. In what power 2 (this will be the first argument)
         is necessary to raise to get 8 (and this\'ll be the second)?</string>
-    <string name="guide_8_text4">\tPlease note: if you can not remember the order of arguments, use a phrase
+    <string name="guide_8_text4">\tIf you can\'t remember the order of arguments, use a phrase
         from the paragraph above.</string>
     <string name="guide_9_title">Root √</string>
     <string name="guide_9_text1">\tLike log, root function also can take one or two arguments.
-        \n\n\tBy default, i.e. with a single parameter, the √ function returns a square root of the parameter.
-        \n\n\tIf the second parameter is passed, then √(a, n) function returns a-th root of n.
-        \n\tExample:</string>
+        \n\n\tBy default, i.e. with a single argument, the √ function returns a square root of the input.
+        \n\n\tIf the second argument is passed, then √(a, n) function returns a-th root of n.
+        \n\tFor example:</string>
     <string name="guide_9_text2">\tOnce again, if you cannot remember the order of arguments, use the phrase:
          \"Take the fourth root (the first argument) of 16 (the second argument)\".</string>
     <string name="guide_10_title">NaN</string>
@@ -254,30 +278,48 @@
     <string name="guide_11_title">In the Upper Case</string>
     <string name="guide_11_text">\tUsually, when you press the button (I mean the ones in the background),
         exactly that character is added into the input field, that is written on the button. However,
-        some buttons, if it isn\'t released for a time, could add the character not in lower but in the upper case.
+        some buttons, if they aren\'t released for a time, could add the character not in lower but in the upper case.
         \n\tThis may be used for, let\'s say, adding a new variable, e.g. constant G in physics, not to be confused with
         the other variable — g (gravitational acceleration). Variable names are case sensitive!
-        \n\tTry it here and now. Initially, simply click on the button. Then hold it down.</string>
+        \n\tTry it now. Initially, simply click on the button. Then hold it down.</string>
     <string name="guide_12_title">Copying from history</string>
-    <string name="guide_12_text">\t\'History\' window consists of records, each of which contains one calculation.
-        If you click on a entry, a context menu will be open, main activities of which would be to copy or to paste
-        expression or result into the input field.
+    <string name="guide_12_text">\t\"History\" window consists of records, each of which contains one calculation.
+        If you click on a entry, a context menu will be open, main actions of which would be to copy the expression
+        or the result or to paste them into the input field.
         \n\tTry it now. Press on a button below. If history is currently empty, then the program will automatically add
         a few records.</string>
     <string name="guide_12_openHistory">Open history</string>
-    <string name="guide_12_text2">\tBy the way, history can be accessed from the options menu that appears after
+    <string name="guide_12_text2">\tBy the way, history can be opened from the options menu that appears after
         clicking on three dots in the upper right corner in the background.</string>
     <string name="guide_14_title">Settings is your Friend</string>
     <string name="guide_14_text">\tThis page is just a reminder that if you want something to change, check,
         whether it is possible to change in the settings.
-        \n\tDo you need to change the unit of angular measure to degrees, change the period
-        of storing the history or view entered variables — open the settings!</string>
+        \n\tDo you need to view typed variables, change the period
+        of storing the history or enable digit grouping — open the settings!</string>
     <string name="guide_15_title">Double Clicks</string>
     <string name="guide_15_text">\tPages (in the background) are designed as follows: there is a home page and
         \"side\" pages. The home page opens immediately after the application is launched.
-        \n\tSide pages can automatically return to home: (1) after a button is clicked, (2) do not return or (3) return after
-        a button is double clicked.
-        \n\tIf a side page does not return you to home, try double clicking on a button — this may help :).</string>
+        \n\t\"Side\" pages can automatically return to home: (1) after a button is clicked, (2) return after
+        a button is double clicked or (3) do not return al all.
+        \n\tFor instance, the left page (with the letters of the Latin/Greek alphabets) will return you
+        to the home page after double clicking on any button there.</string>
+    <string name="guide_16_title">E notation</string>
+    <string name="guide_16_text1">\t\"E\" is used for presenting numbers in scientific notation and means
+        \"…times ten raised to the power of…\", or \"…&#x00A0;×&#x00A0;10^…\". Here are some examples:</string>
+    <string name="guide_16_text2">\tThis notation is often used to presenting very large or very small numbers.
+        E.g. this is how proton mass can be written in kilograms:</string>
+    <string name="guide_16_text3">\tAnd an example with calculation:</string>
+    <string name="guide_16_text4">You can find out more at &lt;a href=\"https://en.wikipedia.org/wiki/Scientific_notation\"&gt;
+        Wikipedia&lt;/a&gt;.</string>
+    <string name="guide_17_title">Namespaces</string>
+    <string name="guide_17_text1">\tA namespace is where all typed variables and functions are written and stored.
+        \n\tVariables and functions can be declared as follows:</string>
+    <string name="guide_17_text2">\tPlease note: all variable/function names are always written at the left,
+        and what they equal to is written at the right.
+        \n\tFunctions can be used like this:</string>
+    <string name="guide_17_text3">\tIn practice, the variables are usually used for storing constants (usually physical).
+        For instance, if you had enough typing masses of elementary particles, their charges and so on each time.
+        Plus variables can be used as a replacement for classic memory (MC, MR, M+, M-).</string>
     <string name="guide_final_title">That\'s all</string>
     <string name="guide_final_text">Now you know everything about the app</string>
 </resources>

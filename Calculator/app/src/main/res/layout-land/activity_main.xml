@@ -28,27 +28,34 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:orientation="vertical"
-        android:background="@color/colorBackground_mainActivity">
+        android:background="@color/colorButtonSeparator">
 
         <LinearLayout
             style="@style/panelRow"
             android:layout_height="wrap_content"
             android:layout_weight="0">
 
-            <roottemplate.calculator.view.InputEditText
+            <LinearLayout
+                android:id="@+id/inputTextParent"
+                style="@style/panelElem"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/inputTextHeight"
                 android:layout_weight="5"
-                android:id="@+id/activity_main_expr"
-                style="@style/inputEditText" />
+                android:orientation="horizontal"
+                android:background="@color/colorInputTextBackground">
+                <roottemplate.calculator.view.InputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/inputTextHeight"
+                    android:id="@+id/activity_main_expr"
+                    style="@style/inputEditText" />
+            </LinearLayout>
 
             <ImageButton
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="15dp"
+                android:padding="13dp"
                 android:id="@+id/activity_main_del"
-                style="@style/panelElem.button.delete"
+                style="?attr/styleDeleteButton"
                 android:contentDescription="Clear" />
 
         </LinearLayout>

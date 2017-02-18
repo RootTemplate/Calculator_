@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:elevation="4dp"
-        android:theme="@style/AppTheme.DialogAppBarOverlay"
+        android:theme="@style/AppTheme.Dialog.AppBarOverlay"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     <ScrollView
@@ -91,7 +91,7 @@
                         android:layout_weight="1" android:id="@+id/guide_same_button_btn2_parent" android:visibility="gone">
                         <Button
                             android:id="@+id/guide_same_button_btn2"
-                            style="@style/panelElem.button.system"
+                            style="@style/panelElem.button.symbol"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_gravity="center"/>
@@ -100,7 +100,7 @@
                         android:layout_weight="1" android:id="@+id/guide_same_button_btn3_parent">
                         <Button
                             android:id="@+id/guide_same_button_btn3"
-                            style="@style/panelElem.button.system"
+                            style="@style/panelElem.button.symbol"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_gravity="center"/>
@@ -173,27 +173,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <TextView
-                        android:text="@string/guide_7_negate"
-                        style="@style/guide_text_table" />
-                    <TextView
-                        android:text="@string/guide_7_order_rightLeft"
-                        style="@style/guide_text_table" />
-                </TableRow>
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:text="@string/guide_7_functionsAndRoot"
-                        style="@style/guide_text_table" />
-                    <TextView
-                        android:text="@string/guide_7_order_rightLeft"
-                        style="@style/guide_text_table" />
-                </TableRow>
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:text="^"
+                        android:text="@string/guide_7_functionsRootPowNegate"
                         style="@style/guide_text_table" />
                     <TextView
                         android:text="@string/guide_7_order_rightLeft"
@@ -253,6 +233,35 @@
                     android:text="@string/guide_9_text2"/>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/guide_eNotation"
+                style="@style/guide">
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="5E3 = 5 × 10^3 = 5000"/>
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="7.3E-2 = 7.3 × 10^(-2) = 0.073"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    style="@style/guide_text"
+                    android:text="@string/guide_16_text2"/>
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="1.672 621 898E-27"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    style="@style/guide_text"
+                    android:text="@string/guide_16_text3"/>
+                <TextView
+                    style="@style/guide_text_math"
+                    android:gravity="center_horizontal"
+                    android:text="12E-2 ^ 2 = (12E-2) ^ 2 = 144E-4 =\n = 0.0144"/>
+                <TextView
+                    android:id="@+id/guide_16_text4"
+                    android:layout_width="wrap_content"
+                    style="@style/guide_text"/>
+            </LinearLayout>
+            <LinearLayout
                 style="@style/guide"
                 android:id="@+id/guide_nan" >
                 <TextView
@@ -283,13 +292,14 @@
                     android:layout_marginTop="15dp">
                     <Button
                         android:id="@+id/guide_longClks_btn1"
-                        style="@style/panelElem.button.system"
+                        style="@style/panelElem.button.symbol"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:text="a"
                         android:layout_weight="0"
                         android:onClick="onGuideLongClkClick"/>
                     <ImageView
+                        android:id="@+id/guide_longClks_arrow1"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_arrow_forward"
@@ -311,13 +321,14 @@
                     android:layout_marginTop="15dp">
                     <Button
                         android:id="@+id/guide_longClks_btn2"
-                        style="@style/panelElem.button.system"
+                        style="@style/panelElem.button.symbol"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:text="A"
                         android:layout_weight="0"
                         android:onClick="onGuideLongClkClick"/>
                     <ImageView
+                        android:id="@+id/guide_longClks_arrow2"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_arrow_forward"
@@ -332,6 +343,56 @@
                         android:textSize="30sp"
                         android:gravity="center" />
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp">
+                    <Button
+                        android:id="@+id/guide_longClks_btn3"
+                        style="@style/panelElem.button.symbol"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:text="("
+                        android:layout_weight="0"
+                        android:onClick="onGuideLongClkClick"/>
+                    <ImageView
+                        android:id="@+id/guide_longClks_arrow3"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        android:contentDescription="->"
+                        android:scaleType="center" />
+                    <TextView
+                        android:id="@+id/guide_longClks_res3"
+                        android:layout_width="30dp"
+                        android:layout_height="60dp"
+                        android:text="\?"
+                        android:visibility="visible"
+                        android:textSize="30sp"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/guide_namespaces"
+                style="@style/guide">
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="a = b = c = 5"/>
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="f(x, y) = x^2 + 2y"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    style="@style/guide_text"
+                    android:text="@string/guide_17_text2"/>
+                <TextView
+                    style="@style/guide_text_math"
+                    android:text="f(2, 3) = 2^2 + 2 × 3 = 10"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    style="@style/guide_text"
+                    android:text="@string/guide_17_text3"/>
             </LinearLayout>
             <LinearLayout
                 style="@style/guide"

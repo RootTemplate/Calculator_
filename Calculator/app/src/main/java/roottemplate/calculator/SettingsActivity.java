@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -32,6 +33,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -323,6 +325,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements IfD
                 return true;
             }
         });
+
+        final DialogPreference dayNightTheme = (DialogPreference) findPreference("dayNightTheme");
+        bindPreferenceSummaryToValue(dayNightTheme);
+        dayNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
+                onThemeValueChanged();
+                return true;
+            }
+        });
+
+        findPreference("darkOrangeEquals").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                onThemeValueChanged();
+                return true;
+            }
+        });
+    }
+
+    private boolean themeChangedNotificationShown = false;
+    private void onThemeValueChanged() {
+        if(themeChangedNotificationShown) return;
+        themeChangedNotificationShown = true;
+        Toast.makeText(SettingsActivity.this, R.string.pref_theme_valueChanged, Toast.LENGTH_SHORT)
+                .show();
     }
 
     @Override

@@ -55,24 +55,21 @@ public class EvaluatorManager {
     public static String closeUnclosedBrackets(String expr, int closingType) {
         if(closingType == BRACKET_CLOSING_TYPE_NO) return expr;
 
-        int bracketsOpen = countRepeats(expr, '(');
-        if(bracketsOpen == 0)
-            return expr;
-        int closed = bracketsOpen - countRepeats(expr, ')');
-        if(closed == 0 || (closingType == BRACKET_CLOSING_TYPE_IFONE && closed > 1))
+        int bracketsOpen = 0;
+        int length = expr.length();
+        for(int i = 0; i < length; i++) {
+            char c = expr.charAt(i);
+            if(c == '(') bracketsOpen++;
+            else if(c == ')') bracketsOpen--;
+        }
+
+        if(bracketsOpen == 0 || (closingType == BRACKET_CLOSING_TYPE_IFONE && bracketsOpen > 1))
             return expr;
 
         StringBuilder sb = new StringBuilder(expr);
-        for(int i = 0; i < closed; i++)
+        for(int i = 0; i < bracketsOpen; i++)
             sb.append(')');
         return sb.toString();
-    }
-    private static int countRepeats(String in, char needle) {
-        int i = -1;
-        int count = 0;
-        while((i = in.indexOf(needle, i + 1)) != -1)
-            count++;
-        return count;
     }
 
     public static String replaceAppToEngine(String expr) {
@@ -143,13 +140,14 @@ public class EvaluatorManager {
     }
 
     public EvalResult eval(String text, int maxDigitsToFit) {
-        if(mFragment.mEvaluator == null) return new EvalResult(null, null, null);
+        if(mFragment.mEvaluator == null) return new EvalResult(null, null, null, -1);
         // Namespace had not been created by UpdateThread; this should not happen often
 
         String text_ = text; // Unmodified text
         text = EvaluatorManager.closeUnclosedBrackets(text, mPrefs.bracketClosingType());
         String result, message = null;
         InputEditText.TextType type;
+        int errorIndex = -1;
         boolean historyRightIsNull = false;
 
         try {
@@ -171,24 +169,27 @@ public class EvaluatorManager {
         } catch (EvaluatorException e) {
             message = EvaluatorManager.replaceEngineToApp(e.getLocalizedMessage());
             result = mContext.getResources().getString(R.string.error);
-            type = InputEditText.TextType.RESULT_MESSAGE;
+            type = InputEditText.TextType.INPUT;
+            errorIndex = e.errorIndex;
         }
 
         if(mPrefs.enabledHistory()) {
             mDb.getHistory().addHistoryElement(text, historyRightIsNull ? null : result, message);
         }
 
-        return new EvalResult(type, result, message);
+        return new EvalResult(type, result, message, errorIndex);
     }
     public static class EvalResult {
         public final InputEditText.TextType mTextType;
         public final String mText;
         public final String mMessage;
+        public final int mErrorIndex;
 
-        public EvalResult(InputEditText.TextType textType, String text, String message) {
+        public EvalResult(InputEditText.TextType textType, String text, String message, int errorIndex) {
             this.mTextType = textType;
             this.mText = text;
             this.mMessage = message;
+            this.mErrorIndex = errorIndex;
         }
     }
 

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="pref_def_doRound">true</bool>
+    <bool name="pref_def_autoBracketClosing">true</bool>
     <bool name="pref_def_enabledHistory">true</bool>
     <bool name="pref_def_enabledTips">true</bool>
     <bool name="pref_def_highlightE">false</bool>
     <bool name="pref_def_separateNamespace">true</bool>
+    <bool name="pref_def_darkOrangeEquals">true</bool>
 </resources>

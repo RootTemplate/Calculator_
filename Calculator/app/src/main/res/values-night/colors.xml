@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="colorPrimarySettings">#283593</color>
+    <color name="colorPrimaryDarkSettings">#1A237E</color>
+
+    <color name="colorInputText">#fff</color>
+    <color name="colorInputTextBackground">#000</color>
+    <color name="colorInputSeparator">#8DFFFFFF</color>
+    <color name="colorInputSeparatorResult">#FB9D31</color>
+    <!--<color name="colorInputHighlightE">#a6a6a6</color>
+    <color name="colorInputHighlightEResult">#b7a68b</color>-->
+
+    <color name="colorEquals">#FFA000</color>
+    <color name="colorErrorDetail">#BFBFBF</color>
+
+    <color name="colorButtonSeparator">#000</color>
+    <color name="colorSpace">@color/colorButtonDelete</color>
+
+    <color name="colorButton">#BDBDBD</color>
+    <color name="colorButtonText">#000</color>
+    <color name="colorButtonFocused">#9E9E9E</color>
+    <color name="colorButtonDelete">#4c5dbd</color>
+    <color name="colorButtonDeleteFocused">#3949AB</color>
+    <color name="colorButtonEquals">#6c7ac6</color> <!--5C6BC0-->
+    <color name="colorButtonEqualsText">#FFF</color>
+    <color name="colorButtonEqualsFocused">#4c5dbd</color> <!--3F51B5-->
+    <color name="colorButtonEqualsDarkOrange">#FF8F00</color>
+    <color name="colorButtonEqualsDarkOrangeFocused">#FF6F00</color>
+    <color name="colorButtonSymbol">#555555</color>
+    <color name="colorButtonSymbolText">#EEEEEE</color>
+    <color name="colorButtonSymbolFocused">#3C3C3C</color>
+    <color name="colorButtonShiftText">#CECECE</color>
+    <color name="colorButtonSystem">#404040</color>
+    <color name="colorButtonSystemText">@color/colorButtonSymbolText</color>
+    <color name="colorButtonSystemFocused">#333333</color> <!--2F2F2F--> <!--8c2708--> <!--TODO-->
+
+    <color name="colorDialogActionBarBackground">#333333</color>
+    <color name="colorDialogListDivider">#3E3E3E</color>
+
+    <color name="colorAboutTitles">#a0a0a0</color>
+    <color name="colorGuideMathBackground">#777777</color>
+
+    <color name="colorIconDelete">#F5F5F5</color>
+    <color name="colorIconDeleteFocused">#20000000</color>
+</resources>

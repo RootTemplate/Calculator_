@@ -20,6 +20,8 @@ package roottemplate.calculator.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -47,18 +49,27 @@ public class ShiftButton extends ImageButton {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ShiftButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        initView();
     }
 
     public ShiftButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initView();
     }
 
     public ShiftButton(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initView();
     }
 
     private void initView() {
         setState(STATE_DISABLED);
+
+        int[] attrs = {R.attr.colorButtonShiftText};
+        TypedArray ta = getContext().obtainStyledAttributes(attrs);
+        int iconColor = ta.getColor(0, -1);
+        setColorFilter(iconColor, PorterDuff.Mode.MULTIPLY);
+        ta.recycle();
     }
 
     public void setState(int state) {

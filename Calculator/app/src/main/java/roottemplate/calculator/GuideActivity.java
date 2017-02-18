@@ -19,23 +19,33 @@
 package roottemplate.calculator;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.StrikethroughSpan;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -51,9 +61,11 @@ public class GuideActivity extends AppCompatActivity {
             R.id.guide_arOrder, // OPERATOR ORDER
             R.id.guide_empty, R.id.guide_same_button, R.id.guide_same_button, R.id.guide_same_button, // SAME BUTTONS
             R.id.guide_log, R.id.guide_root, // log, root
+            R.id.guide_eNotation, // EXPONENT NOTAION
             R.id.guide_nan, // NaN
             R.id.guide_longClks, // LONG CLICKS ON BUTTONS
             R.id.guide_empty, // DOUBLE CLICKS TO MOVE TO MAIN
+            R.id.guide_namespaces, // NAMESPACE
             R.id.guide_historyClks, // HISTORY CLICKS
             R.id.guide_empty, // SETTINGS IS YOUR FRIEND
             R.id.guide_final
@@ -62,6 +74,7 @@ public class GuideActivity extends AppCompatActivity {
     private int mCurGuideIndex = -1;
     private Intent mResult;
 
+    //private GestureDetectorCompat mDetector;
     private Messenger mMainActivity;
     private int mPageCurrent;
     private int mPageCount;
@@ -72,6 +85,16 @@ public class GuideActivity extends AppCompatActivity {
 
     private Button mSameButtonBtn0, mSameButtonBtn1, mSameButtonBtn2, mSameButtonBtn3;
     private TextView mSameButtonText1, mSameButtonText2;
+
+    private final Handler mHandler = new Handler();
+    private final Runnable mScrollbarShowCallback = new Runnable() {
+        @Override
+        public void run() {
+            mScroll.scrollTo(0, 0);
+            mScroll.scrollBy(0, -1);
+            mScroll.scrollBy(0, 1);
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +113,8 @@ public class GuideActivity extends AppCompatActivity {
         //        .getDefaultDisplay().getWidth() * 1F);
         window.setAttributes(layout);
 
+        //mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
         Intent intent = getIntent();
         mMainActivity = new Messenger((
                 (ParcelableBinder) intent.getParcelableExtra("messengerBinder")).getBinder());
@@ -107,6 +132,13 @@ public class GuideActivity extends AppCompatActivity {
         mSameButtonText1 = (TextView) findViewById(R.id.guide_same_button_text1);
         mSameButtonText2 = (TextView) findViewById(R.id.guide_same_button_text2);
 
+        ((TextView) findViewById(R.id.guide_log_math2)).setText(Html.fromHtml("log(b, n) = log<sub>b</sub> n"));
+        ((TextView) findViewById(R.id.guide_root_math)).setText(Html.fromHtml("√(4, 16) = <sup>4</sup>√16 = 2"));
+
+        TextView temp = (TextView) findViewById(R.id.guide_16_text4);
+        temp.setText(Html.fromHtml(getResources().getString(R.string.guide_16_text4)));
+        temp.setMovementMethod(LinkMovementMethod.getInstance());
+
         View.OnLongClickListener longClkLongListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -116,6 +148,13 @@ public class GuideActivity extends AppCompatActivity {
         };
         findViewById(R.id.guide_longClks_btn1).setOnLongClickListener(longClkLongListener);
         findViewById(R.id.guide_longClks_btn2).setOnLongClickListener(longClkLongListener);
+        findViewById(R.id.guide_longClks_btn3).setOnLongClickListener(longClkLongListener);
+
+        PorterDuffColorFilter pd = new PorterDuffColorFilter(getResources().getColor(R.color.colorButtonShiftText),
+                PorterDuff.Mode.MULTIPLY);
+        int[] ids = {R.id.guide_longClks_arrow1, R.id.guide_longClks_arrow2, R.id.guide_longClks_arrow3};
+        for(int id : ids)
+            ((ImageView) findViewById(id)).setColorFilter(pd);
 
         mResult = new Intent();
         setGuideIndex(savedInstanceState == null ? intent.getIntExtra("guideIndex", 0) :
@@ -172,6 +211,11 @@ public class GuideActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*@Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        mDetector.onTouchEvent(ev);
+        return super.dispatchTouchEvent(ev);
+    }*/
 
     // LOGIC METHODS
 
@@ -220,40 +264,47 @@ public class GuideActivity extends AppCompatActivity {
             case 7:
                 mTitle.setText(R.string.guide_8_title);
                 mText.setText(R.string.guide_8_text1);
-                ((TextView) findViewById(R.id.guide_log_math2)).setText(Html.fromHtml("log(b, n) = log<sub>b</sub> n"));
                 break;
             case 8:
                 mTitle.setText(R.string.guide_9_title);
                 mText.setText(R.string.guide_9_text1);
-                ((TextView) findViewById(R.id.guide_root_math)).setText(Html.fromHtml("√(4, 16) = <sup>4</sup>√16 = 2"));
                 break;
             case 9:
+                mTitle.setText(R.string.guide_16_title);
+                mText.setText(R.string.guide_16_text1);
+                break;
+            case 10:
                 mTitle.setText(R.string.guide_10_title);
                 mText.setText(R.string.guide_10_text);
                 break;
-            case 10:
+            case 11:
                 mTitle.setText(R.string.guide_11_title);
                 mText.setText(R.string.guide_11_text);
                 break;
-            case 11:
+            case 12:
                 mTitle.setText(R.string.guide_15_title);
                 mText.setText(R.string.guide_15_text);
                 break;
-            case 12:
+            case 12 + 1:
+                mTitle.setText(R.string.guide_17_title);
+                mText.setText(R.string.guide_17_text1);
+                break;
+            case 14:
                 mTitle.setText(R.string.guide_12_title);
                 mText.setText(R.string.guide_12_text);
                 break;
-            case 12 + 1:
+            case 15:
                 mTitle.setText(R.string.guide_14_title);
                 mText.setText(R.string.guide_14_text);
                 break;
-            case 14:
+            case 16:
                 mTitle.setText(R.string.guide_final_title);
                 mText.setText("");
                 break;
         }
 
-        mScroll.scrollTo(0, 0);
+        mHandler.postDelayed(mScrollbarShowCallback, 10); // Hack to show scrollbar for ~2 sec to make
+                                                          // user know that the page is scrollable
         mCurGuideIndex = index;
         invalidateOptionsMenu();
         setResult(RESULT_OK, mResult.putExtra("guideIndex", mCurGuideIndex));
@@ -274,7 +325,6 @@ public class GuideActivity extends AppCompatActivity {
         }
         mSameButtonBtn3.setText(rightBtn);
         mSameButtonText1.setText(Html.fromHtml(getResources().getString(leftText)));
-        mSameButtonText1.setMovementMethod(LinkMovementMethod.getInstance());
         mSameButtonText2.setText(rightText);
     }
 
@@ -283,8 +333,15 @@ public class GuideActivity extends AppCompatActivity {
         onGuideLongClkClick(view, false);
     }
     private void onGuideLongClkClick(View view, boolean isLong) {
-        int textId = view.getId() == R.id.guide_longClks_btn1 ?
-                R.id.guide_longClks_res1 : R.id.guide_longClks_res2;
+        int textId = 0;
+        switch(view.getId()) {
+            case R.id.guide_longClks_btn1:
+                textId = R.id.guide_longClks_res1; break;
+            case R.id.guide_longClks_btn2:
+                textId = R.id.guide_longClks_res2; break;
+            case R.id.guide_longClks_btn3:
+                textId = R.id.guide_longClks_res3; break;
+        }
         String inner = ((Button) view).getText().toString();
         String outer = isLong ? Util.inverseTextCase(inner) : inner;
         ((TextView) findViewById(textId)).setText(outer);
@@ -323,5 +380,25 @@ public class GuideActivity extends AppCompatActivity {
     private void updateScrollPageButtons() {
         findViewById(R.id.guide_pads_left).setEnabled(mPageCurrent > 0);
         findViewById(R.id.guide_pads_right).setEnabled(mPageCurrent < mPageCount - 1);
+    }
+
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent event) { return true; }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            float dX = event2.getX() - event1.getX();
+            float dY = event2.getY() - event1.getY();
+            Log.d(Util.LOG_TAG, "onFling: " + dX + " " + dY);
+
+            if(Math.abs(dX) > 320 && Math.abs(dY) < 100) {
+                int dPage = (dX > 0) ? 1 : -1;
+                setGuideIndex(mCurGuideIndex + dPage);
+            }
+
+            return true;
+        }
     }
 }

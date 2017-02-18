@@ -1,28 +1,62 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-    </style>
 
+        <item name="colorSpace">@color/colorButtonDelete</item>
+        <item name="colorButtonShiftText">@color/colorButtonShiftText</item>
+
+        <item name="styleBaseButton">@style/panelElem.button.base</item>
+        <item name="styleDeleteButton">@style/panelElem.button.delete</item>
+        <item name="styleEqualsButton">@style/panelElem.button.equals</item>
+        <item name="styleSymbolButton">@style/panelElem.button.symbol</item>
+        <item name="styleSystemButton">@style/panelElem.button.system</item>
+    </style>
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
+    <style name="AppTheme.Legacy" parent="AppTheme">
+        <item name="colorSpace">@color/colorLegacySpace</item>
+        <item name="colorButtonShiftText">@color/colorLegacyButtonShiftText</item>
+
+        <item name="styleBaseButton">@style/panelElem.button.base.legacy</item>
+        <item name="styleDeleteButton">@style/panelElem.button.delete.legacy</item>
+        <item name="styleEqualsButton">@style/panelElem.button.equals.legacy</item>
+        <item name="styleSymbolButton">@style/panelElem.button.symbol.legacy</item>
+        <item name="styleSystemButton">@style/panelElem.button.system.legacy</item>
+    </style>
+    <style name="AppTheme.Legacy.NoActionBar" parent="AppTheme.Legacy">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Settings" parent="AppTheme">
+        <item name="colorPrimary">@color/colorPrimarySettings</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkSettings</item>
+        <item name="actionBarTheme">@style/AppTheme.AppBarOverlay.Settings</item>
+    </style>
+
+    <style name="AppTheme.Settings.NoActionBar" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimarySettings</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkSettings</item>
+        <item name="actionBarTheme">@style/AppTheme.AppBarOverlay.Settings</item>
+    </style>
+
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
+    <style name="AppTheme.AppBarOverlay.Settings" parent="ThemeOverlay.AppCompat.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="AppTheme.DialogAppBarOverlay" parent="AppTheme.AppBarOverlay">
+    <style name="AppTheme.Dialog.AppBarOverlay" parent="AppTheme.AppBarOverlay">
         <item name="android:background">@color/colorDialogActionBarBackground</item>
         <item name="background">@color/colorDialogActionBarBackground</item>
     </style>
@@ -39,13 +73,11 @@
         <item name="android:textColor">@color/colorInputText</item>
         <item name="android:textCursorDrawable">@drawable/cursor_edit_text</item>
         <item name="android:textSize">@dimen/inputTextSize</item>
-        <item name="android:background">#00000000</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
-        <item name="android:layout_marginLeft">2dp</item>
-        <item name="android:layout_marginRight">2dp</item>
-        <item name="android:paddingLeft">6dp</item>
-        <item name="android:paddingRight">6dp</item>
+        <item name="android:background">@color/colorInputTextBackground</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
     </style>
 
     <style name="panelRow">
@@ -68,8 +100,8 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
         <item name="android:padding">0dp</item>
-        <item name="android:layout_margin">0.5dp</item>
-        <item name="android:textSize">30sp</item>
+        <item name="android:layout_margin">1px</item>
+        <item name="android:textSize">31sp</item>
     </style>
 
     <style name="panelElem.button" parent="panelElem">
@@ -78,22 +110,50 @@
         <item name="textAllCaps">false</item>
         <item name="android:textStyle">normal</item>
         <item name="android:typeface">sans</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="panelElem.button.base" parent="panelElem.button">
         <item name="android:background">@drawable/background_digit_button</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/colorButtonText</item>
         <item name="android:tag">digit</item>
+    </style>
+    <style name="panelElem.button.base.legacy" parent="panelElem.button.base">
+        <item name="android:background">@drawable/background_digit_button_legacy</item>
+        <item name="android:textColor">@color/colorLegacyButtonText</item>
     </style>
 
     <style name="panelElem.button.equals" parent="panelElem.button">
         <item name="android:background">@drawable/background_equals_button</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/colorButtonEqualsText</item>
+    </style>
+    <style name="panelElem.button.equals.darkorange" parent="panelElem.button.equals">
+        <item name="android:background">@drawable/background_equals_button_darkorange</item>
+    </style>
+    <style name="panelElem.button.equals.legacy" parent="panelElem.button.equals">
+        <item name="android:background">@drawable/background_equals_button_legacy</item>
+        <item name="android:textColor">@color/colorLegacyButtonEqualsText</item>
+    </style>
+
+    <style name="panelElem.button.symbol" parent="panelElem.button">
+        <item name="android:background">@drawable/background_symbol_button</item>
+        <item name="android:textColor">@color/colorButtonSymbolText</item>
+    </style>
+    <style name="panelElem.button.symbol.legacy" parent="panelElem.button.symbol">
+        <item name="android:background">@drawable/background_symbol_button_legacy</item>
+        <item name="android:textColor">@color/colorLegacyButtonSymbolText</item>
     </style>
 
     <style name="panelElem.button.system" parent="panelElem.button">
-        <item name="android:background">@color/colorButtonSymbol</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/background_system_button</item>
+        <item name="android:textColor">@color/colorButtonSystemText</item>
+        <item name="android:onClick">onSystemButtonClick</item>
+        <item name="android:layout_weight">0</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+    <style name="panelElem.button.system.legacy" parent="panelElem.button.system">
+        <item name="android:background">@drawable/background_system_button</item>
+        <item name="android:textColor">@color/colorButtonSystemText</item>
     </style>
 
     <style name="panelElem.button.delete" parent="panelElem.button.base">
@@ -104,6 +164,9 @@
         <item name="android:longClickable">true</item>
         <item name="android:contentDescription">Delete</item>
         <item name="android:onClick">onDelButtonClick</item>
+    </style>
+    <style name="panelElem.button.delete.legacy" parent="panelElem.button.delete">
+        <item name="android:background">@drawable/background_delete_button_legacy</item>
     </style>
 
     <style name="item_history_text">
@@ -145,7 +208,7 @@
 
     <style name="guide_text_math" parent="guide_text">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:background">#777777</item>
+        <item name="android:background">@color/colorGuideMathBackground</item>
         <item name="android:padding">6dp</item>
         <item name="android:layout_margin">5dp</item>
     </style>

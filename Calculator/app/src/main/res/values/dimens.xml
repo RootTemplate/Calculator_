@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="inputTextHeight">60dp</dimen>
+    <dimen name="inputTextHeight">72dp</dimen>
     <dimen name="inputTextSize">40sp</dimen>
     <dimen name="inputTextCursorHeight">48dp</dimen>
 
