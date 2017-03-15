@@ -224,7 +224,6 @@
     <string name="dialog_kitsUpdated_title">Наборы кнопок были обновлены</string>
     <string name="dialog_kitsUpdated_message">Новый набор распаковали только что</string>
     <string name="pref_theme_valueChanged">Изменения будут применены при следующем запуске приложения</string>
-    <string name="about_checkForUpdates">Проверить обновления</string>
     <string name="later">Позже</string>
     <string name="dialog_update_message">Проверить наличие обновлений для приложения?</string>
     <string name="dialog_update_title">Проверить обновления</string>

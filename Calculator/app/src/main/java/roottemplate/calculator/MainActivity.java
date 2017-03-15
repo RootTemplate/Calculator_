@@ -18,9 +18,7 @@
 
 package roottemplate.calculator;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -47,13 +45,11 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 import java.util.Random;
 
 import roottemplate.calculator.data.AppDatabase;
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
-import roottemplate.calculator.evaluator.util.ExpressionFormatUpdater;
 import roottemplate.calculator.util.ParcelableBinder;
 import roottemplate.calculator.util.Util;
 import roottemplate.calculator.view.FirstLaunchDialogFragment;
@@ -62,7 +58,6 @@ import roottemplate.calculator.view.KitViewPager;
 import roottemplate.calculator.view.NotifyDialogFragment;
 import roottemplate.calculator.view.ShiftButton;
 import roottemplate.calculator.view.SystemButton;
-import roottemplate.calculator.view.UpdateDialogFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private static final int REQUEST_CODE_HISTORY = 0;
@@ -168,10 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         // UPDATE VERSION
         updateVersion();
-        if(UpdateDialogFragment.shouldAskForUpdate(mPrefs)) {
-            new UpdateDialogFragment().show(getSupportFragmentManager(),
-                    UpdateDialogFragment.FRAGMENT_TAG);
-        }
 
         // MISCELLANEOUS INITIALIZATIONS
         mTipsPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt("tipsPageIndex");
@@ -366,7 +357,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
         if(latestVer == thisVer) return;
-        UpdateDialogFragment.onAppUpdated(mPrefs);
         boolean hasNewKKits = latestVer == 2 || latestVer == 3;
 
         if(thisVer == -1) {

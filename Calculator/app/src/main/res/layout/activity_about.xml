@@ -58,23 +58,11 @@
                 android:fontFamily="Arial"
                 android:textColor="@color/colorAboutTitles"/>
 
-            <!--<Button
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about_arote"
                 android:onClick="onAroteClick"
-                android:layout_gravity="center"
-                style="@style/button_noCaps"
-                android:typeface="sans"
-                android:textSize="18sp"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp" />-->
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/about_checkForUpdates"
-                android:onClick="onCheckForUpdatesClick"
                 android:layout_gravity="center"
                 style="@style/button_noCaps"
                 android:typeface="sans"

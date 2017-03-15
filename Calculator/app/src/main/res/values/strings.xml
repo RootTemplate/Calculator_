@@ -59,7 +59,6 @@
     <!-- String related to About -->
 
     <string name="about_arote" translatable="false">RootTemplate</string>
-    <string name="about_checkForUpdates">Check for Updates</string>
     <string name="about_calculator" translatable="false">Calculator_</string>
     <string name="about_copyright" translatable="false">Copyright © RootTemplate Group 1, 2016—2017</string>
     <string name="about_info">&lt;b&gt;Authors&lt;/b&gt;: RootTemplate Group 1&lt;br&gt;
