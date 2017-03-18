@@ -40,6 +40,7 @@ import java.util.List;
 import roottemplate.calculator.data.AppDatabase;
 import roottemplate.calculator.util.AppCompatPreferenceActivity;
 import roottemplate.calculator.view.IfDialogFragment;
+import roottemplate.calculator.view.OnDialogResultListener;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -52,8 +53,9 @@ import roottemplate.calculator.view.IfDialogFragment;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity implements IfDialogFragment.OnDialogResultListener {
+public class SettingsActivity extends AppCompatPreferenceActivity implements OnDialogResultListener {
     private static final int REQUEST_EDIT_NAMESPACE = 0;
+    private static final int REQUEST_EDIT_KEYBOARD_KITS = 1;
     private static final int DIALOG_CLEAR_NAMESPACES = 0;
 
     /**
@@ -326,6 +328,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements IfD
             }
         });
 
+        findPreference("editKeyboardKits").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(SettingsActivity.this, KeyboardsActivity.class);
+                //startActivityForResult(intent, REQUEST_EDIT_KEYBOARD_KITS); todo
+                return true;
+            }
+        });
+
         final DialogPreference dayNightTheme = (DialogPreference) findPreference("dayNightTheme");
         bindPreferenceSummaryToValue(dayNightTheme);
         dayNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -352,6 +363,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements IfD
         themeChangedNotificationShown = true;
         Toast.makeText(SettingsActivity.this, R.string.pref_theme_valueChanged, Toast.LENGTH_SHORT)
                 .show();
+        mResultIntent.putExtra("themeChanged", true);
     }
 
     @Override
@@ -373,6 +385,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements IfD
     }
 
     @Override public void onDialogNegativeClick(int dialogId) {}
+    @Override public void onDialogNeutralClick(int dialogId) {}
 
     /**
      * {@inheritDoc}
@@ -397,6 +410,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements IfD
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
      */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)

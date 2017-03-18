@@ -77,7 +77,7 @@ public class NamespaceActivity extends AppCompatActivity
         mEvaluatorSelectedKitName = mDb.getPrefs().separateNamespace() ? mDb.getPrefs().kitName() : null;
         int selectedKitIndex = 0;
         for(int i = 0; i < allKitNames.length / 2; i++) {
-            mKitNames[i + 1] = allKitNames[i * 2];
+            mKitNames[i + 1] = allKitNames[i * 2]; // TODO: check if shortName exists
             spinnerKitNames[i + 1] = allKitNames[i * 2] + " (" + allKitNames[i * 2 + 1] + ")";
             if(mKitNames[i + 1].equals(mEvaluatorSelectedKitName))
                 selectedKitIndex = i + 1;
@@ -142,61 +142,7 @@ public class NamespaceActivity extends AppCompatActivity
                 new int[] { R.id.text, R.id.isStandard, R.id.delete },
                 0
         );
-        mListAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                switch (view.getId()) {
-                    case R.id.text:
-                        // Set ID of the namespace element as tag of parent-LinearLayout to identify
-                        // the View later
-                        ((View) view.getParent()).setTag(cursor.getInt(cursor.getColumnIndex(
-                                NamespaceContract.NamespaceEntry._ID)));
-
-                        int type = cursor.getInt(cursor.getColumnIndex(
-                                NamespaceContract.NamespaceEntry.COLUMN_NAME_TYPE));
-                        String name = cursor.getString(columnIndex);
-                        String expr = cursor.getString(cursor.getColumnIndex(
-                                NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
-                        SpannableStringBuilder ssb = new SpannableStringBuilder();
-
-                        int start = 0;
-                        if(type == 0) {
-                            // NUMBER
-                            ssb.append(name).append(" = ");
-                            start = ssb.length();
-                            ssb.append(expr);
-                        } else if(type == 1) {
-                            String[] func = expr.split(";");
-                            ssb.append(name).append("(");
-                            for(int i = 1; i < func.length; i++) {
-                                if(i != 1)
-                                    ssb.append(", ");
-                                ssb.append(func[i]);
-                            }
-                            ssb.append(") = ");
-                            start = ssb.length();
-                            ssb.append(func[0]);
-                        } else
-                            Log.e(Util.LOG_TAG, "[NamespaceActivity] Found new type but no support added: "
-                                    + type);
-
-                        ssb.setSpan(new ForegroundColorSpan(getResources()
-                                        .getColor(R.color.colorButtonEqualsFocused)),
-                                start, ssb.length(), 0);
-
-                        ((TextView) view).setText(ssb);
-                        break;
-                    case R.id.isStandard:
-                        ((CheckBox) view).setChecked(cursor.getInt(columnIndex) == 1);
-                        break;
-                    case R.id.delete:
-                        ((ImageButton) view).setColorFilter(getResources().getColor(R.color.colorButtonShiftText),
-                                PorterDuff.Mode.MULTIPLY);
-                        break;
-                }
-                return true;
-            }
-        });
+        mListAdapter.setViewBinder(new ListViewBinder());
         mNamespaceContent.setAdapter(mListAdapter);
     }
 
@@ -249,6 +195,60 @@ public class NamespaceActivity extends AppCompatActivity
         public Cursor loadInBackground() {
             mDb.getNamespace().updateDatabase(false, false);
             return mDb.getNamespace().getNamespace(mKitName);
+        }
+    }
+
+    private class ListViewBinder implements SimpleCursorAdapter.ViewBinder {
+        @Override
+        public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+            switch (view.getId()) {
+            case R.id.text:
+                // Set ID of the namespace element as tag of parent-LinearLayout to identify
+                // the View later
+                ((View) view.getParent()).setTag(cursor.getInt(cursor.getColumnIndex(
+                        NamespaceContract.NamespaceEntry._ID)));
+
+                int type = cursor.getInt(cursor.getColumnIndex(
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_TYPE));
+                String name = cursor.getString(columnIndex);
+                String expr = cursor.getString(cursor.getColumnIndex(
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
+                SpannableStringBuilder ssb = new SpannableStringBuilder();
+
+                int start = 0;
+                if(type == 0) {
+                    // NUMBER
+                    ssb.append(name).append(" = ");
+                    start = ssb.length();
+                    ssb.append(expr);
+                } else if(type == 1) {
+                    String[] func = expr.split(";");
+                    ssb.append(name).append("(");
+                    for(int i = 1; i < func.length; i++) {
+                        if(i != 1) ssb.append(", ");
+                        ssb.append(func[i]);
+                    }
+                    ssb.append(") = ");
+                    start = ssb.length();
+                    ssb.append(func[0]);
+                } else
+                    Log.e(Util.LOG_TAG, "[NamespaceActivity] Found new type but no support added: "
+                            + type);
+
+                ssb.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorNamespaceEquals)),
+                        start, ssb.length(), 0);
+
+                ((TextView) view).setText(ssb);
+                break;
+            case R.id.isStandard:
+                ((CheckBox) view).setChecked(cursor.getInt(columnIndex) == 1);
+                break;
+            case R.id.delete:
+                ((ImageButton) view).setColorFilter(getResources().getColor(R.color.colorButtonShiftText),
+                        PorterDuff.Mode.MULTIPLY);
+                break;
+            }
+            return true;
         }
     }
 }

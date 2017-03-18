@@ -98,6 +98,8 @@ public class GuideActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Maybe todo: set normal or Legacy theme to fix button colors (themes)
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
 

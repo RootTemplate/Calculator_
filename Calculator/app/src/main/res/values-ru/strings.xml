@@ -183,9 +183,9 @@
     <string name="guide_17_text2">\tОбратите внимание: слева всегда записываются сами переменные/функции, а
         справа то, чему они равны.
         \n\tПосле этого функции можно использовать так:</string>
-    <string name="guide_17_text3">\tНа практике, переменные обычно используются для запоминания констант
+    <string name="guide_17_text3">\tНа практике переменные обычно используются для запоминания констант
         (обычно физических). Например, если вас достало каждый раз вводить массы элементарных частиц, их заряды,
-        и т.д. Плюс переменные можно использовать как замену классической памяти (MC, MR, M+, M-).</string>
+        и т.д. Переменные также можно использовать как замену классической памяти (MC, MR, M+, M−).</string>
     <string name="guide_final_title">Это всё</string>
     <string name="guide_final_text">Теперь вы всё знаете о приложении.</string>
 
@@ -224,6 +224,7 @@
     <string name="dialog_kitsUpdated_title">Наборы кнопок были обновлены</string>
     <string name="dialog_kitsUpdated_message">Новый набор распаковали только что</string>
     <string name="pref_theme_valueChanged">Изменения будут применены при следующем запуске приложения</string>
+    <string name="about_checkForUpdates">Проверить обновления</string>
     <string name="later">Позже</string>
     <string name="dialog_update_message">Проверить наличие обновлений для приложения?</string>
     <string name="dialog_update_title">Проверить обновления</string>
@@ -232,4 +233,8 @@
     <string name="pref_darkOrangeEquals_title">Оранжевая кнопка «Равно»</string>
     <string name="pref_dayNightTheme_title">Тема</string>
     <string name="pref_darkOrangeEquals_summary">Покрасить кнопку «Равно» в оранжевый цвет в темной теме</string>
+    <string name="title_activity_keyboards">Редактировать наборы кнопок</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отменить</string>
+    <string name="saveChanged">Сохранить изменения</string>
 </resources>

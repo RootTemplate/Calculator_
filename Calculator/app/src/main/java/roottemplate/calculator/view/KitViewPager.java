@@ -33,6 +33,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import roottemplate.calculator.MainActivity;
 import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.data.KeyboardKits;
@@ -110,7 +112,7 @@ public class KitViewPager extends ViewPager {
 
             return KeyboardKitsXmlManager.createContentViewFromPage(this.getContext(),
                     activity.getKeyboardKits().mButtons, activity.getPreferredKeyboardKitVersion().mPages[mPageIndex],
-                    inflater, isEastLocale, prefs.getAppTheme(activity), prefs.darkOrangeEquals(), activity);
+                    inflater, isEastLocale, prefs.getAppTheme(), prefs.darkOrangeEquals(), activity);
         }
 
         @Override
@@ -124,7 +126,7 @@ public class KitViewPager extends ViewPager {
 
             boolean doInverse = ShiftButton.isInverseEnabled(shiftState);
             boolean changeText = forceUpdate || ShiftButton.isInverseEnabled(mShiftState) != doInverse;
-            KeyboardKits.Button[] buttons = ((MainActivity) getActivity()).getKeyboardKits().mButtons;
+            ArrayList<KeyboardKits.Button> buttons = ((MainActivity) getActivity()).getKeyboardKits().mButtons;
             ViewGroup root = (ViewGroup) getView();
             int lines = root.getChildCount();
             for (int i = 0; i < lines; i++) {
@@ -134,7 +136,7 @@ public class KitViewPager extends ViewPager {
                     View view = line.getChildAt(j);
                     if(view instanceof Button) {
                         Button btn = (Button) view;
-                        KeyboardKits.Button btnInfo = buttons[(int) btn.getTag()];
+                        KeyboardKits.Button btnInfo = buttons.get((int) btn.getTag());
                         if(!changeText || !btnInfo.mEnableCaseInverse) continue;
                         if (doInverse)
                             btn.setText(Util.inverseTextCase(btn.getText().toString()));

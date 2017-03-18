@@ -18,9 +18,14 @@
 
 package roottemplate.calculator.data;
 
+import java.util.ArrayList;
+
 public class KeyboardKits {
     public enum ButtonType {
-        EQUALS, DIGIT, BASE, SYMBOL, SHIFT, SYSTEM
+        EQUALS, DIGIT, BASE, SYMBOL, SHIFT, SYSTEM;
+    }
+    public enum ButtonCategory {
+        SYSTEM, DIGITS, OPERATORS, FUNCTIONS, LETTERS, MISCELLANEOUS, CUSTOM
     }
     public enum PageReturnType {
         NEVER, IF_DOUBLE_CLICK, ALWAYS
@@ -32,48 +37,57 @@ public class KeyboardKits {
         public ButtonType mType;
         public int mLocaleEastId;
         public boolean mEnableCaseInverse;
+        public ButtonCategory mCategory;
 
-        public Button(String name, String text, String type, String localeEast, boolean inverseOnLongClick) {
+        public Button(String name, String text, String type, String localeEast, boolean inverseOnLongClick,
+                      ButtonCategory category) {
             this(name, text, ButtonType.valueOf(type.toUpperCase()),
-                    localeEast == null ? -1 : Integer.parseInt(localeEast), inverseOnLongClick);
+                    localeEast == null ? -1 : Integer.parseInt(localeEast), inverseOnLongClick,
+                    category);
         }
-        public Button(String name, String text, ButtonType type, int localeEastId, boolean enableCaseInverse) {
+        public Button(String text, ButtonType type, boolean enableCaseInverse, ButtonCategory category) {
+            this(text, text, type, -1, enableCaseInverse, category);
+        }
+        public Button(String name, String text, ButtonType type, int localeEastId, boolean enableCaseInverse,
+                      ButtonCategory category) {
             mName = name;
             mText = text;
             mType = type;
             mLocaleEastId = localeEastId;
             mEnableCaseInverse = enableCaseInverse;
+            mCategory = category;
         }
 
         @Override
         public String toString() {
             return "Button {name: " + mName + ", text: " + mText + ", type: " + mType.toString() +
                     ", localeEast: " + mLocaleEastId + ", enableCaseInverse: " + mEnableCaseInverse
-                    + "}";
+                    + ", category: " + mCategory + "}";
         }
     }
 
     public static class Page {
         public PageReturnType mMoveToMain;
-        public boolean mIsLayoutLandscape;
+        /** true if layout has orientation="vertical", false if orientation="horizontal" **/
+        public boolean mIsVerticalOrient;
         public int[][] mButtons;
 
-        public Page(String moveToMain, boolean isLayoutLandscape, int[][] buttons) {
+        public Page(String moveToMain, boolean isVerticalOrient, int[][] buttons) {
             this(moveToMain != null ? (moveToMain.equalsIgnoreCase("ifDouble") ?
                             PageReturnType.IF_DOUBLE_CLICK : PageReturnType.valueOf(moveToMain.toUpperCase()))
                     : null,
-                    isLayoutLandscape, buttons);
+                    isVerticalOrient, buttons);
         }
-        public Page(PageReturnType moveToMain, boolean isLayoutLandscape, int[][] buttons) {
+        public Page(PageReturnType moveToMain, boolean isVerticalOrient, int[][] buttons) {
             mMoveToMain = moveToMain;
-            mIsLayoutLandscape = isLayoutLandscape;
+            mIsVerticalOrient = isVerticalOrient;
             mButtons = buttons;
         }
 
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder("Page {moveToMain: " + (mMoveToMain == null ? null : mMoveToMain.toString())
-                    + ", layoutLandscape: " + mIsLayoutLandscape + ", buttons: [");
+                    + ", verticalOrientation: " + mIsVerticalOrient + ", buttons: [");
             for(int i = 0; i < mButtons.length; i++) {
                 if(i != 0)
                     sb.append("], [");
@@ -120,12 +134,15 @@ public class KeyboardKits {
         public String mShortName;
         public boolean mActionBarAccess;
         public KitVersion[] mKitVersions;
+        public boolean mIsSystem;
 
-        public Kit(String name, String shortName, boolean actionBarAccess, KitVersion[] kitVersions) {
+        public Kit(String name, String shortName, boolean actionBarAccess, boolean isSystem,
+                   KitVersion[] kitVersions) {
             mName = name;
             mShortName = shortName;
             mActionBarAccess = actionBarAccess;
             mKitVersions = kitVersions;
+            mIsSystem = isSystem;
 
             for(KitVersion kv : kitVersions)
                 kv.mParent = this;
@@ -138,6 +155,7 @@ public class KeyboardKits {
                     .append("name: ").append(mName).append(", ")
                     .append("shortName: ").append(mShortName).append(", ")
                     .append("actionBarAccess: ").append(mActionBarAccess).append(", ")
+                    .append("isSystem: ").append(mIsSystem).append(", ")
                     .append("kitVersions: [");
             for (int i = 0; i < mKitVersions.length; i++) {
                 if (i != 0)
@@ -149,31 +167,113 @@ public class KeyboardKits {
     }
 
 
-    public Button[] mButtons;
-    public Kit[] mKits;
-    public boolean mIsDefault;
+    public ArrayList<Button> mButtons;
+    public ArrayList<Kit> mKits;
 
-    public KeyboardKits(Button[] buttons, Kit[] kits, boolean isDefault) {
+    public KeyboardKits(ArrayList<Button> buttons, ArrayList<Kit> kits) {
         mButtons = buttons;
         mKits = kits;
-        mIsDefault = isDefault;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ButtonKits {");
-        sb.append("isDefault: ").append(mIsDefault).append(", buttons: [");
-        for(int i = 0; i < mButtons.length; i++) {
-            if(i != 0)
+        boolean first = true;
+        StringBuilder sb = new StringBuilder("ButtonKits {buttons: [");
+        for(Button btn : mButtons) {
+            if(first)
+                first = false;
+            else
                 sb.append(",\n");
-            sb.append(mButtons[i].toString());
+            sb.append(btn.toString());
         }
         sb.append("],\n\n\nkits: [");
-        for(int i = 0; i < mKits.length; i++) {
-            if(i != 0)
+        first = true;
+        for(Kit kit : mKits) {
+            if(first)
+                first = false;
+            else
                 sb.append(",\n\n");
-            sb.append(mKits[i].toString());
+            sb.append(kit.toString());
         }
         return sb.append("]}").toString();
+    }
+
+
+
+    public static final int DEFAULT_BUTTONS_COUNT = 66;
+    public static Button[] generateDefaultButtonArray() {
+        Button[] r = new Button[DEFAULT_BUTTONS_COUNT];
+        r[0] = new Button("=", ButtonType.EQUALS, false, ButtonCategory.SYSTEM);
+        r[1] = new Button("0", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[2] = new Button("1", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[3] = new Button("2", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[4] = new Button("3", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[5] = new Button("4", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[6] = new Button("5", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[7] = new Button("6", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[8] = new Button("7", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[9] = new Button("8", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[10] = new Button("9", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[11] = new Button(",", ButtonType.SYMBOL, false, ButtonCategory.MISCELLANEOUS);
+        r[12] = new Button("e", ButtonType.SYMBOL, true, ButtonCategory.LETTERS);
+        r[12 + 1] = new Button("\u03c0", ButtonType.SYMBOL, true, ButtonCategory.LETTERS); // PI
+        r[14] = new Button("(", ButtonType.SYMBOL, true, ButtonCategory.MISCELLANEOUS);
+        r[15] = new Button(")", ButtonType.SYMBOL, true, ButtonCategory.MISCELLANEOUS);
+        r[16] = new Button("|x|", "abs(", ButtonType.SYMBOL, -1, false, ButtonCategory.FUNCTIONS);
+        r[17] = new Button("+", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS);
+        r[18] = new Button("\u2212", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS); // minus
+        r[19] = new Button("\u00d7", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS); // multiply
+        r[20] = new Button("\u00f7", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS); // divide
+        r[21] = new Button("!", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS);
+        r[22] = new Button("^", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS);
+        r[23] = new Button("\u221a", ButtonType.SYMBOL, false, ButtonCategory.OPERATORS); // sqrt
+        r[24] = new Button(".", ButtonType.DIGIT, false, ButtonCategory.DIGITS);
+        r[25] = new Button("\u221e", ButtonType.SYMBOL, false, ButtonCategory.MISCELLANEOUS); // infinity
+        r[26] = new Button("NaN", ButtonType.SYMBOL, false, ButtonCategory.MISCELLANEOUS);
+        r[27] = new Button("E", ButtonType.SYMBOL, true, ButtonCategory.MISCELLANEOUS);
+        r[28] = new Button("%", ButtonType.SYMBOL, false, ButtonCategory.MISCELLANEOUS);
+        r[29] = new Button("=", ButtonType.SYMBOL, false, ButtonCategory.SYSTEM);
+        
+        r[30] = new Button("sin", "sin(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[31] = new Button("cos", "cos(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[32] = new Button("tan", "tan(", ButtonType.BASE, 36, false, ButtonCategory.FUNCTIONS);
+        r[33] = new Button("asin", "asin(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[34] = new Button("acos", "acos(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[35] = new Button("atan", "atan(", ButtonType.BASE, 37, false, ButtonCategory.FUNCTIONS);
+        r[36] = new Button("tg", "tg(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[37] = new Button("atg", "atg(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[38] = new Button("log", "log(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[39] = new Button("lg", "lg(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        r[40] = new Button("ln", "ln(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
+        
+        r[41] = new Button("", ButtonType.SHIFT, false, ButtonCategory.SYSTEM);
+        r[42] = new Button("a", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[43] = new Button("b", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[44] = new Button("c", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[45] = new Button("f", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[46] = new Button("g", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[47] = new Button("h", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[48] = new Button("k", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[49] = new Button("m", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[50] = new Button("n", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[51] = new Button("r", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[52] = new Button("s", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[53] = new Button("t", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[54] = new Button("x", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[55] = new Button("y", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[56] = new Button("z", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[57] = new Button("α", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[58] = new Button("β", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[59] = new Button("μ", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[60] = new Button("ν", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[61] = new Button("φ", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[62] = new Button("ρ", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[63] = new Button("i", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        r[64] = new Button("q", ButtonType.BASE, true, ButtonCategory.LETTERS);
+        
+        r[65] = new Button("amu", ButtonType.SYSTEM, false, ButtonCategory.SYSTEM);
+        // 66 elements; if you change this value, don't forget to change it in the
+        // DEFAULT_BUTTONS_COUNT field
+        return r;
     }
 }

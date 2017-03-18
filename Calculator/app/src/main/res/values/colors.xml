@@ -3,13 +3,14 @@
     <color name="colorPrimary">#FF9800</color> <!--FB8C00-->
     <color name="colorPrimaryDark">#F57C00</color> <!--F57C00--> <!--f57c00-->
     <color name="colorAccent">#FF4081</color>
+    <color name="colorAccentAlternative">#009688</color>
 
     <color name="colorPrimarySettings">#EEEEEE</color>
     <color name="colorPrimaryDarkSettings">#9E9E9E</color>
 
     <color name="colorInputText">#2C2C2C</color>
     <color name="colorInputTextBackground">#FAFAFA</color>
-    <color name="colorInputSeparator">#A0000000</color>
+    <color name="colorInputSeparator">#85000000</color>
     <color name="colorInputSeparatorResult">@color/colorEquals</color>
     <!--<color name="colorInputHighlightE">#a6a6a6</color>
     <color name="colorInputHighlightEResult">#b7a68b</color>-->
@@ -39,11 +40,11 @@
     <color name="colorDialogActionBarBackground">#3B3B3B</color>
     <color name="colorDialogListDivider">#B6B6B6</color>
 
-    <color name="colorAboutTitles">#a0a0a0</color>
+    <color name="colorAboutTitles">#848484</color>
     <color name="colorGuideMathBackground">#D0D0D0</color>
-
-    <color name="colorIconDelete">#000</color>
-    <color name="colorIconDeleteFocused">#20000000</color>
+    <color name="colorIcon">#000</color>
+    <color name="colorIconBackgroundFocused">#20000000</color>
+    <color name="colorNamespaceEquals">#db6e00</color>
 
 
     <!-- Legacy Colours -->

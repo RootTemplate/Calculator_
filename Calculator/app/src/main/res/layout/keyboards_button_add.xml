@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ImageButton
+        android:layout_width="@dimen/default_keyboard_action_button_size"
+        android:layout_height="@dimen/default_keyboard_action_button_size"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_gravity="center"
+        android:tint="@color/colorIcon"
+        android:src="@drawable/ic_add_black_43dp"
+        android:onClick="onAddCustomButtonClick"
+        android:contentDescription="@string/add" />
+</LinearLayout>

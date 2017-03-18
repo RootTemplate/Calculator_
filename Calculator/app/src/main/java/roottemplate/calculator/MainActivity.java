@@ -21,6 +21,7 @@ package roottemplate.calculator;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,16 +36,13 @@ import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Random;
 
 import roottemplate.calculator.data.AppDatabase;
@@ -116,8 +114,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             params.rightMargin = 0;
         }
 
+        // UPDATE VERSION
+        updateVersion();
+
         // INIT KEYBOARD KITS
-        if(!readKeyboardKits())
+        mKeyboardKits = Util.readKeyboardKits(this);
+        if(mKeyboardKits == null)
             return;
 
         // INIT ACTION BAR (after INIT KEYBOARD KITS as mKeyboardKits is used in actionBar)
@@ -161,9 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         mViewPager = (KitViewPager) findViewById(R.id.activity_main_viewPager);
         invalidateCurrentKeyboardKit();
 
-        // UPDATE VERSION
-        updateVersion();
-
         // MISCELLANEOUS INITIALIZATIONS
         mTipsPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt("tipsPageIndex");
     }
@@ -192,7 +191,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if(mPrefs.enabledHistory()) {
             if(mHistoryClearingThread != null)
                 mHistoryClearingThread.interrupt();
-            mDatabase.close();
+            if(mDatabase != null)
+                mDatabase.close();
         }
     }
 
@@ -227,6 +227,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
                     mInputText.clearText();
             }
+            if(data.getBooleanExtra("themeChanged", false) && Build.VERSION.SDK_INT >= 11) {
+                recreate();
+            }
         } else if(requestCode == REQUEST_CODE_GUIDES) {
             mTipsPageIndex = data.getIntExtra("guideIndex", 0);
         }
@@ -237,15 +240,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        KeyboardKits.Kit[] kits = mKeyboardKits.mKits;
-        if(kits.length >= 2) {
+        ArrayList<KeyboardKits.Kit> kits = mKeyboardKits.mKits;
+        if(kits.size() >= 2) {
             Random random = new Random();
-            for(int i = 0; i < kits.length; i++) {
-                KeyboardKits.Kit kit = kits[i];
-                if(kit.mActionBarAccess) {
+            int i = 0;
+            for(KeyboardKits.Kit kit : kits) {
+                if(kit.mActionBarAccess) { // todo: action bar access
                     MenuItem item = menu.add(GROUP_KIT_MAGIC, random.nextInt(), i, kit.mShortName);
                     MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
                 }
+                i++;
             }
         }
 
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             return true;
         } else if (id == R.id.action_settings) {
             int i = 0;
-            String[] kitNames = new String[mKeyboardKits.mKits.length * 2];
+            String[] kitNames = new String[mKeyboardKits.mKits.size() * 2];
             for(KeyboardKits.Kit kit : mKeyboardKits.mKits) {
                 kitNames[i++] = kit.mName;
                 kitNames[i++] = kit.mShortName;
@@ -300,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if(item.getGroupId() == GROUP_KIT_MAGIC) {
-            mPrefs.kitName(mKeyboardKits.mKits[item.getOrder()].mName);
+            mPrefs.kitName(mKeyboardKits.mKits.get(item.getOrder()).mName);
             invalidateCurrentKeyboardKit();
         }
 
@@ -337,43 +341,27 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
 
-    private boolean readKeyboardKits() {
-        try {
-            mKeyboardKits = KeyboardKitsXmlManager.parse(this);
-            if (mKeyboardKits.mKits.length == 0) {
-                Log.e(Util.LOG_TAG, "ButtonKits xml file has 0 kits. Restoring default xml");
-                KeyboardKitsXmlManager.restoreDefaultButtonKitsXml(this);
-                mKeyboardKits = KeyboardKitsXmlManager.parse(this);
-            }
-        } catch (IOException | XmlPullParserException e) {
-            Log.e(Util.LOG_TAG, "Exception while parsing ButtonKits. Restoring default xml", e);
-            Util.fatalError(this, R.string.message_bad_kits_xml, e);
-            return false;
-        }
-        return true;
-    }
-
     private void updateVersion() {
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
-        if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3;
+        if(latestVer == thisVer && false) return;
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || true; // todo
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
                     FirstLaunchDialogFragment.FRAGMENT_TAG);
         } else if(hasNewKKits) {
-            if(mKeyboardKits.mIsDefault) {
+            if(true) {
                 NotifyDialogFragment dialog = new NotifyDialogFragment();
                 Bundle args = new Bundle();
                 args.putInt("title", R.string.dialog_kitsUpdated_title);
                 args.putInt("message", R.string.dialog_kitsUpdated_message);
                 dialog.setArguments(args);
-                dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
+                //dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated"); todo
 
                 KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
-                readKeyboardKits();
-                invalidateCurrentKeyboardKit();
+                /*readKeyboardKits(); This will be invoked later in onCreate
+                invalidateCurrentKeyboardKit();*/
             } else {
                 /* TODO. Update KeyboardKits if new version provides new default kits.
                     If user has already specified custom ButtonKits, ask to try new default;
@@ -397,8 +385,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 kitVersion.mMainPageIndex);
         mEvalManager.setKit(kitVersion.mParent.mName);
 
-        if(mPrefs.separateNamespace())
-            mInputText.clearText();
+        if(mPrefs.separateNamespace()) {
+            if(mInputText.getTextType() != InputEditText.TextType.INPUT)
+                mInputText.clearText();
+        }
 
         invalidateActionBarMenu();
     }
@@ -406,9 +396,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private void invalidateActionBarMenu() {
         // Hacks to set selected MenuItem bold
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        KeyboardKits.Kit[] kits = mKeyboardKits.mKits;
+        ArrayList<KeyboardKits.Kit> kits = mKeyboardKits.mKits;
         KeyboardKits.Kit currentKit = mCurrentKeyboardKitVersion.mParent;
-        if(kits.length < 2) return;
+        if(kits.size() < 2) return;
 
         ActionMenuView menuView = null;
         for (int i = 0; i < toolbar.getChildCount(); i++) {
@@ -424,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             MenuItem item = menu.getItem(i);
             if(item.getGroupId() == GROUP_KIT_MAGIC) {
                 boolean typefaceSet = false;
-                int typeface = (kits[item.getOrder()] == currentKit) ? Typeface.BOLD : Typeface.NORMAL;
+                int typeface = (kits.get(item.getOrder()) == currentKit) ? Typeface.BOLD : Typeface.NORMAL;
 
                 // For buttons in the action bar
                 if(menuView != null && i < menuView.getChildCount()) {
@@ -487,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void onPadButtonClick(View view, boolean inverseTextCase) {
-        KeyboardKits.Button btn = mKeyboardKits.mButtons[(int) view.getTag()];
+        KeyboardKits.Button btn = mKeyboardKits.mButtons.get((int) view.getTag());
         if (btn.mType == KeyboardKits.ButtonType.EQUALS) {
             eval();
             return;
@@ -501,25 +491,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         mLastClickedView = view;
         mLastClickedTime = time;
         // TODO: icon, edit keyboard kits button, as fractional (?)
-        // TODO: tips <- (double clicks on shift ?, asin = arcsin ?, editing keyboard kits,
-        //       namespaces in keyboard kits)
+        // TODO: tips <- (asin = arcsin ?, editing keyboard kits, namespaces in keyboard kits)
+        // TODO: ask for permission (Location)
         // TODO: delete configChanges="..." from manifest when this bug will be fixed. Links:
         //       https://code.google.com/p/android/issues/detail?id=206394
         //       https://code.google.com/p/android/issues/detail?id=225911
-        /* DONE:
-         *    history repeating
-         *    fix input field
-         *    error - do not display in input field
-         *    tips <- scroll bar show on move
-         *    sin/cos move in keyboard kits
-         *    DEG/RAD
-         *    fixed bug: f(x) incorrect output in Edit Namespace activity
-         *    shift disabled after double click
-         *    designs
-         *    update checker
-         *    tips updated
-         *    Copyright year updated
-         */
 
         KitViewPager.PageFragment fragment = mViewPager.getCurrentPageFragment();
         if(!returnByDoubleClick) {

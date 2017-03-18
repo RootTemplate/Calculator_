@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.R;
@@ -65,15 +66,14 @@ public class KeyboardKitsXmlManager {
         parser.setInput(file, null);
         parser.nextTag();
         parser.require(XmlPullParser.START_TAG, null, "KeyboardKits");
-        boolean isDefault = Boolean.parseBoolean(parser.getAttributeValue(null, "isDefault"));
 
-        KeyboardKits.Button[] buttons = null;
-        KeyboardKits.Kit[] kits = null;
+        ArrayList<KeyboardKits.Button> buttons = null;
+        ArrayList<KeyboardKits.Kit> kits = null;
         while(parser.next() != XmlPullParser.END_TAG) {
             if(parser.getEventType() != XmlPullParser.START_TAG)
                 continue;
             if(buttons == null) {
-                parser.require(XmlPullParser.START_TAG, null, "Buttons");
+                parser.require(XmlPullParser.START_TAG, null, "CustomButtons");
                 buttons = readButtons(parser);
             } else {
                 parser.require(XmlPullParser.START_TAG, null, "Kits");
@@ -82,11 +82,11 @@ public class KeyboardKitsXmlManager {
             }
         }
 
-        return new KeyboardKits(buttons, kits, isDefault);
+        return new KeyboardKits(buttons, kits);
     }
 
-    private static KeyboardKits.Button[] readButtons(XmlPullParser parser) throws IOException, XmlPullParserException {
-        ArrayList<KeyboardKits.Button> buttons = new ArrayList<>();
+    private static ArrayList<KeyboardKits.Button> readButtons(XmlPullParser parser) throws IOException, XmlPullParserException {
+        ArrayList<KeyboardKits.Button> buttons = new ArrayList<>(Arrays.asList(KeyboardKits.generateDefaultButtonArray()));
         while(parser.nextTag() != XmlPullParser.END_TAG) {
             parser.require(XmlPullParser.START_TAG, null, "Button");
             int id;
@@ -96,12 +96,15 @@ public class KeyboardKitsXmlManager {
                 throw new XmlPullParserException("<Button> must have 'name' or 'text' attributes, or both", parser, null);
             try {
                 id = Integer.parseInt(parser.getAttributeValue(null, "id"));
+                if(id > -1)
+                    throw new XmlPullParserException("Id of a custom button must be <= -1", parser, null);
+                id = -id - 1 + KeyboardKits.DEFAULT_BUTTONS_COUNT;
             } catch(Exception e) {
                 throw new XmlPullParserException("Id of <Button> cannot be parsed", parser, e);
             }
             if(id < buttons.size() && buttons.get(id) != null)
                 throw new XmlPullParserException("Id of a <Button> must be unique. Another <Button> with the " +
-                        "same id = " + id + " found", parser, null);
+                        "same id = -" + id + " found", parser, null);
             try {
                 buttons.add(id,
                         new KeyboardKits.Button(
@@ -109,7 +112,8 @@ public class KeyboardKitsXmlManager {
                                 text == null ? name : text,
                                 parser.getAttributeValue(null, "type"),
                                 parser.getAttributeValue(null, "localeEast"),
-                                Boolean.parseBoolean(parser.getAttributeValue(null, "enableCaseInverse"))
+                                Boolean.parseBoolean(parser.getAttributeValue(null, "enableCaseInverse")),
+                                KeyboardKits.ButtonCategory.CUSTOM
                         )
                 );
             } catch(Exception e) {
@@ -117,11 +121,10 @@ public class KeyboardKitsXmlManager {
             }
             parser.next(); // END_TAG
         }
-
-        return buttons.toArray(new KeyboardKits.Button[buttons.size()]);
+        return buttons;
     }
 
-    private static KeyboardKits.Kit[] readKits(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static ArrayList<KeyboardKits.Kit> readKits(XmlPullParser parser) throws IOException, XmlPullParserException {
         ArrayList<KeyboardKits.Kit> kits = new ArrayList<>();
 
         while(parser.nextTag() != XmlPullParser.END_TAG) { // END_TAG of <Kits>
@@ -129,7 +132,13 @@ public class KeyboardKitsXmlManager {
             String kitName = parser.getAttributeValue(null, "name");
             String kitShortName = parser.getAttributeValue(null, "shortName");
             boolean kitActionBarAccess = Boolean.parseBoolean(parser.getAttributeValue(null, "actionBarAccess"));
+            boolean isSystem = Boolean.parseBoolean(parser.getAttributeValue(null, "isSystem"));
             ArrayList<KeyboardKits.KitVersion> kitVersions = new ArrayList<>();
+
+            for(KeyboardKits.Kit kit : kits)
+                if(kit.mName.equals(kitName))
+                    throw new XmlPullParserException("<Kit>'s name must be unique. Found two <Kit>s with name: "
+                            + kitName, parser, null);
 
             int prevPagesCount = -1;
             while(parser.nextTag() != XmlPullParser.END_TAG) { // END_TAG of <Kit>
@@ -141,13 +150,13 @@ public class KeyboardKitsXmlManager {
             }
 
             KeyboardKits.KitVersion[] kitVArr = kitVersions.toArray(new KeyboardKits.KitVersion[kitVersions.size()]);
-            kits.add(new KeyboardKits.Kit(kitName, kitShortName, kitActionBarAccess, kitVArr));
+            kits.add(new KeyboardKits.Kit(kitName, kitShortName, kitActionBarAccess, isSystem, kitVArr));
         }
 
         if(kits.isEmpty())
             throw new XmlPullParserException("<Kit> has 0 <Variant>s", parser, null);
 
-        return kits.toArray(new KeyboardKits.Kit[kits.size()]);
+        return kits;
     }
 
     private static KeyboardKits.KitVersion readKitVersion(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -161,11 +170,11 @@ public class KeyboardKitsXmlManager {
             parser.require(XmlPullParser.START_TAG, null, "Page");
             boolean isMain = Boolean.parseBoolean(parser.getAttributeValue(null, "main"));
             String moveToMain = parser.getAttributeValue(null, "moveToMain");
-            boolean layoutLandscape = parser.getAttributeValue(null, "layoutOrientation").equalsIgnoreCase("landscape");
+            boolean verticalOrient = parser.getAttributeValue(null, "layoutOrientation").equalsIgnoreCase("vertical");
             int[][] buttons = readPageRows(parser);
 
             try {
-                pages.add(new KeyboardKits.Page(moveToMain, layoutLandscape, buttons));
+                pages.add(new KeyboardKits.Page(moveToMain, verticalOrient, buttons));
             } catch(Exception e) {
                 throw new XmlPullParserException("Exception at <Page> tag", parser, e);
             }
@@ -195,7 +204,9 @@ public class KeyboardKitsXmlManager {
             ArrayList<Integer> row = new ArrayList<>();
             while(parser.nextTag() != XmlPullParser.END_TAG) { // END_TAG of <PageRow>
                 parser.require(XmlPullParser.START_TAG, null, "Button");
-                row.add(Integer.parseInt(parser.getAttributeValue(null, "id")));
+                int id = Integer.parseInt(parser.getAttributeValue(null, "id"));
+                if(id < 0) id = KeyboardKits.DEFAULT_BUTTONS_COUNT - (id + 1);
+                row.add(id);
                 parser.next(); // END_TAG of <Button>
             }
 
@@ -231,13 +242,14 @@ public class KeyboardKitsXmlManager {
     }
 
 
-    public static View createContentViewFromPage(Context context, KeyboardKits.Button[] buttons,
+
+    public static View createContentViewFromPage(Context context, ArrayList<KeyboardKits.Button> buttons,
                                                  KeyboardKits.Page page, LayoutInflater inflater,
                                                  boolean isEastLocale, int theme,
                                                  boolean preferOrangeEquals,
                                                  View.OnLongClickListener btnLongClkListener) {
         LinearLayout root = new LinearLayout(context);
-        boolean portrait = !page.mIsLayoutLandscape;
+        boolean portrait = page.mIsVerticalOrient;
         root.setOrientation(portrait ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
         root.setBackgroundColor(context.getResources().getColor(R.color.colorButtonSeparator));
         root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -247,13 +259,15 @@ public class KeyboardKitsXmlManager {
         int[][] table = page.mButtons;
         for (int[] aTable : table) {
             LinearLayout row = supportCreateRowLLWithStyle(context,
-                    !page.mIsLayoutLandscape ? R.style.panelRow : R.style.panelRowLand);
+                    portrait ? R.style.panelRow : R.style.panelRowLand);
             for (int aTable_ : aTable) {
                 int btnId = aTable_;
-                if (buttons[btnId].mLocaleEastId != -1 && isEastLocale)
-                    btnId = buttons[btnId].mLocaleEastId;
+                KeyboardKits.Button btnInfo = buttons.get(btnId);
+                if (btnInfo.mLocaleEastId != -1 && isEastLocale) {
+                    btnId = btnInfo.mLocaleEastId;
+                    btnInfo = buttons.get(btnId);
+                }
 
-                KeyboardKits.Button btnInfo = buttons[btnId];
                 View view = inflater.inflate(getKeyboardButtonLayout(btnInfo.mType, darkOrangeEquals),
                         row, false);
                 view.setTag(btnId);
@@ -272,7 +286,7 @@ public class KeyboardKitsXmlManager {
                 int margin = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0.5F,
                         context.getResources().getDisplayMetrics()));
                 params.setMargins(margin, margin, margin, margin);
-                if (page.mIsLayoutLandscape) {
+                if (!portrait) {
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     params.height = 0;
                 }
@@ -316,18 +330,18 @@ public class KeyboardKitsXmlManager {
         return result;
     }
 
-    public static KeyboardKits.KitVersion getPreferredKitVersion(KeyboardKits.Kit[] kits,
+    public static KeyboardKits.KitVersion getPreferredKitVersion(ArrayList<KeyboardKits.Kit> kits,
                                                                  String preferredKitName, boolean landscape) {
         KeyboardKits.Kit kit = null;
         if(preferredKitName == null)
-            kit = kits[0];
+            kit = kits.get(0);
         else {
             for(KeyboardKits.Kit aKit : kits) {
                 if(aKit.mName.equals(preferredKitName))
                     kit = aKit;
             }
             if(kit == null)
-                kit = kits[0];
+                kit = kits.get(0);
         }
 
         for(KeyboardKits.KitVersion kv : kit.mKitVersions)

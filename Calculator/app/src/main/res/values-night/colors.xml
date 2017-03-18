@@ -2,14 +2,14 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccentAlternative">#26A69A</color>
 
     <color name="colorPrimarySettings">#283593</color>
     <color name="colorPrimaryDarkSettings">#1A237E</color>
 
     <color name="colorInputText">#fff</color>
     <color name="colorInputTextBackground">#000</color>
-    <color name="colorInputSeparator">#8DFFFFFF</color>
+    <color name="colorInputSeparator">#90FFFFFF</color>
     <color name="colorInputSeparatorResult">#FB9D31</color>
     <!--<color name="colorInputHighlightE">#a6a6a6</color>
     <color name="colorInputHighlightEResult">#b7a68b</color>-->
@@ -43,7 +43,7 @@
 
     <color name="colorAboutTitles">#a0a0a0</color>
     <color name="colorGuideMathBackground">#777777</color>
-
-    <color name="colorIconDelete">#F5F5F5</color>
-    <color name="colorIconDeleteFocused">#20000000</color>
+    <color name="colorIcon">#F5F5F5</color>
+    <color name="colorIconBackgroundFocused">#20000000</color>
+    <color name="colorNamespaceEquals">@color/colorButtonEqualsDarkOrangeFocused</color>
 </resources>

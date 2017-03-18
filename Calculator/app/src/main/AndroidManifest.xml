@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="roottemplate.calculator">
 
+    <!-- For support's TwilightManager to determine sunrise & sunset times -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.network" />
+
+    <!-- TODO: fix this -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -24,23 +29,27 @@
             android:theme="@style/AppTheme.Settings" />
         <activity
             android:name=".HistoryActivity"
-            android:label="@string/title_activity_history"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="@string/title_activity_history"
             android:theme="@style/AppTheme.Dialog" />
         <activity
             android:name=".GuideActivity"
-            android:label="@string/title_activity_guide"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="@string/title_activity_guide"
             android:theme="@style/AppTheme.Dialog" />
         <activity
             android:name=".AboutActivity"
-            android:label="@string/title_activity_about"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.Dialog" />
         <activity
             android:name=".NamespaceActivity"
             android:label="@string/title_activity_namespace"
-            android:theme="@style/AppTheme.Settings"/>
+            android:theme="@style/AppTheme.Settings" />
+        <activity
+            android:name=".KeyboardsActivity"
+            android:label="@string/title_activity_keyboards"
+            android:theme="@style/AppTheme.Settings" />
     </application>
 
 </manifest>

@@ -52,13 +52,6 @@ public class PreferencesManager {
         mPrefs.edit().putInt("version", ver).apply();
     }
 
-    public long nextUpdateCheckTime() {
-        return mPrefs.getLong("nextUpdateCheckTime", -1);
-    }
-    public void nextUpdateCheckTime(long time) {
-        mPrefs.edit().putLong("nextUpdateCheckTime", time).apply();
-    }
-
     public int bracketClosingType() {
         return Integer.parseInt(mPrefs.getString(
                 "bracketClosingType", mResources.getString(R.string.pref_def_brClosingType)));
@@ -146,8 +139,8 @@ public class PreferencesManager {
         }
         return AppCompatDelegate.MODE_NIGHT_AUTO;
     }
-    public int getAppTheme(Context context) {
-        boolean isDay = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+    public int getAppTheme() {
+        boolean isDay = (mResources.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                 != Configuration.UI_MODE_NIGHT_YES;
         if(isDay) return THEME_DAY;
         if(dayNightTheme() == THEME_LEGACY)

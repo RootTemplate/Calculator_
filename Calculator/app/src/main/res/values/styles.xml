@@ -15,6 +15,7 @@
         <item name="styleSymbolButton">@style/panelElem.button.symbol</item>
         <item name="styleSystemButton">@style/panelElem.button.system</item>
     </style>
+
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -30,6 +31,7 @@
         <item name="styleSymbolButton">@style/panelElem.button.symbol.legacy</item>
         <item name="styleSystemButton">@style/panelElem.button.system.legacy</item>
     </style>
+
     <style name="AppTheme.Legacy.NoActionBar" parent="AppTheme.Legacy">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -47,16 +49,23 @@
         <item name="actionBarTheme">@style/AppTheme.AppBarOverlay.Settings</item>
     </style>
 
+    <style name="AppTheme.Settings.KeyboardKits" parent="AppTheme.Settings">
+        <item name="colorAccent">@color/colorAccentAlternative</item>
+    </style>
+
     <style name="AppTheme.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.AppBarOverlay.Settings" parent="ThemeOverlay.AppCompat.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.Dialog.AppBarOverlay" parent="AppTheme.AppBarOverlay">
+        <!-- Setting this color to "colorPrimary" property in theme does not work -->
         <item name="android:background">@color/colorDialogActionBarBackground</item>
         <item name="background">@color/colorDialogActionBarBackground</item>
     </style>
@@ -116,8 +125,8 @@
     <style name="panelElem.button.base" parent="panelElem.button">
         <item name="android:background">@drawable/background_digit_button</item>
         <item name="android:textColor">@color/colorButtonText</item>
-        <item name="android:tag">digit</item>
     </style>
+
     <style name="panelElem.button.base.legacy" parent="panelElem.button.base">
         <item name="android:background">@drawable/background_digit_button_legacy</item>
         <item name="android:textColor">@color/colorLegacyButtonText</item>
@@ -127,9 +136,11 @@
         <item name="android:background">@drawable/background_equals_button</item>
         <item name="android:textColor">@color/colorButtonEqualsText</item>
     </style>
+
     <style name="panelElem.button.equals.darkorange" parent="panelElem.button.equals">
         <item name="android:background">@drawable/background_equals_button_darkorange</item>
     </style>
+
     <style name="panelElem.button.equals.legacy" parent="panelElem.button.equals">
         <item name="android:background">@drawable/background_equals_button_legacy</item>
         <item name="android:textColor">@color/colorLegacyButtonEqualsText</item>
@@ -139,6 +150,7 @@
         <item name="android:background">@drawable/background_symbol_button</item>
         <item name="android:textColor">@color/colorButtonSymbolText</item>
     </style>
+
     <style name="panelElem.button.symbol.legacy" parent="panelElem.button.symbol">
         <item name="android:background">@drawable/background_symbol_button_legacy</item>
         <item name="android:textColor">@color/colorLegacyButtonSymbolText</item>
@@ -151,6 +163,7 @@
         <item name="android:layout_weight">0</item>
         <item name="android:textSize">28sp</item>
     </style>
+
     <style name="panelElem.button.system.legacy" parent="panelElem.button.system">
         <item name="android:background">@drawable/background_system_button</item>
         <item name="android:textColor">@color/colorButtonSystemText</item>
@@ -165,6 +178,7 @@
         <item name="android:contentDescription">Delete</item>
         <item name="android:onClick">onDelButtonClick</item>
     </style>
+
     <style name="panelElem.button.delete.legacy" parent="panelElem.button.delete">
         <item name="android:background">@drawable/background_delete_button_legacy</item>
     </style>

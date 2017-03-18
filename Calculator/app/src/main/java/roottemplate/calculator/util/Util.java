@@ -30,11 +30,17 @@ import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Objects;
 
 import roottemplate.calculator.PreferencesManager;
+import roottemplate.calculator.R;
+import roottemplate.calculator.data.KeyboardKits;
+import roottemplate.calculator.data.KeyboardKitsXmlManager;
 import roottemplate.calculator.view.FatalErrorDialogFragment;
 
 public class Util {
@@ -139,5 +145,21 @@ public class Util {
             Log.e(LOG_TAG, "Unable to call android.support.v7.app.TwilightManager.isNight()", e);
             return -1;
         }
+    }
+
+    public static KeyboardKits readKeyboardKits(AppCompatActivity activity) {
+        KeyboardKits kits = null;
+        try {
+            kits = KeyboardKitsXmlManager.parse(activity);
+            if (kits.mKits.size() == 0) {
+                Log.e(Util.LOG_TAG, "ButtonKits xml file has 0 kits. Restoring default xml");
+                KeyboardKitsXmlManager.restoreDefaultButtonKitsXml(activity);
+                kits = KeyboardKitsXmlManager.parse(activity);
+            }
+        } catch (IOException | XmlPullParserException e) {
+            Log.e(Util.LOG_TAG, "Exception while parsing ButtonKits", e);
+            Util.fatalError(activity, R.string.message_bad_kits_xml, e);
+        }
+        return kits;
     }
 }

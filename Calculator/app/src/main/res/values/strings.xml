@@ -5,6 +5,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_namespace">Edit Namespaces</string>
+    <string name="title_activity_keyboards">Edit Keyboard Kits</string>
 
     <string name="action_history">History</string>
     <string name="action_guide">Tips</string>
@@ -19,6 +20,9 @@
     <string name="no">No</string>
     <string name="ok">OK</string>
     <string name="later">Later</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="saveChanged">Save changes</string>
 
     <string name="rad" translatable="false">RAD</string>
     <string name="deg" translatable="false">DEG</string>
@@ -59,6 +63,7 @@
     <!-- String related to About -->
 
     <string name="about_arote" translatable="false">RootTemplate</string>
+    <string name="about_checkForUpdates">Check for Updates</string>
     <string name="about_calculator" translatable="false">Calculator_</string>
     <string name="about_copyright" translatable="false">Copyright © RootTemplate Group 1, 2016—2017</string>
     <string name="about_info">&lt;b&gt;Authors&lt;/b&gt;: RootTemplate Group 1&lt;br&gt;
@@ -72,6 +77,30 @@
     <string name="namespace_common_ns">Common (used when namespaces are not separated)</string>
     <string name="namespace_summary">If you use \'Retain namespace entries\', but you do not want
         one item to be auto-deleted, tick the checkbox in the right and it will not be removed.</string>
+
+
+    <!-- Strings related to Edit Keyboard Kits -->
+
+    <string-array name="keyboards_categories" translatable="false">
+        <item>System</item>
+        <item>Digits</item>
+        <item>Operators</item>
+        <item>Functions</item>
+        <item>Letters</item>
+        <item>Miscellaneous</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="keyboards_editButton_styles" translatable="false">
+        <item>Light style</item>
+        <item>Light style, behaviour of a digit</item>
+        <item>Dark style</item>
+    </string-array>
+
+    <string name="keyboards_editButton_title" translatable="false">Custom button</string>
+    <string name="keyboards_editButton_positive" translatable="false">Add Button</string>
+    <string name="keyboards_editButton_name" translatable="false">Name</string>
+    <string name="keyboards_editButton_enableTextField" translatable="false">Override the text added when button is clicked</string>
+    <string name="keyboards_editButton_enableCaseInverse" translatable="false">Inverse the case when shift is pressed</string>
 
 
     <!-- Strings related to Settings -->
@@ -316,9 +345,9 @@
     <string name="guide_17_text2">\tPlease note: all variable/function names are always written at the left,
         and what they equal to is written at the right.
         \n\tFunctions can be used like this:</string>
-    <string name="guide_17_text3">\tIn practice, the variables are usually used for storing constants (usually physical).
+    <string name="guide_17_text3">\tIn practice the variables are usually used for storing constants (usually physical).
         For instance, if you had enough typing masses of elementary particles, their charges and so on each time.
-        Plus variables can be used as a replacement for classic memory (MC, MR, M+, M-).</string>
+        Variables can also be used as a replacement for classic memory (MC, MR, M+, M−).</string>
     <string name="guide_final_title">That\'s all</string>
     <string name="guide_final_text">Now you know everything about the app</string>
 </resources>

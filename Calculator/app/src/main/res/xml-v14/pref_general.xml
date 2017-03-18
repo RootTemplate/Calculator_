@@ -146,7 +146,9 @@
             android:defaultValue="@bool/pref_def_darkOrangeEquals" />
 
         <Preference
-            android:title="@string/pref_editButtonKits_title" />
+            android:key="editKeyboardKits"
+            android:title="@string/pref_editButtonKits_title"
+            android:persistent="false" />
 
     </PreferenceCategory>
 
