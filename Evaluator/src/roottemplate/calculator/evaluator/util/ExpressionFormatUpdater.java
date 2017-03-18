@@ -66,12 +66,15 @@ public class ExpressionFormatUpdater {
                 number = -1;
             } else {
                 if(number == -1) {
-                    numberStart = i;
-                    number = 0;
-                    digitsSkipped = 0;
-                    
-                    if(i == updEnd) {
-                        i--;
+                    if(c != point) {
+                        numberStart = i;
+                        number = 0;
+                        digitsSkipped = 0;
+                        if(i == updEnd) i--;
+                    } else { // For numbers like ".123", which doesn't have "0" before decimal point
+                        number = 1;
+                        numberStart = i - 1;
+                        i--; // To rerun this iteration
                     }
                 } else if(number == 1) {
                     if(i != numberStart) {
