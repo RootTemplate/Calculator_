@@ -21,9 +21,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/dialog_horizontal_margin"
-    android:paddingRight="@dimen/dialog_horizontal_margin">
+    android:paddingRight="@dimen/dialog_horizontal_margin"
+    android:paddingTop="5dp">
 
-    <EditText
+    <Spinner
         android:id="@+id/editPage_orient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,56 +33,52 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:ems="10"
-        android:hint="@string/keyboards_editButton_name"
-        android:inputType="textNoSuggestions"
-        android:maxLines="1" />
+        android:entries="@array/keyboards_editPage_orient" />
 
-    <CheckBox
-        android:id="@+id/editKit_actionBarAccess"
-        android:layout_width="wrap_content"
+    <Spinner
+        android:id="@+id/editPage_returnToMain"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editButton_enableCaseInverse"
-        android:layout_marginTop="5dp"
-        android:text="@string/keyboards_editButton_enableTextField" />
+        android:layout_below="@+id/editPage_orient"
+        android:layout_marginTop="10dp"
+        android:entries="@array/keyboards_editPage_returnToMain" />
 
-    <EditText
-        android:id="@+id/editButton_text"
+    <Button
+        android:id="@+id/editPage_setMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_actionBarAccess"
-        android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:enabled="false"
-        android:inputType="textPersonName" />
+        android:layout_below="@+id/editPage_returnToMain"
+        android:layout_marginTop="6dp"
+        android:text="@string/keyboards_editPage_setMain" />
 
-    <Spinner
-        android:id="@+id/editButton_style"
-        android:layout_width="wrap_content"
-        android:layout_height="27dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editPage_orient"
+        android:layout_below="@+id/editPage_setMain"
         android:layout_marginTop="5dp"
-        android:entries="@array/keyboards_editButton_styles"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/editButton_enableCaseInverse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/keyboards_editButton_enableCaseInverse"
-        android:layout_below="@+id/editButton_style"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        <Button
+            android:id="@+id/editPage_addPageLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/keyboards_editPage_addPageLeft" />
+
+        <Button
+            android:id="@+id/editPage_addPageRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/keyboards_editPage_addPageRight" />
+    </LinearLayout>
 
 </RelativeLayout>

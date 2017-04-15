@@ -22,7 +22,8 @@
     <string name="later">Later</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
-    <string name="saveChanged">Save changes</string>
+    <string name="save">Save</string>
+    <string name="saveChanges">Save changes</string>
 
     <string name="rad" translatable="false">RAD</string>
     <string name="deg" translatable="false">DEG</string>
@@ -30,6 +31,7 @@
     <string name="menuItem_cut">Cut all</string>
     <string name="menuItem_copy">Copy all</string>
     <string name="menuItem_paste">Paste</string>
+    <string name="menuItem_asFraction">As fraction</string>
 
     <string name="menuItem_history_copyExpr">Copy expression</string>
     <string name="menuItem_history_copyResult">Copy result</string>
@@ -39,7 +41,7 @@
 
     <string name="dialog_fatalError_title">Fatal Error!</string>
     <string name="dialog_fatalError_button">Close app</string>
-    <string name="message_bad_kits_xml">Cannot parse .xml file containing information about button kits. Try removing application data in system settings. \n\nError: %s</string>
+    <string name="message_bad_kits_xml">Cannot parse .xml file containing information about keyboard kits. Try removing application data in system settings. \n\nError: %s</string>
 
     <string name="dialog_firstLaunch_title">First Launch</string>
     <string name="dialog_firstLaunch_message">\t\tThere are many useful features in this app, which are
@@ -50,8 +52,12 @@
     <string name="dialog_firstLaunch_positive">Open tips</string>
     <string name="dialog_firstLaunch_negative">Later</string>
 
-    <string name="dialog_kitsUpdated_title">Button kits were updated</string>
+    <string name="dialog_kitsUpdated_title">Keyboard kits were updated</string>
     <string name="dialog_kitsUpdated_message">The kit was unpacked moments ago</string>
+
+    <string name="dialog_kitsCannotBeSaved">Sorry, but new keyboards kits cannot be saved by unknown
+        reason. Here are some details. Please, send screenshot of this window to the author (RootTemplate).
+        We would be grateful if you could do this.</string>
 
     <string name="dialog_update_title">Check for Updates</string>
     <string name="dialog_update_message">Would you like to check for updates?</string>
@@ -59,8 +65,36 @@
     <string name="dialog_update_neutral" translatable="false">@string/later</string>
     <string name="dialog_update_negative" translatable="false">@string/no</string>
 
+    <string name="dialog_asFraction_title" translatable="false">@string/menuItem_asFraction</string>
+    <string name="dialog_asFraction_message_error">This fraction is approximately equal to result number and differs from it by %1$s%%.</string>
 
-    <!-- String related to About -->
+    <string name="dialog_save_title">Save changes?</string>
+    <string name="dialog_save_positive" translatable="false">@string/save</string>
+    <string name="dialog_save_negative">Don\'t save</string>
+    <string name="dialog_save_neutral" translatable="false">@string/cancel</string>
+
+
+    <!-- SI prefixes -->
+
+    <string name="yotta">Y</string>
+    <string name="zetta">Z</string>
+    <string name="exa">E</string>
+    <string name="peta">P</string>
+    <string name="tera">T</string>
+    <string name="giga">G</string>
+    <string name="mega">M</string>
+    <string name="kilo">k</string>
+    <string name="milli">m</string>
+    <string name="micro">μ</string>
+    <string name="nano">n</string>
+    <string name="pico">p</string>
+    <string name="femto">f</string>
+    <string name="atto">a</string>
+    <string name="zepto">z</string>
+    <string name="yocto">y</string>
+
+
+    <!-- Strings related to About -->
 
     <string name="about_arote" translatable="false">RootTemplate</string>
     <string name="about_checkForUpdates">Check for Updates</string>
@@ -81,7 +115,7 @@
 
     <!-- Strings related to Edit Keyboard Kits -->
 
-    <string-array name="keyboards_categories" translatable="false">
+    <string-array name="keyboards_categories">
         <item>System</item>
         <item>Digits</item>
         <item>Operators</item>
@@ -90,27 +124,68 @@
         <item>Miscellaneous</item>
         <item>Custom</item>
     </string-array>
-    <string-array name="keyboards_editButton_styles" translatable="false">
+    <string-array name="keyboards_editButton_styles">
         <item>Light style</item>
         <item>Light style, behaviour of a digit</item>
         <item>Dark style</item>
     </string-array>
+    <string-array name="keyboards_editPage_orient">
+        <item>Vertical orientation of lines</item>
+        <item>Horizontal orientation of lines</item>
+    </string-array>
+    <string-array name="keyboards_editPage_returnToMain">
+        <item>Do not return to home page</item>
+        <item>Return to home after double click</item>
+        <item>Return to home after single click</item>
+    </string-array>
 
-    <string name="keyboards_editButton_title" translatable="false">Custom button</string>
-    <string name="keyboards_editButton_positive" translatable="false">Add Button</string>
-    <string name="keyboards_editButton_name" translatable="false">Name</string>
-    <string name="keyboards_editButton_enableTextField" translatable="false">Override the text added when button is clicked</string>
-    <string name="keyboards_editButton_enableCaseInverse" translatable="false">Inverse the case when shift is pressed</string>
+    <string name="keyboards_editButton_title">Custom button</string>
+    <string name="keyboards_editButton_name">Name</string>
+    <string name="keyboards_editButton_enableTextField">Override the text added when button is clicked</string>
+    <string name="keyboards_editButton_enableCaseInverse">Inverse the case when shift is pressed</string>
+
+    <string name="keyboards_editKit_title">Kit</string>
+    <string name="keyboards_editKit_name">Full name</string>
+    <string name="keyboards_editKit_actionBarAccess">Show kit on main screen</string>
+    <string name="keyboards_editKit_shortName">Short name</string>
+    <string name="keyboards_editKit_deleteKit">Delete kit</string>
+    <string name="keyboards_editKit_contentCopied">Kit content will be copied from \"%1$s\".</string>
+    <string name="keyboards_editKit_alreadyExists">Kit named \"%1$s\" already exists.</string>
+
+    <string name="keyboards_editPage_title">Page</string>
+    <string name="keyboards_editPage_setMain">Set this page as home</string>
+    <string name="keyboards_editPage_addPageLeft">New page at left</string>
+    <string name="keyboards_editPage_addPageRight">New page at right</string>
+    <string name="keyboards_editPage_deletePage">Delete page</string>
+
+    <string name="keyboards_deleteButton_title">Delete button</string>
+    <string name="keyboards_deleteButton_message">Button will be deleted. Are you sure?</string>
+    <string name="keyboards_deletePage_title">Delete page</string>
+    <string name="keyboards_deletePage_message">Page will be deleted. Are you sure?</string>
+    <string name="keyboards_deleteKit_title">Delete kit</string>
+    <string name="keyboards_deleteKit_message">Are you sure that you want to delete the kit?</string>
+
+    <string name="keyboards_addKit">New kit</string>
+    <string name="keyboards_editPage">The page</string>
+    <string name="keyboards_editKit">The kit</string>
+    <string name="keyboards_btnInfo">Edit</string>
+    <string name="keyboards_btnClear">Remove</string>
+    <string name="keyboards_btnDelete">Delete</string>
+
+    <string name="keyboards_message_cannotEditSystemKit">Unfortunately, you cannot edit the button
+        set that is available by default. You need to create a new set by choosing \"Add new kit\" from
+        the menu at the top of the screen.</string>
 
 
     <!-- Strings related to Settings -->
 
     <string name="pref_def_brClosingType" translatable="false">2</string>
     <string name="pref_def_amu" translatable="false">1</string>
-    <string name="pref_def_storingHistory" translatable="false">30</string>
+    <string name="pref_def_storingHistory" translatable="false">50</string>
     <string name="pref_def_digitGrouping" translatable="false">0</string>
     <string name="pref_def_digitGrouping_separator_left" translatable="false">1</string>
     <string name="pref_def_digitGrouping_separator_fract" translatable="false">0</string>
+    <string name="pref_def_outputType" translatable="false">0</string>
     <string name="pref_def_storingNamespace" translatable="false">-1</string>
     <string name="pref_def_dayNightTheme" translatable="false">0</string>
 
@@ -122,7 +197,7 @@
     <string name="pref_category_tips">Tips</string>
     <string name="pref_category_namespace">Namespace</string>
     <string name="pref_category_theme">Theme</string>
-    <string name="pref_theme_valueChanged">Changes will be applied on the next app launch</string>
+    <string name="pref_theme_valueChanged">Changes will be applied after exiting the settings.</string>
 
     <string name="pref_doRound_title">Rounding</string>
     <string name="pref_doRound_summary">Round result number to fit the screen</string>
@@ -131,8 +206,9 @@
     <string name="pref_digitGrouping_title">Digit grouping</string>
     <string name="pref_digitGrouping_separator_left_title">Separator of left part</string>
     <string name="pref_digitGrouping_separator_fract_title">Separator of fractional part</string>
-    <string name="pref_highlightE_title">Highlight E</string>
-    <string name="pref_highlightE_summary">To see the exponent better</string>
+    <string name="pref_outputType_title">Way to express numbers in the result</string>
+    <string name="pref_highlightE_title">Highlight \"E\"</string>
+    <string name="pref_highlightE_summary">Lower font size of \"E\" letter so that the exponent would be more visible</string>
     <string name="pref_amu_title">Measurement units of angle</string>
     <string name="pref_enabledHistory_title">History</string>
     <string name="pref_enabledHistory_summary">Remember calculations</string>
@@ -157,6 +233,10 @@
     <string name="pref_darkOrangeEquals_summary">Use orange colour for \"Equals\" button in dark theme</string>
     <string name="pref_editColors_title">Edit colours</string>
     <string name="pref_editButtonKits_title">Edit keyboard kits</string>
+    <string name="pref_restoreKitDefaults_title">Restore default keyboard kits</string>
+    <string name="pref_restoreKitDefaults_message">Are you sure that you want to restore defaults?
+        You will lose all your changes.</string>
+    <string name="pref_restoreKitDefaults_result">Default kits restored</string>
 
     <string-array name="pref_amu_list_entries">
         <item>Radians</item>
@@ -177,6 +257,12 @@
         <item>Space</item>
         <item>Comma</item>
         <item>Apostrophe</item>
+    </string-array>
+    <string-array name="pref_outputType_entries">
+        <item>Standard</item>
+        <item>Always use scientific notation</item>
+        <item>Engineering notation</item>
+        <item>Engineering notation with SI prefixes</item>
     </string-array>
     <string-array name="pref_storingHistory_list_entries">
         <item>Until app is closed</item>
@@ -219,6 +305,12 @@
         <item>2</item>
     </string-array>
     <string-array name="pref_digitGrouping_separator_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="pref_outputType_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>

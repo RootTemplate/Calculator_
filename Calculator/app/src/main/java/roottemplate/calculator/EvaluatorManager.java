@@ -19,6 +19,7 @@
 package roottemplate.calculator;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -52,6 +53,30 @@ public class EvaluatorManager {
         replacementMap.put('\u00f7', '/');
     }
 
+    public static String exponentToSIPrefix(int exponent, Resources resources) {
+        int resId = 0;
+        switch (exponent / 3) {
+            case 0: return null;
+            case 1: resId = R.string.kilo; break;
+            case 2: resId = R.string.mega; break;
+            case 3: resId = R.string.giga; break;
+            case 4: resId = R.string.tera; break;
+            case 5: resId = R.string.peta; break;
+            case 6: resId = R.string.exa; break;
+            case 7: resId = R.string.zetta; break;
+            case 8: resId = R.string.yotta; break;
+            case -1: resId = R.string.milli; break;
+            case -2: resId = R.string.micro; break;
+            case -3: resId = R.string.nano; break;
+            case -4: resId = R.string.pico; break;
+            case -5: resId = R.string.femto; break;
+            case -6: resId = R.string.atto; break;
+            case -7: resId = R.string.zepto; break;
+            case -8: resId = R.string.yocto; break;
+        }
+        return resId == 0 ? null : resources.getString(resId);
+    }
+
     public static String closeUnclosedBrackets(String expr, int closingType) {
         if(closingType == BRACKET_CLOSING_TYPE_NO) return expr;
 
@@ -80,6 +105,7 @@ public class EvaluatorManager {
     }
 
     public static String replaceEngineToApp(String expr) {
+        if(expr == null) return null;
         for(Map.Entry e : replacementMap.entrySet()) {
             expr = expr.replace((char) e.getValue(), (char) e.getKey());
         }
@@ -87,18 +113,39 @@ public class EvaluatorManager {
         return expr;
     }
 
-    public static String doubleToPreferableString(double x, int maxLen, PreferencesManager prefs) {
-        String res;
+    public static String[] doubleToPreferableString(double x, int maxLen, PreferencesManager prefs) {
+        String res = null;
+        String showText = null;
         int digitGrouping = prefs.digitGrouping();
         if(prefs.doRound()) {
-            res = roottemplate.calculator.evaluator.util.Util.doubleToString(x,
-                    maxLen - (digitGrouping > 0 ? 1 : 0), // Reserve 1 digit for commas and stuff
-                    Math.round(maxLen * 0.8F), Math.round(maxLen * 0.6F)
-            );
+            maxLen -= digitGrouping > 0 ? 1 : 0; // Reserve 1 digit for commas and stuff
+            int outputType = prefs.outputType();
+            switch(outputType) {
+                case 0:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen,
+                            Math.round(maxLen * 0.8F), Math.round(maxLen * 0.6F));
+                    break;
+                case 1:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen, 2, 0);
+                    break;
+                case 2:
+                case 3:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToStringInEngNotation(x, maxLen);
+                    break;
+            }
+
+            int indexOfE;
+            if(outputType == 3 && (indexOfE = res.indexOf('E')) != -1) {
+                int exponent = Integer.parseInt(res.substring(indexOfE + 1));
+                String prefix = exponentToSIPrefix(exponent, prefs.getResources());
+                if(prefix != null) {
+                    showText = res.substring(0, indexOfE) + " " + prefix;
+                }
+            }
         } else
             res = Double.toString(x);
 
-        return res;
+        return new String[] {res, showText};
     }
 
 
@@ -109,18 +156,23 @@ public class EvaluatorManager {
     private final AppDatabase mDb;
     private volatile Thread mEvaluatorUpdaterThread;
     private volatile boolean mFirstUpdateAfterLaunch;
+    private double mLastResultNumber = Double.NaN;
 
     public EvaluatorManager(Context context, NamespaceFragment fragment, PreferencesManager prefs,
-                            AppDatabase db, boolean isAppJustLaunched) {
+                            AppDatabase db, boolean isAppJustLaunched, double lastResultNumber) {
         mContext = context;
         mFragment = fragment;
         mPrefs = prefs;
         mDb = db;
         mFirstUpdateAfterLaunch = isAppJustLaunched;
+        mLastResultNumber = lastResultNumber;
     }
 
     private String getKitName() {
         return mPrefs.separateNamespace() ? mKitName : null;
+    }
+    public double getLastResultNumber() {
+        return mLastResultNumber;
     }
 
     public void setKit(String kitName) {
@@ -140,12 +192,12 @@ public class EvaluatorManager {
     }
 
     public EvalResult eval(String text, int maxDigitsToFit) {
-        if(mFragment.mEvaluator == null) return new EvalResult(null, null, null, -1);
+        if(mFragment.mEvaluator == null) return new EvalResult(null, null, null, -1, null);
         // Namespace had not been created by UpdateThread; this should not happen often
 
         String text_ = text; // Unmodified text
         text = EvaluatorManager.closeUnclosedBrackets(text, mPrefs.bracketClosingType());
-        String result, message = null;
+        String result, message = null, showText = null;
         InputEditText.TextType type;
         int errorIndex = -1;
         boolean historyRightIsNull = false;
@@ -156,11 +208,13 @@ public class EvaluatorManager {
                     .process(expr);
 
             if (n != null) {
-                result = EvaluatorManager.doubleToPreferableString(n.doubleValue(), maxDigitsToFit,
-                        mPrefs);
-                result = EvaluatorManager.replaceEngineToApp(result); // To convert "Infinity" -> symbol
+                mLastResultNumber = n.doubleValue();
+                String[] results = EvaluatorManager.doubleToPreferableString(mLastResultNumber,
+                        maxDigitsToFit, mPrefs);
+                result = EvaluatorManager.replaceEngineToApp(results[0]); // To convert "Infinity" -> symbol
+                showText = EvaluatorManager.replaceEngineToApp(results[1]);
 
-                type = InputEditText.TextType.RESULT_NUMBER;
+                type = showText == null ? InputEditText.TextType.RESULT_NUMBER : InputEditText.TextType.RESULT_MESSAGE;
             } else {
                 type = InputEditText.TextType.RESULT_MESSAGE;
                 result = text_;
@@ -177,19 +231,22 @@ public class EvaluatorManager {
             mDb.getHistory().addHistoryElement(text, historyRightIsNull ? null : result, message);
         }
 
-        return new EvalResult(type, result, message, errorIndex);
+        return new EvalResult(type, result, message, errorIndex, showText);
     }
     public static class EvalResult {
         public final InputEditText.TextType mTextType;
         public final String mText;
         public final String mMessage;
         public final int mErrorIndex;
+        public final String mShowText;
 
-        public EvalResult(InputEditText.TextType textType, String text, String message, int errorIndex) {
+        public EvalResult(InputEditText.TextType textType, String text, String message,
+                          int errorIndex, String showText) {
             this.mTextType = textType;
             this.mText = text;
             this.mMessage = message;
             this.mErrorIndex = errorIndex;
+            this.mShowText = showText;
         }
     }
 

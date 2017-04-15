@@ -9,6 +9,14 @@
             android:title="@string/pref_doRound_title"
             android:summary="@string/pref_doRound_summary"/>
 
+        <ListPreference
+            android:key="outputType"
+            android:dependency="doRound"
+            android:title="@string/pref_outputType_title"
+            android:entries="@array/pref_outputType_entries"
+            android:entryValues="@array/pref_outputType_values"
+            android:defaultValue="@string/pref_def_outputType" />
+
         <!--<CheckBoxPreference
             android:key="autoBracketClosing"
             android:defaultValue="@bool/pref_def_autoBracketClosing"
@@ -55,11 +63,41 @@
             android:entryValues="@array/pref_digitGrouping_separator_values"
             android:defaultValue="@string/pref_def_digitGrouping_separator_fract" />
 
-        <!--<CheckBoxPreference
+        <CheckBoxPreference
             android:key="highlightE"
             android:defaultValue="@bool/pref_def_highlightE"
             android:title="@string/pref_highlightE_title"
-            android:summary="@string/pref_highlightE_summary" />-->
+            android:summary="@string/pref_highlightE_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_theme">
+
+        <!--<Preference
+            android:title="@string/pref_editColors_title" />-->
+
+        <ListPreference
+            android:key="dayNightTheme"
+            android:title="@string/pref_dayNightTheme_title"
+            android:entries="@array/pref_dayNightTheme_entries"
+            android:entryValues="@array/pref_dayNightTheme_values"
+            android:defaultValue="@string/pref_def_dayNightTheme" />
+
+        <CheckBoxPreference
+            android:key="darkOrangeEquals"
+            android:title="@string/pref_darkOrangeEquals_title"
+            android:summary="@string/pref_darkOrangeEquals_summary"
+            android:defaultValue="@bool/pref_def_darkOrangeEquals" />
+
+        <Preference
+            android:key="editKeyboardKits"
+            android:title="@string/pref_editButtonKits_title"
+            android:persistent="false" />
+
+        <Preference
+            android:key="restoreKitDefaults"
+            android:title="@string/pref_restoreKitDefaults_title" />
 
     </PreferenceCategory>
 
@@ -83,17 +121,6 @@
         <Preference
             android:key="clearHistory"
             android:title="@string/pref_clearHistory_title" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/pref_category_tips">
-
-        <CheckBoxPreference
-            android:key="enabledTips"
-            android:defaultValue="@bool/pref_def_enabledTips"
-            android:title="@string/pref_enabledTips_title"
-            android:summary="@string/pref_enabledTips_summary" />
 
     </PreferenceCategory>
 
@@ -127,28 +154,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_category_theme">
-
-        <!--<Preference
-            android:title="@string/pref_editColors_title" />-->
-
-        <ListPreference
-            android:key="dayNightTheme"
-            android:title="@string/pref_dayNightTheme_title"
-            android:entries="@array/pref_dayNightTheme_entries"
-            android:entryValues="@array/pref_dayNightTheme_values"
-            android:defaultValue="@string/pref_def_dayNightTheme" />
+        android:title="@string/pref_category_tips">
 
         <CheckBoxPreference
-            android:key="darkOrangeEquals"
-            android:title="@string/pref_darkOrangeEquals_title"
-            android:summary="@string/pref_darkOrangeEquals_summary"
-            android:defaultValue="@bool/pref_def_darkOrangeEquals" />
-
-        <Preference
-            android:key="editKeyboardKits"
-            android:title="@string/pref_editButtonKits_title"
-            android:persistent="false" />
+            android:key="enabledTips"
+            android:defaultValue="@bool/pref_def_enabledTips"
+            android:title="@string/pref_enabledTips_title"
+            android:summary="@string/pref_enabledTips_summary" />
 
     </PreferenceCategory>
 

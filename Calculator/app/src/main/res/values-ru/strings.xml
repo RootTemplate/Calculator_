@@ -35,6 +35,12 @@
         <item>Только в результате</item>
         <item>Всегда разделять</item>
     </string-array>
+    <string-array name="pref_outputType_entries">
+        <item>Стандартный</item>
+        <item>Всегда в экспоненциальной записи</item>
+        <item>В инженерной записи</item>
+        <item>В инженерной записи с приставками СИ</item>
+    </string-array>
     <string-array name="pref_storingHistory_list_entries">
         <item>До закрытия приложения</item>
         <item>15 минут</item>
@@ -66,6 +72,47 @@
         <item>В зависимости от времени (обратно)</item>
         <item>Наследие</item>
     </string-array>
+    <string-array name="keyboards_categories">
+        <item>Системные</item>
+        <item>Цифры</item>
+        <item>Операторы</item>
+        <item>Функции</item>
+        <item>Буквы</item>
+        <item>Разное</item>
+        <item>Пользовательское</item>
+    </string-array>
+    <string-array name="keyboards_editButton_styles">
+        <item>Светлый стиль</item>
+        <item>Светлый стиль, поведение как у цифры</item>
+        <item>Тёмный стиль</item>
+    </string-array>
+    <string-array name="keyboards_editPage_orient">
+        <item>Вертикальная ориентация строк</item>
+        <item>Горизонтальная ориентация строк</item>
+    </string-array>
+    <string-array name="keyboards_editPage_returnToMain">
+        <item>Не возвращать на дом. страницу</item>
+        <item>Возврат. на дом. после двойного клика</item>
+        <item>Возврат. на дом. после одинарного клика</item>
+    </string-array>
+
+    <string name="yotta">И</string>
+    <string name="zetta">З</string>
+    <string name="exa">Э</string>
+    <string name="peta">П</string>
+    <string name="tera">Т</string>
+    <string name="giga">Г</string>
+    <string name="mega">М</string>
+    <string name="kilo">к</string>
+    <string name="milli">м</string>
+    <string name="micro">мк</string>
+    <string name="nano">н</string>
+    <string name="pico">п</string>
+    <string name="femto">ф</string>
+    <string name="atto">а</string>
+    <string name="zepto">з</string>
+    <string name="yocto">и</string>
+
     <string name="pref_category_namespace">Именное пространство</string>
     <string name="pref_category_theme">Стиль</string>
     <string name="pref_clearHistory_title">Очистить историю</string>
@@ -162,8 +209,8 @@
         \n\tНужно ли вам посмотреть введённые переменные, изменить срок хранения записей истории
         или включить разделение разрядов в числах — откройте настройки!</string>
     <string name="guide_15_title">Двойные клики</string>
-    <string name="guide_15_text">\tСтраницы (на заднем плане) устроены так: есть главная страница и «побочные».
-        Главная страница открывается сразу же после открытия приложения.
+    <string name="guide_15_text">\tСтраницы (на заднем плане) устроены так: есть домашняя страница и «побочные».
+        Домашняя страница открывается сразу же после открытия приложения.
         \n\t«Побочные» могут автоматически возвращать на главную: (а) после одного нажатия на кнопку, (б)
         возвращать после двойного нажатия на кнопку или (в) не возвращать совсем.
         \n\tТак, например, самая левая страница (с буквами латинского/греческого алфавитов)
@@ -208,8 +255,6 @@
     <string name="pref_digitGrouping_title">Разделять разряды числа</string>
     <string name="pref_digitGrouping_separator_fract_title">Разделитель дробной части</string>
     <string name="pref_digitGrouping_separator_left_title">Разделитель целой части</string>
-    <string name="pref_highlightE_summary">Чтобы ВИДЕТЬ</string>
-    <string name="pref_highlightE_title">Подсвечивать E</string>
     <string name="pref_storingNamespace_title">Хранить записи им. пространства</string>
     <string name="pref_separateNamespace_title">Разделять простран.</string>
     <string name="pref_separateNamespace_summary">Если включено, переменные/функции, введенные в одном наборе, не будут доступны в другом</string>
@@ -219,11 +264,11 @@
     <string name="no">Нет</string>
     <string name="namespace_common_ns">Общее (используется когда пространства не разделены)</string>
     <string name="namespace_clear">Очистить простр.</string>
-    <string name="namespace_summary">Если вы используете опцию «Хранить записи им. пространства», но не хотите, чтобы какой-то элемент был удален, поставьте галочку справа, и он не будет удален</string>
+    <string name="namespace_summary">Если вы используете настройку «Хранить записи им. пространства», но не хотите, чтобы какой-то элемент был удален, поставьте галочку справа, и он не будет удален</string>
     <string name="ok">OK</string>
     <string name="dialog_kitsUpdated_title">Наборы кнопок были обновлены</string>
     <string name="dialog_kitsUpdated_message">Новый набор распаковали только что</string>
-    <string name="pref_theme_valueChanged">Изменения будут применены при следующем запуске приложения</string>
+    <string name="pref_theme_valueChanged">Изменения будут применены после выхода из настроек</string>
     <string name="about_checkForUpdates">Проверить обновления</string>
     <string name="later">Позже</string>
     <string name="dialog_update_message">Проверить наличие обновлений для приложения?</string>
@@ -234,7 +279,48 @@
     <string name="pref_dayNightTheme_title">Тема</string>
     <string name="pref_darkOrangeEquals_summary">Покрасить кнопку «Равно» в оранжевый цвет в темной теме</string>
     <string name="title_activity_keyboards">Редактировать наборы кнопок</string>
-    <string name="add">Добавить</string>
+    <string name="pref_highlightE_title">Выделять «E»</string>
+    <string name="pref_highlightE_summary">Уменьшать шрифт символа «E», чтобы экспонента стала более заметна</string>
+    <string name="pref_outputType_title">Вывод чисел в результате</string>
+    <string name="keyboards_editKit">Набор кнопок</string>
+    <string name="keyboards_editPage">Страница</string>
+    <string name="menuItem_asFraction">В виде дроби</string>
+    <string name="dialog_asFraction_message_error">Эта дробь примерно равна полученному числу и отличается от него на %1$s%%.</string>
+    <string name="keyboards_message_cannotEditSystemKit">К сожалению, вы не можете редактировать набор кнопок, доступный по умолчанию. Вам нужно создать новый набор, выбрав пункт «Новый набор» в меню в верхней части экрана.</string>
+    <string name="keyboards_addKit">Новый набор</string>
     <string name="cancel">Отменить</string>
-    <string name="saveChanged">Сохранить изменения</string>
+    <string name="add">Добавить</string>
+    <string name="dialog_kitsCannotBeSaved">Извините, но новые наборы кнопок не могут быть сохранены по неизвестным причинам. Ниже есть детали этого проишествия. Пожалуйста, отправьте скриншот этого окна автору (RootTemplate). Мы были бы вам признательны, если бы вы это сделали.</string>
+    <string name="keyboards_btnClear">Убрать</string>
+    <string name="keyboards_btnDelete">Удалить</string>
+    <string name="keyboards_btnInfo">Редакт.</string>
+    <string name="keyboards_deleteButton_message">Кнопка будет удалена. Вы уверены?</string>
+    <string name="keyboards_deleteButton_title">Удалить кнопку</string>
+    <string name="keyboards_deleteKit_message">Вы уверены, что хотите удалить набор?</string>
+    <string name="keyboards_deleteKit_title">Удалить набор</string>
+    <string name="keyboards_deletePage_message">Страница будет удалена. Вы уверены?</string>
+    <string name="keyboards_deletePage_title">Удалить страницу</string>
+    <string name="keyboards_editButton_enableCaseInverse">Менять регистр, когда включен shift</string>
+    <string name="keyboards_editButton_enableTextField">Переопределить текст, добавляемый при нажатии кнопки</string>
+    <string name="keyboards_editButton_title">Пользовательская кнопка</string>
+    <string name="keyboards_editButton_name">Имя</string>
+    <string name="keyboards_editKit_title">Набор кнопок</string>
+    <string name="keyboards_editKit_shortName">Короткое имя</string>
+    <string name="keyboards_editKit_name">Полное имя</string>
+    <string name="keyboards_editKit_contentCopied">Кнопки набора будут скопированы из «%1$s».</string>
+    <string name="keyboards_editKit_actionBarAccess">Показывать набор на главном экране</string>
+    <string name="keyboards_editKit_alreadyExists">Набор с именем «%1$s» уже существует.</string>
+    <string name="keyboards_editKit_deleteKit">Удалить набор</string>
+    <string name="keyboards_editPage_addPageLeft">Новая страница слева</string>
+    <string name="keyboards_editPage_addPageRight">Новая страница справа</string>
+    <string name="keyboards_editPage_setMain">Сделать эту страницу домашней</string>
+    <string name="keyboards_editPage_title">Страница</string>
+    <string name="keyboards_editPage_deletePage">Удалить страницу</string>
+    <string name="pref_restoreKitDefaults_message">Вы уверены, что хотите восстановить наборы? Вы потеряете все свои изменения.</string>
+    <string name="pref_restoreKitDefaults_result">Наборы по умолчанию восстановлены</string>
+    <string name="pref_restoreKitDefaults_title">Восстановить наборы кнопок по умолчанию</string>
+    <string name="saveChanges">Сохранить изменения</string>
+    <string name="save">Сохранить</string>
+    <string name="dialog_save_title">Сохранить изменения?</string>
+    <string name="dialog_save_negative">Не сохранять</string>
 </resources>

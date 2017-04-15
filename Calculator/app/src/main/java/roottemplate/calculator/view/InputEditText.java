@@ -30,8 +30,10 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
-import android.text.style.ForegroundColorSpan;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.ContextMenu;
@@ -39,14 +41,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.widget.EditText;
+import android.view.View;
 
 import roottemplate.calculator.R;
 import roottemplate.calculator.evaluator.util.ExpressionFormatUpdater;
 import roottemplate.calculator.util.ExpressionFormatter;
 import roottemplate.calculator.util.Util;
 
-public class InputEditText extends EditText {
+public class InputEditText extends android.support.v7.widget.AppCompatEditText {
     public static final char DIGIT_DELIMITER = ' ';
 
     public static String intToDigitSeparator(int i) {
@@ -69,13 +71,15 @@ public class InputEditText extends EditText {
     private byte mExprWhenGroupDigits;
     private String mDigitSeparatorLeft;
     private String mDigitSeparatorFract;
-    //private boolean mHighlightE;
+    private boolean mHighlightE;
 
     private TextType mTextType;
+    private String mMessageReplacement;
     private Rect r = new Rect();
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
     private MenuHandler mHandler = new MenuHandler();
+    private InputCallback mInputCallback;
     private int mMaxDigitsToFit = -1;
     private long mTimeSinceDown;
 
@@ -99,16 +103,16 @@ public class InputEditText extends EditText {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         setTextType(ss.mTextType);
+        mMessageReplacement = ss.mMessageReplacement;
     }
 
     @Override
     public Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), mTextType);
+        return new SavedState(super.onSaveInstanceState(), mTextType, mMessageReplacement);
     }
 
     private void init() {
-        if(Build.VERSION.SDK_INT >= 11)
-            setCustomSelectionActionModeCallback(new NoTextSelectionMode());
+        setCustomSelectionActionModeCallback(new NoTextSelectionMode());
         setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
         mUpdater.updateContainer = new ExpressionFormatUpdater.Update();
@@ -129,6 +133,10 @@ public class InputEditText extends EditText {
     }
 
 
+    public void setInputCallback(InputCallback callback) {
+        mInputCallback = callback;
+    }
+
     private void updateDigitGrouping(int updStart, int updEnd, boolean force) {
         if(!force && !mUpdater.doGroup()) return;
 
@@ -138,7 +146,7 @@ public class InputEditText extends EditText {
         setSelection(u.cursor());
     }
 
-    public void initDigitFormatting(int when, int left, int fractional/*, boolean highlightE*/) {
+    public void initDigitFormatting(int when, int left, int fractional, boolean highlightE) {
         int mask = 0;
         if(left > 0) mask |= ExpressionFormatter.DIGIT_GROUPING_LEFT;
         if(fractional > 0) mask |= ExpressionFormatter.DIGIT_GROUPING_FRACTIONAL;
@@ -147,33 +155,40 @@ public class InputEditText extends EditText {
         mExprWhenGroupDigits = (byte) when;
         mDigitSeparatorLeft = intToDigitSeparator(left);
         mDigitSeparatorFract = intToDigitSeparator(fractional);
-        //mHighlightE = highlightE;
+        mHighlightE = highlightE;
 
         TextType type = mTextType;
         mTextType = null;
         setTextType(type);
     }
 
-    /*private void updateExprText(ExpressionFormatter.Patch p) {
+    private void updateEHighlights(int startChangedIndex, int endChangedIndex) {
         Editable text = super.getText();
-        text.replace(p.start(), p.end(), p.replaceWith());
-        setSelection(p.newCursor());
+        int startIndex = startChangedIndex > 0 ? startChangedIndex - 1 : 0;
+        int endIndex = endChangedIndex < text.length() - 1 ? endChangedIndex + 1 : endChangedIndex;
+        if(mHighlightE && mTextType != TextType.RESULT_MESSAGE) {
+            int eTextSize = getContext().getResources().getDimensionPixelSize(R.dimen.inputTextEHighlight);
 
-        if(mHighlightE && mTextType != TextType.RESULT_MESSAGE && text.length() > 0) {
-            int color = getEHighlightColor(mTextType);
-            int start = p.start() > 0 ? p.start() - 1 : 0;
-            int end = p.start() + p.replaceWith().length() - 1;
-            if(end + 1 < text.length()) end++;
-
-            for (EHighlightSpan span : text.getSpans(start, end, EHighlightSpan.class))
-                text.removeSpan(span);
-
-            for (int i = start; i <= end; i++)
-                if (text.charAt(i) == 'E') {
-                    text.setSpan(new EHighlightSpan(color), i, i + 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            for(int i = startIndex; i < endIndex; i++) {
+                if(text.charAt(i) != 'E') continue;
+                boolean eShouldBeHighlighted = false;
+                if(i > 0 && i < text.length() - 1) {
+                    char prev = text.charAt(i - 1);
+                    char next = text.charAt(i + 1);
+                    if((Character.isDigit(prev) || prev == '.') &&
+                            (Character.isDigit(next) || next == '+' || next == '-' || next == '\u2212') ) {
+                        text.setSpan(new AbsoluteSizeSpan(eTextSize), i, i + 1,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        eShouldBeHighlighted = true;
+                    }
                 }
+                if(!eShouldBeHighlighted) {
+                    for(AbsoluteSizeSpan span : text.getSpans(i, i + 1, AbsoluteSizeSpan.class))
+                        text.removeSpan(span);
+                }
+            }
         }
-    }*/
+    }
 
     /**
      * Appends <code>str</code> to expression in this text field
@@ -182,17 +197,6 @@ public class InputEditText extends EditText {
      *                      previously cleared
      */
     public void appendText(String str, boolean clearIfResult) {
-        appendText(str, clearIfResult, null);
-    }
-    /**
-     * Appends <code>str</code> to expression in this text field
-     * @param str The string to append
-     * @param clearIfResult If current TextType is RESULT(_NUMBER or _MESSAGE) then expression is
-     *                      previously cleared
-     * @param suffix The string to append (like {@code str}) but will be appended <i>after</i> new
-     *               cursor position
-     */
-    public void appendText(String str, boolean clearIfResult, String suffix) {
         if(clearIfResult && mTextType != TextType.INPUT)
             clearText();
         else
@@ -204,11 +208,11 @@ public class InputEditText extends EditText {
 
         text.insert(cursor, str);
         cursor += str.length();
-        if(suffix != null)
-            text.insert(cursor, suffix);
         setSelection(cursor);
 
-        updateDigitGrouping(cursor - str.length(), cursor - 1, false);
+        int startIndex = cursor - str.length();
+        updateEHighlights(startIndex, cursor);
+        updateDigitGrouping(startIndex, cursor - 1, false);
     }
     public void setText(String str) {
         clearText();
@@ -229,10 +233,12 @@ public class InputEditText extends EditText {
         return sb.toString();
     }
     public void clearText() {
+        mMessageReplacement = null; // Make sure that no text will appear after setting TextType.INPUT
         super.setText("");
         setTextType(TextType.INPUT);
     }
     public void delSymbol() {
+        mMessageReplacement = null;
         setTextType(TextType.INPUT);
 
         int cursor = getSelectionStart();
@@ -240,10 +246,15 @@ public class InputEditText extends EditText {
 
         getEditableText().delete(cursor - 1, cursor);
         setSelection(--cursor);
+        updateEHighlights(cursor, cursor);
         updateDigitGrouping(cursor, cursor - 1, false);
     }
     public void setCursor(int cursor) {
         setSelection(cursor);
+    }
+
+    public void setMessageReplacement(String messageReplacement) {
+        mMessageReplacement = messageReplacement;
     }
 
     public void setTextType(TextType type) {
@@ -263,7 +274,8 @@ public class InputEditText extends EditText {
             setCursorVisible(true);
 
             if(mTextType == TextType.RESULT_MESSAGE) {
-                super.setText("");
+                Editable text = getText();
+                text.replace(0, text.length(), mMessageReplacement == null ? "" : mMessageReplacement);
             }
         } else {
             setTextColor(getResources().getColor(R.color.colorEquals));
@@ -271,32 +283,12 @@ public class InputEditText extends EditText {
             setCursorVisible(false);
         }
 
-        /*if(mHighlightE && (
-                type == TextType.INPUT && mTextType != TextType.INPUT ||
-                type != TextType.INPUT && mTextType == TextType.INPUT
-        )) {
-            int color = getEHighlightColor(type);
-            Editable text = getText();
-            EHighlightSpan[] spans = text.getSpans(0, text.length() - 1, EHighlightSpan.class);
-            for(EHighlightSpan span : spans) {
-                int start = text.getSpanStart(span);
-                int end = text.getSpanEnd(span);
-                text.removeSpan(span);
-                if(type != TextType.RESULT_MESSAGE)
-                    text.setSpan(new EHighlightSpan(color), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            }
-        }*/
-
         mTextType = type;
+        updateEHighlights(0, getText().length());
     }
     public TextType getTextType() {
         return mTextType;
     }
-
-    /*private int getEHighlightColor(TextType type) {
-        return getResources().getColor(type == TextType.INPUT ? R.color.colorInputHighlightE :
-                R.color.colorInputHighlightEResult);
-    }*/
 
     @Override
     protected void onCreateContextMenu(ContextMenu menu) {
@@ -314,6 +306,10 @@ public class InputEditText extends EditText {
                 case R.id.menuItem_paste:
                     if(Util.getPrimaryClip(getContext()).isEmpty())
                         item.setVisible(false);
+                    break;
+                case R.id.menuItem_asFraction:
+                    item.setVisible(mTextType == TextType.RESULT_NUMBER && mInputCallback != null &&
+                            mInputCallback.canShowResultAsFraction(this));
                     break;
             }
 
@@ -420,6 +416,11 @@ public class InputEditText extends EditText {
 
 
 
+    public interface InputCallback {
+        boolean canShowResultAsFraction(InputEditText v);
+        void onShowResultAsFraction(InputEditText v);
+    }
+
     private class MenuHandler implements MenuItem.OnMenuItemClickListener {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -434,6 +435,10 @@ public class InputEditText extends EditText {
                 case R.id.menuItem_paste:
                     appendText(Util.getPrimaryClip(getContext()), true);
                     return true;
+                case R.id.menuItem_asFraction:
+                    if(mInputCallback != null)
+                        mInputCallback.onShowResultAsFraction(InputEditText.this);
+                    break;
             }
             return false;
         }
@@ -443,8 +448,6 @@ public class InputEditText extends EditText {
         }
     }
 
-    // API <= 10 will ignore that, so this error is not a big problem
-    @SuppressLint("NewApi")
     private class NoTextSelectionMode implements ActionMode.Callback {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -470,16 +473,19 @@ public class InputEditText extends EditText {
 
     public static class SavedState extends BaseSavedState {
         private TextType mTextType;
+        private String mMessageReplacement;
 
-        private SavedState(Parcelable superState, TextType textType) {
+        private SavedState(Parcelable superState, TextType textType, String messageReplacement) {
             super(superState);
             mTextType = textType;
+            mMessageReplacement = messageReplacement;
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(mTextType.ordinal());
+            out.writeString(mMessageReplacement);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR
@@ -496,27 +502,7 @@ public class InputEditText extends EditText {
         private SavedState(Parcel in) {
             super(in);
             mTextType = TextType.values()[in.readInt()];
-        }
-    }
-    
-    private static class EHighlightSpan extends ForegroundColorSpan {
-        public static final Creator<EHighlightSpan> CREATOR = new Creator<EHighlightSpan>() {
-            @Override
-            public EHighlightSpan createFromParcel(Parcel in) {
-                return new EHighlightSpan(in);
-            }
-    
-            @Override
-            public EHighlightSpan[] newArray(int size) {
-                return new EHighlightSpan[size];
-            }
-        };
-
-        public EHighlightSpan(int color) {
-            super(color);
-        }
-        protected EHighlightSpan(Parcel src) {
-            super(src);
+            mMessageReplacement = in.readString();
         }
     }
 }

@@ -11,4 +11,8 @@
     <item
         android:id="@+id/menuItem_paste"
         android:title="@string/menuItem_paste" />
+
+    <item
+        android:id="@+id/menuItem_asFraction"
+        android:title="@string/menuItem_asFraction" />
 </menu>

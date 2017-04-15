@@ -19,6 +19,7 @@
 package roottemplate.calculator;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import roottemplate.calculator.data.AppDatabase;
+import roottemplate.calculator.data.KeyboardKitsXmlManager;
 import roottemplate.calculator.util.AppCompatPreferenceActivity;
 import roottemplate.calculator.view.IfDialogFragment;
 import roottemplate.calculator.view.OnDialogResultListener;
@@ -57,6 +59,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
     private static final int REQUEST_EDIT_NAMESPACE = 0;
     private static final int REQUEST_EDIT_KEYBOARD_KITS = 1;
     private static final int DIALOG_CLEAR_NAMESPACES = 0;
+    private static final int DIALOG_RESTORE_KITS = 1;
 
     /**
      * Determines whether to always show the simplified settings UI, where
@@ -69,9 +72,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
+    private BindPreferenceChangeListener sBindPreferenceSummaryToValueListener = new BindPreferenceChangeListener();
+
+    private class BindPreferenceChangeListener implements Preference.OnPreferenceChangeListener {
+        public void onPreferenceChange(Preference preference, Object value, boolean initialCall) {
             String stringValue = value.toString();
 
             if (preference instanceof ListPreference) {
@@ -86,36 +90,34 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
                                 ? listPreference.getEntries()[index]
                                 : null);
 
-            }/* else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-
-            }*/ else {
+            } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
             }
+
+            switch (preference.getKey()) {
+                case "digitGrouping":
+                    boolean enabled = !value.equals("0");
+                    findPreference("digitGroupingSeparatorLeft").setEnabled(enabled);
+                    findPreference("digitGroupingSeparatorFract").setEnabled(enabled);
+                    // Fall through
+                case "digitGroupingSeparatorLeft":
+                case "digitGroupingSeparatorFract":
+                    if(!initialCall) onInputDigitGroupingChanged();
+                    break;
+                case "dayNightTheme":
+                    if(!initialCall) onThemeValueChanged();
+                    break;
+            }
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            onPreferenceChange(preference, newValue, false);
             return true;
         }
-    };
+    }
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -148,7 +150,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
@@ -157,7 +159,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+                        .getString(preference.getKey(), ""), true);
     }
 
     private Intent mResultIntent;
@@ -261,23 +263,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         bindPreferenceSummaryToValue(findPreference("storingHistory"));
         bindPreferenceSummaryToValue(findPreference("digitGroupingSeparatorLeft"));
         bindPreferenceSummaryToValue(findPreference("digitGroupingSeparatorFract"));
+        bindPreferenceSummaryToValue(findPreference("outputType"));
         bindPreferenceSummaryToValue(findPreference("storingNamespace"));
+        bindPreferenceSummaryToValue(findPreference("digitGrouping"));
+        bindPreferenceSummaryToValue(findPreference("dayNightTheme"));
 
-        Preference digitGrouping = findPreference("digitGrouping");
-        digitGrouping.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference("highlightE").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean enabled = !(newValue).equals("0");
-                findPreference("digitGroupingSeparatorLeft").setEnabled(enabled);
-                findPreference("digitGroupingSeparatorFract").setEnabled(enabled);
-                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
+                onInputDigitGroupingChanged();
                 return true;
             }
         });
-        digitGrouping.getOnPreferenceChangeListener().onPreferenceChange(digitGrouping,
-                PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getString(digitGrouping.getKey(), "0"));
 
         setupClearPreference("clearHistory", getIntent().getIntExtra("historySize", -1) == 0,
                 R.string.pref_clearHistory_empty, new Runnable() {
@@ -290,21 +287,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         findPreference("clearAllNamespaces").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if(Build.VERSION.SDK_INT >= 11) {
-                    Bundle args = new Bundle();
-                    args.putInt("id", DIALOG_CLEAR_NAMESPACES);
-                    args.putInt("title", R.string.pref_clearAllNamespaces_title);
-                    args.putInt("message", R.string.pref_clearAllNamespaces_message);
-                    args.putInt("positiveBtn", R.string.yes);
-                    args.putInt("negativeBtn", R.string.no);
-                    IfDialogFragment dialog = new IfDialogFragment();
-                    dialog.setArguments(args);
-                    getFragmentManager().beginTransaction()
-                            .add(dialog, "dialog")
-                            .commit();
-                } else {
-                    onDialogPositiveClick(DIALOG_CLEAR_NAMESPACES);
-                }
+                Bundle args = new Bundle();
+                args.putInt("id", DIALOG_CLEAR_NAMESPACES);
+                args.putInt("title", R.string.pref_clearAllNamespaces_title);
+                args.putInt("message", R.string.pref_clearAllNamespaces_message);
+                args.putInt("positiveBtn", R.string.yes);
+                args.putInt("negativeBtn", R.string.no);
+                IfDialogFragment dialog = new IfDialogFragment();
+                dialog.setArguments(args);
+                getFragmentManager().beginTransaction()
+                        .add(dialog, "dialog")
+                        .commit();
                 return true;
             }
         });
@@ -332,18 +325,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(SettingsActivity.this, KeyboardsActivity.class);
-                //startActivityForResult(intent, REQUEST_EDIT_KEYBOARD_KITS); todo
+                startActivityForResult(intent, REQUEST_EDIT_KEYBOARD_KITS);
                 return true;
             }
         });
 
-        final DialogPreference dayNightTheme = (DialogPreference) findPreference("dayNightTheme");
-        bindPreferenceSummaryToValue(dayNightTheme);
-        dayNightTheme.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference("restoreKitDefaults").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
-                onThemeValueChanged();
+            public boolean onPreferenceClick(Preference preference) {
+                Bundle args = new Bundle();
+                args.putInt("id", DIALOG_RESTORE_KITS);
+                args.putInt("title", R.string.pref_restoreKitDefaults_title);
+                args.putInt("message", R.string.pref_restoreKitDefaults_message);
+                args.putInt("positiveBtn", R.string.yes);
+                args.putInt("negativeBtn", R.string.no);
+                IfDialogFragment dialog = new IfDialogFragment();
+                dialog.setArguments(args);
+                getFragmentManager().beginTransaction()
+                        .add(dialog, "dialog")
+                        .commit();
                 return true;
             }
         });
@@ -366,11 +366,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         mResultIntent.putExtra("themeChanged", true);
     }
 
+    private void onInputDigitGroupingChanged() {
+        mResultIntent.putExtra("inputDigitGroupingChanged", true);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_EDIT_NAMESPACE) {
             mResultIntent.putExtra("updateSelectedKit", data.getBooleanExtra("selectedKitChanged", false));
+        } else if(requestCode == REQUEST_EDIT_KEYBOARD_KITS) {
+            mResultIntent.putExtra("updateKitViews", resultCode == Activity.RESULT_OK);
         }
     }
 
@@ -381,6 +387,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             pref.setEnabled(false);
             pref.setSummary(R.string.pref_clearAllNamespaces_summary_empty);
             mResultIntent.putExtra("clearAllNamespaces", true);
+        } else if(dialogId == DIALOG_RESTORE_KITS) {
+            KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
+            mResultIntent.putExtra("updateKitViews", true);
+            Toast.makeText(this, R.string.pref_restoreKitDefaults_result, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -406,10 +416,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         }
     }
 
-    /**
+    /* *
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
-     */
+     * /
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
@@ -419,10 +429,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
                 ;
     }
 
-    /**
+    /* *
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
-     */
+     * /
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
         @Override
@@ -430,13 +440,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 
         @Override

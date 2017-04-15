@@ -77,8 +77,11 @@ public class NamespaceActivity extends AppCompatActivity
         mEvaluatorSelectedKitName = mDb.getPrefs().separateNamespace() ? mDb.getPrefs().kitName() : null;
         int selectedKitIndex = 0;
         for(int i = 0; i < allKitNames.length / 2; i++) {
-            mKitNames[i + 1] = allKitNames[i * 2]; // TODO: check if shortName exists
-            spinnerKitNames[i + 1] = allKitNames[i * 2] + " (" + allKitNames[i * 2 + 1] + ")";
+            mKitNames[i + 1] = allKitNames[i * 2];
+            String fullName = allKitNames[i * 2];
+            String shortName = allKitNames[i * 2 + 1];
+            if(shortName != null && !shortName.isEmpty()) fullName += " (" + shortName + ")";
+            spinnerKitNames[i + 1] = fullName;
             if(mKitNames[i + 1].equals(mEvaluatorSelectedKitName))
                 selectedKitIndex = i + 1;
         }

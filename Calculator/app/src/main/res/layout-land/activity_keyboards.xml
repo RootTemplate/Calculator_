@@ -21,67 +21,72 @@
             android:id="@+id/kits_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/kit_preview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/button_category_spinner"
-            android:layout_below="@+id/linearLayout2" />
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/buttons_palette"
+            android:layout_toStartOf="@+id/buttons_palette" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:orientation="horizontal"
             android:layout_below="@+id/kits_spinner"
-            android:id="@+id/linearLayout2">
+            android:gravity="center"
+            android:orientation="horizontal">
 
+            <!-- TODO maybe fix this -->
             <Button
                 android:id="@+id/editPageButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/keyboards_editPage" />
 
             <Button
                 android:id="@+id/editKitButton"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/keyboards_editKit" />
         </LinearLayout>
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/kit_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_toLeftOf="@+id/buttons_palette"
+            android:layout_toStartOf="@+id/buttons_palette" />
+
         <Spinner
             android:id="@+id/button_category_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_above="@+id/buttons_palette"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:entries="@array/keyboards_categories" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/kit_preview"
+            android:layout_toEndOf="@+id/linearLayout2"
+            android:layout_toLeftOf="@+id/buttons_palette"
+            android:layout_toRightOf="@+id/linearLayout2"
+            android:layout_toStartOf="@+id/buttons_palette"
+            android:entries="@array/keyboards_categories"
+            android:layout_below="@+id/kits_spinner" />
 
         <LinearLayout
             android:id="@+id/dragActionBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/buttons_palette"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/kit_preview"
+            android:layout_alignBottom="@+id/button_category_spinner"
+            android:layout_alignLeft="@+id/button_category_spinner"
+            android:layout_alignStart="@+id/button_category_spinner"
+            android:layout_below="@+id/kits_spinner"
+            android:layout_toLeftOf="@+id/buttons_palette"
+            android:layout_toStartOf="@+id/buttons_palette"
+            android:alpha="0"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:alpha="0">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/dragActionInfo"
@@ -107,21 +112,26 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/buttons_palette"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:scrollbars="horizontal"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:scrollbars="vertical"
+            android:layout_alignParentBottom="true" />
 
         <FrameLayout
             android:id="@+id/draggingViewRoot"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:visibility="invisible"
-            android:layout_below="@+id/buttons_palette"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_above="@+id/buttons_palette"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="false"
+            android:visibility="invisible">
 
         </FrameLayout>
 

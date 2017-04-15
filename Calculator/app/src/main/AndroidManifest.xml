@@ -3,7 +3,7 @@
     package="roottemplate.calculator">
 
     <!-- For support's TwilightManager to determine sunrise & sunset times -->
-    <!--uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /-->
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
     <uses-feature android:name="android.hardware.location.network" />
 
     <!-- TODO: fix this -->

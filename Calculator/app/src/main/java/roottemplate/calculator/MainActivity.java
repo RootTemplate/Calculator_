@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +51,7 @@ import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
 import roottemplate.calculator.util.ParcelableBinder;
 import roottemplate.calculator.util.Util;
+import roottemplate.calculator.view.AsFractionDialogFragment;
 import roottemplate.calculator.view.FirstLaunchDialogFragment;
 import roottemplate.calculator.view.InputEditText;
 import roottemplate.calculator.view.KitViewPager;
@@ -57,7 +59,8 @@ import roottemplate.calculator.view.NotifyDialogFragment;
 import roottemplate.calculator.view.ShiftButton;
 import roottemplate.calculator.view.SystemButton;
 
-public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener,
+        InputEditText.InputCallback {
     private static final int REQUEST_CODE_HISTORY = 0;
     private static final int REQUEST_CODE_SETTINGS = 1;
     private static final int REQUEST_CODE_GUIDES = 2;
@@ -96,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         // SET CONTENT VIEW
         setContentView(R.layout.activity_main);
         mInputText = (InputEditText) findViewById(R.id.activity_main_expr);
+        mInputText.setInputCallback(this);
+        updateInputDigitFormatting();
         findViewById(R.id.activity_main_del).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -157,7 +162,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             fm.beginTransaction().add(nsFragment, EvaluatorManager.NamespaceFragment.FRAGMENT_NAME)
                     .commit();
         }
-        mEvalManager = new EvaluatorManager(this, nsFragment, mPrefs, mDatabase, savedInstanceState == null);
+        mEvalManager = new EvaluatorManager(this, nsFragment, mPrefs, mDatabase,
+                savedInstanceState == null, savedInstanceState != null ?
+                savedInstanceState.getDouble("lastResultNumber") : Double.NaN);
 
         // INIT KitViewPager
         mViewPager = (KitViewPager) findViewById(R.id.activity_main_viewPager);
@@ -173,15 +180,19 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         if(mEvalManager != null) { // Can be false if readKeyboardKits() went unsuccessful
             mEvalManager.updateEvaluatorOptions(); // In case if they have just been changed in settings
-            mInputText.initDigitFormatting(mPrefs.digitGrouping(), mPrefs.digitSeparatorLeft(),
-                    mPrefs.digitSeparatorFract()/*, mPrefs.highlightE()*/);
         }
+    }
+    private void updateInputDigitFormatting() {
+        mInputText.initDigitFormatting(mPrefs.digitGrouping(), mPrefs.digitSeparatorLeft(),
+                mPrefs.digitSeparatorFract(), mPrefs.highlightE());
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("tipsPageIndex", mTipsPageIndex);
+        outState.putDouble("lastResultNumber", mEvalManager == null ? Double.NaN :
+                mEvalManager.getLastResultNumber());
     }
 
     @Override
@@ -210,12 +221,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(data == null) return;
         if(requestCode == REQUEST_CODE_HISTORY && resultCode == RESULT_OK) {
             String paste = data.getStringExtra("paste");
             if(paste != null) {
                 mInputText.appendText(paste, true);
             }
         } else if(requestCode == REQUEST_CODE_SETTINGS) {
+            if(data.getBooleanExtra("inputDigitGroupingChanged", false))
+                updateInputDigitFormatting();
             if(data.getBooleanExtra("clearAllNamespaces", false)) {
                 mEvalManager.clearAllNamespace();
                 if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
@@ -227,7 +241,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
                     mInputText.clearText();
             }
-            if(data.getBooleanExtra("themeChanged", false) && Build.VERSION.SDK_INT >= 11) {
+            if(data.getBooleanExtra("themeChanged", false)) {
+                recreate();
+            }
+            if(data.getBooleanExtra("updateKitViews", false)) {
                 recreate();
             }
         } else if(requestCode == REQUEST_CODE_GUIDES) {
@@ -241,7 +258,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         ArrayList<KeyboardKits.Kit> kits = mKeyboardKits.mKits;
-        if(kits.size() >= 2) {
+        int visibleKitsCount = 0;
+        for(KeyboardKits.Kit kit : kits)
+            if(kit.mActionBarAccess) visibleKitsCount++;
+        if(visibleKitsCount >= 2) {
             Random random = new Random();
             int i = 0;
             for(KeyboardKits.Kit kit : kits) {
@@ -344,8 +364,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private void updateVersion() {
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
-        if(latestVer == thisVer && false) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || true; // todo
+        if(latestVer == thisVer) return;
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 6;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
@@ -357,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 args.putInt("title", R.string.dialog_kitsUpdated_title);
                 args.putInt("message", R.string.dialog_kitsUpdated_message);
                 dialog.setArguments(args);
-                //dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated"); todo
+                dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
 
                 KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
                 /*readKeyboardKits(); This will be invoked later in onCreate
@@ -398,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         ArrayList<KeyboardKits.Kit> kits = mKeyboardKits.mKits;
         KeyboardKits.Kit currentKit = mCurrentKeyboardKitVersion.mParent;
-        if(kits.size() < 2) return;
+        if(kits.size() < 2) return; // Old check
 
         ActionMenuView menuView = null;
         for (int i = 0; i < toolbar.getChildCount(); i++) {
@@ -522,8 +542,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if(text.isEmpty()) return;
 
         EvaluatorManager.EvalResult res = mEvalManager.eval(text, mInputText.getMaxDigitsToFit());
-        if(res.mText != null && res.mMessage == null)
-            mInputText.setText(res.mText);
+        if(res.mMessage == null) {
+            if(res.mShowText != null) {
+                mInputText.setText(res.mShowText);
+                mInputText.setMessageReplacement(res.mText);
+            } else if(res.mText != null)
+                mInputText.setText(res.mText);
+        }
         if(res.mTextType != null)
             mInputText.setTextType(res.mTextType);
         if(res.mMessage != null) {
@@ -532,6 +557,21 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if(res.mErrorIndex != -1)
                 mInputText.setCursor(res.mErrorIndex + 1);
         }
+    }
+
+    @Override
+    public boolean canShowResultAsFraction(InputEditText v) {
+        double x = mEvalManager.getLastResultNumber();
+        return !Double.isInfinite(x) && !Double.isNaN(x) && Math.round(x) != x;
+    }
+
+    @Override
+    public void onShowResultAsFraction(InputEditText v) {
+        AsFractionDialogFragment fragment = new AsFractionDialogFragment();
+        Bundle args = new Bundle();
+        args.putDouble("number", mEvalManager.getLastResultNumber());
+        fragment.setArguments(args);
+        getFragmentManager().beginTransaction().add(fragment, "AsFraction").commit();
     }
 
 

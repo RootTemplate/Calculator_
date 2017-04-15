@@ -46,4 +46,7 @@
     <color name="colorIcon">#F5F5F5</color>
     <color name="colorIconBackgroundFocused">#20000000</color>
     <color name="colorNamespaceEquals">@color/colorButtonEqualsDarkOrangeFocused</color>
+
+    <color name="colorDragActionImage">#FFFFFF</color>
+    <color name="colorDragActionHover">#E0E0E0</color>
 </resources>

@@ -38,6 +38,10 @@ public class PreferencesManager {
         mResources = resources;
     }
 
+    public Resources getResources() {
+        return mResources;
+    }
+
     public String kitName() {
         return mPrefs.getString("selectedKit", null);
     }
@@ -113,6 +117,11 @@ public class PreferencesManager {
 
     public boolean highlightE() {
         return mPrefs.getBoolean("highlightE", mResources.getBoolean(R.bool.pref_def_highlightE));
+    }
+
+    public int outputType() {
+        return Integer.parseInt(mPrefs.getString("outputType",
+                mResources.getString(R.string.pref_def_outputType)));
     }
 
     public static final int THEME_DAY = 1;

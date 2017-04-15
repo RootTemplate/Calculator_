@@ -33,7 +33,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:ems="10"
-        android:hint="@string/keyboards_editButton_name"
+        android:hint="@string/keyboards_editKit_name"
         android:inputType="textNoSuggestions"
         android:maxLines="1" />
 
@@ -43,12 +43,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editButton_enableCaseInverse"
-        android:layout_marginTop="5dp"
-        android:text="@string/keyboards_editButton_enableTextField" />
+        android:layout_below="@+id/editPage_orient"
+        android:layout_marginTop="2dp"
+        android:checked="true"
+        android:text="@string/keyboards_editKit_actionBarAccess" />
 
     <EditText
-        android:id="@+id/editButton_text"
+        android:id="@+id/editKit_shortName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -58,30 +59,28 @@
         android:layout_below="@+id/editKit_actionBarAccess"
         android:layout_marginLeft="35dp"
         android:layout_marginStart="35dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="2dp"
         android:ems="10"
-        android:enabled="false"
+        android:hint="@string/keyboards_editKit_shortName"
         android:inputType="textPersonName" />
 
-    <Spinner
-        android:id="@+id/editButton_style"
-        android:layout_width="wrap_content"
-        android:layout_height="27dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editPage_orient"
-        android:layout_marginTop="5dp"
-        android:entries="@array/keyboards_editButton_styles"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <CheckBox
-        android:id="@+id/editButton_enableCaseInverse"
+    <TextView
+        android:id="@+id/editKit_contentCopied"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/keyboards_editButton_enableCaseInverse"
-        android:layout_below="@+id/editButton_style"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/editKit_shortName"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/editKit_errorOfExistence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editKit_contentCopied"
+        android:layout_marginTop="8dp"
+        android:textColor="#ffcc0000"
+        android:visibility="gone" /> <!-- textColor = @android:color/holo_red_dark -->
 
 </RelativeLayout>

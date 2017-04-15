@@ -18,26 +18,23 @@
 
 package roottemplate.calculator.util;
 
-import android.app.UiModeManager;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.text.ClipboardManager;
 import android.util.Log;
-import android.widget.TextView;
+import android.view.View;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.Objects;
 
-import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.R;
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
@@ -77,6 +74,16 @@ public class Util {
         return "#" + Integer.toHexString(color & 0xffffff);
     }
 
+    public static int[][] cloneIntMatrix(int[][] m) {
+        int[][] res = new int[m.length][];
+        for(int i = 0; i < m.length; i++) {
+            int[] cache = m[i];
+            res[i] = new int[cache.length];
+            System.arraycopy(cache, 0, res[i], 0, cache.length);
+        }
+        return res;
+    }
+
     public static String inverseTextCase(String str) {
         String t = str.toUpperCase();
         t = t.equals(str) ? str.toLowerCase() : t;
@@ -106,6 +113,31 @@ public class Util {
 
     public static boolean equals(Object a, Object b) {
         return (a == b) || (a != null && a.equals(b));
+    }
+
+    public static int[] appendToIntArray(int[] a, int index, int value) {
+        int[] res = new int[a.length + 1];
+        System.arraycopy(a, 0, res, 0, index);
+        res[index] = value;
+        System.arraycopy(a, index, res, index + 1, a.length - index);
+        return res;
+    }
+    public static <T> T[] appendToObjectArray(T[] a, int index, T value, T[] newA) {
+        System.arraycopy(a, 0, newA, 0, index);
+        newA[index] = value;
+        System.arraycopy(a, index, newA, index + 1, a.length - index);
+        return newA;
+    }
+    public static int[] removeFromIntArray(int[] a, int index) {
+        int[] res = new int[a.length - 1];
+        System.arraycopy(a, 0, res, 0, index);
+        System.arraycopy(a, index + 1, res, index, a.length - index - 1);
+        return res;
+    }
+    public static <T> T[] removeFromObjectArray(T[] a, int index, T[] newA) {
+        System.arraycopy(a, 0, newA, 0, index);
+        System.arraycopy(a, index + 1, newA, index, a.length - index - 1);
+        return newA;
     }
 
 
@@ -161,5 +193,35 @@ public class Util {
             Util.fatalError(activity, R.string.message_bad_kits_xml, e);
         }
         return kits;
+    }
+
+    public static void animateFading(View v, int visibility, int duration) {
+        if(Build.VERSION.SDK_INT >= 12) {
+            v.animate().alpha(visibility == View.VISIBLE ? 1 : 0).setDuration(duration)
+                    .setListener(new FadeListener(v, visibility));
+        } else
+            v.setVisibility(visibility);
+    }
+    private static class FadeListener extends AnimatorListenerAdapter {
+        private final View view;
+        private final int visibility;
+
+        private FadeListener(View view, int visibility) {
+            this.view = view;
+            this.visibility = visibility;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            super.onAnimationEnd(animation);
+            view.setVisibility(visibility);
+        }
+    }
+
+    public static void animateAlpha(View v, int alpha, int duration) {
+        if(Build.VERSION.SDK_INT >= 12) {
+            v.animate().alpha(alpha).setDuration(duration);
+        } else
+            v.setAlpha(alpha);
     }
 }

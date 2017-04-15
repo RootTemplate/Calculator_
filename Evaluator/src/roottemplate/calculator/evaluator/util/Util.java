@@ -40,9 +40,17 @@ public class Util {
         
         return withE ? doubleToStringWithE(n, maxLen) : doubleToStringNoE(n, maxLen);
     }
-    
+    public static String doubleToStringInEngNotation(double n, int maxLen) {
+        String result = doubleToStringWithE(n, maxLen, true);
+        if(result.endsWith("E0")) result = result.substring(0, result.length() - 2);
+        return result;
+    }
+
     public static String doubleToStringWithE(double n, int maxLen) {
-        String str = String.format(Locale.US, "%.340e", n);
+        return doubleToStringWithE(n, maxLen, false);
+    }
+    public static String doubleToStringWithE(double n, int maxLen, boolean engineeringNotation) {
+        String str = String.format(Locale.US, "%.30e", n);
         int eIndex = str.indexOf('e');
         String mantissa = str.substring(0, eIndex);
         
@@ -64,6 +72,22 @@ public class Util {
                 }
             }
             exponent = String.valueOf(exponentV);
+        }
+
+        int exponentMod3 = exponentV % 3;
+        if(engineeringNotation && exponentMod3 != 0) {
+            if(exponentMod3 < 0)
+                exponentMod3 = exponentMod3 + 3;
+            exponentV -= exponentMod3;
+            exponent = String.valueOf(exponentV);
+
+            if(result.length() > 1) result.deleteCharAt(1); // Remove the point (if there is one)
+            int resultLen = result.length();
+            if(1 + exponentMod3 < resultLen)
+                result.insert(1 + exponentMod3, '.');
+            else
+                for(; 1 + exponentMod3 > resultLen; resultLen++)
+                    result.append('0');
         }
         
         return result.append('E').append(exponent).toString();
@@ -139,5 +163,71 @@ public class Util {
             }
         }
         return digitsAppended;
+    }
+
+
+    /**
+     * Ideal error percentage used to toFraction(double, int. int) method.
+     * If method finds Fraction with error &lt;FRACTION_IDEAL_ERROR, it will return
+     * found Fraction even if it could find another Fraction with lower error. It is not final, so you can
+     * change the value if you need to.
+     */
+    public static double FRACTION_IDEAL_ERROR = 0.000_000_1;
+
+    /**
+     * Finds closest fraction to given number.<br/>
+     * Equivalent to {@code toFraction(x, maxQ, 2)}.
+     * @param x The number.
+     * @param maxQ Limit of the denominator. Must be &gt;2.
+     * @return Found closest to x fraction.
+     * @see Util#FRACTION_IDEAL_ERROR
+     */
+    public static Fraction toFraction(double x, int maxQ) {
+        return toFraction(x, maxQ, 2);
+    }
+
+    /**
+     * Finds closest fraction to given number.
+     * @param x The number.
+     * @param maxQ Limit of the denominator. Must be &gt;2.
+     * @param minQ Minimum denominator. Must be &gt;=2. Used if you want to continue search of closest fraction.
+     * @return Found closest to x fraction.
+     * @see Util#FRACTION_IDEAL_ERROR
+     */
+    public static Fraction toFraction(double x, int maxQ, int minQ) {
+        if(maxQ < 1 || minQ < 1)
+            throw new IllegalArgumentException("toFraction illegal arguments: maxQ=" + maxQ + "; minQ=" + minQ);
+
+        // Approximate x with p/q.
+        int pFound = (int) Math.round(x);
+        int qFound = 1;
+        double errorFound = Math.abs(pFound / (double) qFound / x - 1);
+        for (int q = minQ; q < maxQ && errorFound > FRACTION_IDEAL_ERROR; ++q) {
+            int p = (int) (x * q);
+            for (int i = 0; i < 2; ++i) { // below and above x
+                double error = Math.abs(p / (double) q / x - 1);
+                if (error < errorFound) {
+                    pFound = p;
+                    qFound = q;
+                    errorFound = error;
+                }
+                ++p;
+            }
+        }
+        return new Fraction(pFound, qFound, errorFound * 100);
+    }
+    public static class Fraction {
+        public final int num, denom;
+        public final double errorPercentage;
+
+        public Fraction(int num, int denom, double errorPercentage) {
+            this.num = num;
+            this.denom = denom;
+            this.errorPercentage = errorPercentage;
+        }
+
+        public String toString() {
+            return String.valueOf(num) + '/' + denom + ' ' + errorPercentage + '%';
+        }
     }
 }

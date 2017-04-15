@@ -46,6 +46,9 @@
     <color name="colorIconBackgroundFocused">#20000000</color>
     <color name="colorNamespaceEquals">#db6e00</color>
 
+    <color name="colorDragActionImage">#848484</color>
+    <color name="colorDragActionHover">#757575</color>
+
 
     <!-- Legacy Colours -->
 

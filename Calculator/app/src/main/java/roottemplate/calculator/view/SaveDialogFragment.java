@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 RootTemplate Group 1.
+ * Copyright (c) 2017 RootTemplate Group 1.
  * This file is part of Calculator_.
  *
  * Calculator_ is free software: you can redistribute it and/or modify
@@ -25,7 +25,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
-public class IfDialogFragment extends DialogFragment {
+import roottemplate.calculator.R;
+
+public class SaveDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -36,11 +38,10 @@ public class IfDialogFragment extends DialogFragment {
                 .OnDialogButtonClickListener(getActivity(), dialogId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(args.getInt("title"))
-                .setPositiveButton(args.getInt("positiveBtn"), listener)
-                .setNegativeButton(args.getInt("negativeBtn"), listener);
-        if(args.containsKey("message"))
-            builder.setMessage(args.getInt("message"));
+                .setTitle(R.string.dialog_save_title)
+                .setPositiveButton(R.string.dialog_save_positive, listener)
+                .setNegativeButton(R.string.dialog_save_negative, listener)
+                .setNeutralButton(R.string.dialog_save_neutral, listener);
         return builder.create();
     }
 }

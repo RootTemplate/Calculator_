@@ -7,8 +7,8 @@ android {
         applicationId "roottemplate.calculator"
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 5
-        versionName 'WHAT A LIMITED EDITION (#3)'
+        versionCode 6
+        versionName 'KIT LIMITED EDITION'
     }
     buildTypes {
         release {

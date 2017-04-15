@@ -36,9 +36,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import roottemplate.calculator.KeyboardsActivity;
 import roottemplate.calculator.PreferencesManager;
 import roottemplate.calculator.R;
 import roottemplate.calculator.util.Util;
@@ -49,6 +51,14 @@ public class KeyboardKitsXmlManager {
 
     public static void invalidateInstalledKeyboardKits(Context context) {
         context.deleteFile(PADS_FILENAME);
+    }
+
+
+    public static void invalidateInstalledKeyboardKits(Context context, KeyboardKits newKits) throws IOException {
+        invalidateInstalledKeyboardKits(context);
+        FileOutputStream file = context.openFileOutput(PADS_FILENAME, Context.MODE_PRIVATE);
+        newKits.dumpToXml(new PrintWriter(file));
+        file.close();
     }
 
     public static KeyboardKits parse(Context context) throws IOException, XmlPullParserException {
@@ -333,15 +343,25 @@ public class KeyboardKitsXmlManager {
     public static KeyboardKits.KitVersion getPreferredKitVersion(ArrayList<KeyboardKits.Kit> kits,
                                                                  String preferredKitName, boolean landscape) {
         KeyboardKits.Kit kit = null;
-        if(preferredKitName == null)
-            kit = kits.get(0);
-        else {
-            for(KeyboardKits.Kit aKit : kits) {
-                if(aKit.mName.equals(preferredKitName))
+        if(preferredKitName == null) {
+            for(KeyboardKits.Kit aKit : kits)
+                if(aKit.mActionBarAccess) {
                     kit = aKit;
+                    break;
+                }
+        } else {
+            for(KeyboardKits.Kit aKit : kits) {
+                if(aKit.mName.equals(preferredKitName)) {
+                    kit = aKit;
+                    break;
+                }
             }
-            if(kit == null)
-                kit = kits.get(0);
+            if(kit == null || !kit.mActionBarAccess)
+                for(KeyboardKits.Kit aKit : kits)
+                    if(aKit.mActionBarAccess) {
+                        kit = aKit;
+                        break;
+                    }
         }
 
         for(KeyboardKits.KitVersion kv : kit.mKitVersions)
@@ -349,5 +369,4 @@ public class KeyboardKitsXmlManager {
                 return kv;
         return kit.mKitVersions[0];
     }
-
 }

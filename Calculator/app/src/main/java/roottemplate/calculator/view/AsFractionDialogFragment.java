@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 RootTemplate Group 1.
+ * Copyright (c) 2017 RootTemplate Group 1.
  * This file is part of Calculator_.
  *
  * Calculator_ is free software: you can redistribute it and/or modify
@@ -20,27 +20,26 @@ package roottemplate.calculator.view;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
-public class IfDialogFragment extends DialogFragment {
-    @NonNull
+import roottemplate.calculator.R;
+import roottemplate.calculator.evaluator.util.Util;
+
+public class AsFractionDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        int dialogId = args.getInt("id", 0);
+        double x = getArguments().getDouble("number");
+        Util.Fraction fraction = Util.toFraction(x, 1000);
+        String message = String.valueOf(fraction.num) + '/' + fraction.denom;
+        if(fraction.errorPercentage != 0)
+            message += ". " + String.format(getResources().getString(R.string.dialog_asFraction_message_error),
+                    Util.doubleToString(fraction.errorPercentage, 8, 3, 3));
 
-        DialogInterface.OnClickListener listener = new OnDialogResultListener
-                .OnDialogButtonClickListener(getActivity(), dialogId);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(args.getInt("title"))
-                .setPositiveButton(args.getInt("positiveBtn"), listener)
-                .setNegativeButton(args.getInt("negativeBtn"), listener);
-        if(args.containsKey("message"))
-            builder.setMessage(args.getInt("message"));
-        return builder.create();
+        return new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.dialog_asFraction_title)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok, null)
+                .create();
     }
 }

@@ -10,9 +10,10 @@
     <dimen name="inputTextHeight">72dp</dimen>
     <dimen name="inputTextSize">40sp</dimen>
     <dimen name="inputTextCursorHeight">48dp</dimen>
+    <dimen name="inputTextEHighlight">34sp</dimen>
 
     <dimen name="dialogErrorMargin">70dp</dimen>
 
-    <dimen name="default_keyboard_button_size">75dp</dimen>
+    <dimen name="default_keyboard_button_size">72dp</dimen>
     <dimen name="default_keyboard_action_button_size">60dp</dimen>
 </resources>
