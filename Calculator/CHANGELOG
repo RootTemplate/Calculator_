@@ -24,8 +24,6 @@
 === СПИСОК ИЗМЕНЕНИЙ ===
 
 [KITS LIMITED EDITION]
-	ВНИМАНИЕ! Не забыть в что нового написать, что изменился формат наборов кнопок, поэтому диалог Button kits were updated
-	
 	[Evaluator]
 		- Добавлен метод в класс Util toFraction, переводящий double в дробь
 	[Calculator_]
