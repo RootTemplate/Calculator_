@@ -346,7 +346,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
             KeyboardKits.Page[] pages = kv.mPages;
             kv.mPages = Util.appendToObjectArray(pages, index, page,
                     new KeyboardKits.Page[pages.length + 1]);
-            if (kv.mMainPageIndex <= index)
+            if (kv.mMainPageIndex >= index)
                 kv.mMainPageIndex++;
         }
         mKitPreviewAdapter.notifyDataSetChanged();
@@ -398,6 +398,8 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
             kv.mPages = Util.removeFromObjectArray(pages, pageIndex, new KeyboardKits.Page[pages.length - 1]);
             if (kv.mMainPageIndex > pageIndex)
                 kv.mMainPageIndex--;
+            else if(kv.mMainPageIndex >= kv.mPages.length)
+                kv.mMainPageIndex = kv.mPages.length - 1;
         }
         mKitPreviewAdapter.notifyDataSetChanged();
     }
@@ -617,6 +619,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 mDraggingButtonLayoutParams = null;
                 mDragTempPage = null;
                 mDragTempCannotEditKit = false;
+                mMessageCannotEditSystemShown = false; // Set this to false on drag start & end
                 break;
             case DragEvent.ACTION_DRAG_EXITED:
                 if(v.getTag() == null) { // Not a button => root

@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
         if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 6;
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 7;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
