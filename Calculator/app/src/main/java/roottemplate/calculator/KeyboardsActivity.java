@@ -437,6 +437,11 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
     private void notifyCustomButtonsChanged() {
         if(mCurrentCategoryIndex == KeyboardKits.ButtonCategory.CUSTOM.ordinal())
             mPalette.getAdapter().notifyDataSetChanged();
+        // Invalidate all pages
+        int childCount = mKitPreview.getChildCount();
+        for(int i = 0; i < childCount; i++)
+            mKitPreviewAdapter.mInvalidatePages.add((KeyboardKits.Page) mKitPreview.getChildAt(i).getTag());
+        mKitPreviewAdapter.notifyDataSetChanged();
     }
     private void notifyPageChanged(int pageIndex) {
         mKitPreviewAdapter.mInvalidatePages.add(mCurrentKitV.mPages[pageIndex]);

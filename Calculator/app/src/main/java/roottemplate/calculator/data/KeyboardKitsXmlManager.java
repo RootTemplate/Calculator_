@@ -30,10 +30,12 @@ import android.widget.LinearLayout;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -56,9 +58,12 @@ public class KeyboardKitsXmlManager {
 
     public static void invalidateInstalledKeyboardKits(Context context, KeyboardKits newKits) throws IOException {
         invalidateInstalledKeyboardKits(context);
-        FileOutputStream file = context.openFileOutput(PADS_FILENAME, Context.MODE_PRIVATE);
-        newKits.dumpToXml(new PrintWriter(file));
-        file.close();
+        FileOutputStream fileStream = context.openFileOutput(PADS_FILENAME, Context.MODE_PRIVATE);
+        XmlSerializer xml = Xml.newSerializer();
+        xml.setOutput(new PrintWriter(fileStream));
+        xml.startDocument("utf-8", true);
+        newKits.dumpToXml(xml);
+        xml.endDocument();
     }
 
     public static KeyboardKits parse(Context context) throws IOException, XmlPullParserException {

@@ -18,7 +18,9 @@
 
 package roottemplate.calculator.data;
 
-import java.io.PrintWriter;
+import org.xmlpull.v1.XmlSerializer;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -121,21 +123,24 @@ public class KeyboardKits {
             return sb.append("]}").toString();
         }
 
-        public void dumpToXml(PrintWriter f, boolean isMainPage) {
-            f.append("<Page main=\"").append(Boolean.toString(isMainPage)).append("\"");
+        public void dumpToXml(XmlSerializer f, boolean isMainPage) throws IOException {
+            f.startTag("", "Page")
+                    .attribute("", "main", Boolean.toString(isMainPage))
+                    .attribute("", "layoutOrientation", mIsVerticalOrient ? "vertical" : "horizontal");
+
             if(mMoveToMain != null)
-                f.append(" moveToMain=\"").append(mMoveToMain.toString()).append("\"");
-            f.append(" layoutOrientation=\"")
-                    .append(mIsVerticalOrient ? "vertical" : "horizontal").append("\">");
+                f.attribute("", "moveToMain", mMoveToMain.toString());
             for(int[] row : mButtons) {
-                f.append("<PageRow>");
+                f.startTag("", "PageRow");
                 for(int btnId : row) {
                     if(btnId >= DEFAULT_BUTTONS_COUNT) btnId = DEFAULT_BUTTONS_COUNT - btnId - 1;
-                    f.append("<Button id=\"").append(Integer.toString(btnId)).append("\"/>");
+                    f.startTag("", "Button")
+                            .attribute("", "id", Integer.toString(btnId))
+                            .endTag("", "Button");
                 }
-                f.append("</PageRow>");
+                f.endTag("", "PageRow");
             }
-            f.print("</Page>");
+            f.endTag("", "Page");
         }
     }
 
@@ -166,15 +171,15 @@ public class KeyboardKits {
             return sb.append("]}").toString();
         }
 
-        public void dumpToXml(PrintWriter f) {
-            f.append("<Version orientation=\"")
-                    .append(mIsLandscapeOrient ? "landscape" : "portrait").append("\">");
+        public void dumpToXml(XmlSerializer f) throws IOException {
+            f.startTag("", "Version")
+                    .attribute("", "orientation", mIsLandscapeOrient ? "landscape" : "portrait");
             int i = 0;
             for(Page page : mPages) {
                 page.dumpToXml(f, i == mMainPageIndex);
                 i++;
             }
-            f.print("</Version>");
+            f.endTag("", "Version");
         }
     }
 
@@ -221,17 +226,16 @@ public class KeyboardKits {
             return sb.append("]}").toString();
         }
 
-        public void dumpToXml(PrintWriter f) {
-            f.append("<Kit isSystem=\"").append(Boolean.toString(mIsSystem))
-                    .append("\" name=\"").append(mName)
-                    .append("\" actionBarAccess=\"").append(Boolean.toString(mActionBarAccess))
-                    .append("\"");
+        public void dumpToXml(XmlSerializer f) throws IOException {
+            f.startTag("", "Kit")
+                    .attribute("", "isSystem", Boolean.toString(mIsSystem))
+                    .attribute("", "name", mName)
+                    .attribute("", "actionBarAccess", Boolean.toString(mActionBarAccess));
             if(mShortName != null)
-                f.append(" shortName=\"").append(mShortName).append("\"");
-            f.print(">");
+                f.attribute("", "shortName", mShortName);
             for(KitVersion kv : mKitVersions)
                 kv.dumpToXml(f);
-            f.print("</Kit>");
+            f.endTag("", "Kit");
         }
     }
 
@@ -267,26 +271,27 @@ public class KeyboardKits {
         return sb.append("]}").toString();
     }
 
-    public void dumpToXml(PrintWriter f) {
-        f.print("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-        f.print("<KeyboardKits>");
-        f.print("<CustomButtons>");
+    public void dumpToXml(XmlSerializer f) throws IOException {
+        f.startTag("", "KeyboardKits");
+        f.startTag("", "CustomButtons");
         ListIterator<Button> it = mButtons.listIterator(DEFAULT_BUTTONS_COUNT);
         for(int i = -1; it.hasNext(); i--) {
             Button btn = it.next();
-            f.append("<Button id=\"").append(String.valueOf(i))
-                    .append("\" name=\"").append(btn.mName)
-                    .append("\" text=\"").append(btn.mText)
-                    .append("\" type=\"").append(btn.mType.toString())
-                    .append("\" enableCaseInverse=\"").append(Boolean.toString(btn.mEnableCaseInverse))
-                    .append("\"/>");
+            f.startTag("", "Button")
+                    .attribute("", "id", Integer.toString(i))
+                    .attribute("", "name", btn.mName)
+                    .attribute("", "text", btn.mText)
+                    .attribute("", "type", btn.mType.toString())
+                    .attribute("", "enableCaseInverse", Boolean.toString(btn.mEnableCaseInverse))
+                    .endTag("", "Button");
             // Custom buttons cannot have localeEastId
         }
-        f.print("</CustomButtons><Kits>");
+        f.endTag("", "CustomButtons");
+        f.startTag("", "Kits");
         for(Kit kit : mKits)
             kit.dumpToXml(f);
-        f.print("</Kits></KeyboardKits>");
-        f.flush();
+        f.endTag("", "Kits");
+        f.endTag("", "KeyboardKits");
     }
 
 
