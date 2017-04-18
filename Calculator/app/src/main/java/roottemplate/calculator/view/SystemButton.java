@@ -61,14 +61,16 @@ public class SystemButton extends Button {
         return 1;
     }
 
-    public void onButtonClicked(MainActivity activity) {
+    public boolean onButtonClicked(MainActivity activity, boolean isHandled) {
         PreferencesManager prefs = activity.getPrefs();
-        int amu = prefs.getAMU() + 1;
-        if(amu > 2) amu = 1;
-        prefs.amu(amu);
-
-        activity.invalidateEvaluatorOptions();
+        int amu = prefs.getAMU();
+        if(!isHandled) {
+            if (++amu > 2) amu = 1;
+            prefs.amu(amu);
+            activity.invalidateEvaluatorOptions();
+        }
         updateText(amu);
+        return true;
     }
 
     private void updateText(int amu) {

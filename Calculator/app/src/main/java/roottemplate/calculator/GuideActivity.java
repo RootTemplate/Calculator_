@@ -60,13 +60,14 @@ public class GuideActivity extends AppCompatActivity {
             R.id.guide_pads, // PADS
             R.id.guide_arOrder, // OPERATOR ORDER
             R.id.guide_empty, R.id.guide_same_button, R.id.guide_same_button, R.id.guide_same_button, // SAME BUTTONS
+            R.id.guide_empty, // AS FRACTION
             R.id.guide_log, R.id.guide_root, // log, root
             R.id.guide_eNotation, // EXPONENT NOTAION
-            R.id.guide_nan, // NaN
             R.id.guide_longClks, // LONG CLICKS ON BUTTONS
             R.id.guide_empty, // DOUBLE CLICKS TO MOVE TO MAIN
-            R.id.guide_namespaces, // NAMESPACE
-            R.id.guide_historyClks, // HISTORY CLICKS
+            R.id.guide_namespaces, // NAMESPACES
+            //R.id.guide_historyClks, // HISTORY CLICKS
+            R.id.guide_nan, // NaN
             R.id.guide_empty, // SETTINGS IS YOUR FRIEND
             R.id.guide_final
     };
@@ -264,20 +265,20 @@ public class GuideActivity extends AppCompatActivity {
                 setupGuideSameButton(R.string.guide_6_title, 0, ".", ",", R.string.guide_6_point, R.string.guide_6_comma);
                 break;
             case 7:
+                mTitle.setText(R.string.guide_18_title);
+                mText.setText(R.string.guide_18_text);
+                break;
+            case 8:
                 mTitle.setText(R.string.guide_8_title);
                 mText.setText(R.string.guide_8_text1);
                 break;
-            case 8:
+            case 9:
                 mTitle.setText(R.string.guide_9_title);
                 mText.setText(R.string.guide_9_text1);
                 break;
-            case 9:
+            case 10:
                 mTitle.setText(R.string.guide_16_title);
                 mText.setText(R.string.guide_16_text1);
-                break;
-            case 10:
-                mTitle.setText(R.string.guide_10_title);
-                mText.setText(R.string.guide_10_text);
                 break;
             case 11:
                 mTitle.setText(R.string.guide_11_title);
@@ -292,9 +293,13 @@ public class GuideActivity extends AppCompatActivity {
                 mText.setText(R.string.guide_17_text1);
                 break;
             case 14:
+                mTitle.setText(R.string.guide_10_title);
+                mText.setText(R.string.guide_10_text);
+                break;
+            /*case 14:
                 mTitle.setText(R.string.guide_12_title);
                 mText.setText(R.string.guide_12_text);
-                break;
+                break;*/
             case 15:
                 mTitle.setText(R.string.guide_14_title);
                 mText.setText(R.string.guide_14_text);

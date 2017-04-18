@@ -233,6 +233,13 @@
     <string name="guide_17_text3">\tНа практике переменные обычно используются для запоминания констант
         (обычно физических). Например, если вас достало каждый раз вводить массы элементарных частиц, их заряды,
         и т.д. Переменные также можно использовать как замену классической памяти (MC, MR, M+, M−).</string>
+    <string name="guide_18_title">В виде дроби</string>
+    <string name="guide_18_text">\tВы можете переводить нецелые числа из десятичной записи (0.6666667) в дроби (2/3).
+        \n\n\tПосле того как вы посчитали введённое выражение и получили дробный ответ,
+        нажмите на выражение (чтобы открыть стандартное меню «Скопировать / Вставить») и выберите соответствующий пункт
+        («В виде дроби»).
+        \n\n\tВнимание! Если вы попробуете перевести в дробь число с очень большим знаменателем или даже иррациональное,
+        приложение выведет приблезительно равную дробь. Попробуйте сделать это с числом &#x3c0;!</string>
     <string name="guide_final_title">Это всё</string>
     <string name="guide_final_text">Теперь вы всё знаете о приложении.</string>
 
@@ -316,11 +323,12 @@
     <string name="keyboards_editPage_setMain">Сделать эту страницу домашней</string>
     <string name="keyboards_editPage_title">Страница</string>
     <string name="keyboards_editPage_deletePage">Удалить страницу</string>
-    <string name="pref_restoreKitDefaults_message">Вы уверены, что хотите восстановить наборы? Вы потеряете все свои изменения.</string>
-    <string name="pref_restoreKitDefaults_result">Наборы по умолчанию восстановлены</string>
-    <string name="pref_restoreKitDefaults_title">Восстановить наборы кнопок по умолчанию</string>
+    <string name="dialog_restoreKitDefaults_message">Вы уверены, что хотите восстановить наборы кнопок по умолчанию? Вы потеряете все свои изменения.</string>
+    <string name="dialog_restoreKitDefaults_result">Наборы по умолчанию восстановлены</string>
+    <string name="dialog_restoreKitDefaults_title">Восстановить наборы по умолчанию</string>
     <string name="saveChanges">Сохранить изменения</string>
     <string name="save">Сохранить</string>
     <string name="dialog_save_title">Сохранить изменения?</string>
     <string name="dialog_save_negative">Не сохранять</string>
+    <string name="changesSaved">Изменения сохранены</string>
 </resources>

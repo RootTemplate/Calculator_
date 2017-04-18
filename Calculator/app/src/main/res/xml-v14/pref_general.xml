@@ -10,12 +10,12 @@
             android:summary="@string/pref_doRound_summary"/>
 
         <ListPreference
-            android:key="outputType"
+            android:defaultValue="@string/pref_def_outputType"
             android:dependency="doRound"
-            android:title="@string/pref_outputType_title"
             android:entries="@array/pref_outputType_entries"
             android:entryValues="@array/pref_outputType_values"
-            android:defaultValue="@string/pref_def_outputType" />
+            android:key="outputType"
+            android:title="@string/pref_outputType_title" />
 
         <!--<SwitchPreference
             android:key="autoBracketClosing"
@@ -94,10 +94,6 @@
             android:key="editKeyboardKits"
             android:title="@string/pref_editButtonKits_title"
             android:persistent="false" />
-
-        <Preference
-            android:key="restoreKitDefaults"
-            android:title="@string/pref_restoreKitDefaults_title" />
 
     </PreferenceCategory>
 

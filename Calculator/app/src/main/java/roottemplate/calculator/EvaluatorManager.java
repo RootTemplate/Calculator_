@@ -126,7 +126,7 @@ public class EvaluatorManager {
                             Math.round(maxLen * 0.8F), Math.round(maxLen * 0.6F));
                     break;
                 case 1:
-                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen, 2, 0);
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen, 1, 0);
                     break;
                 case 2:
                 case 3:

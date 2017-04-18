@@ -32,6 +32,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
@@ -48,6 +49,7 @@ import android.text.TextWatcher;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -85,6 +87,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
     private static final int DIALOG_DELETE_KIT = 3;
     private static final int DIALOG_DELETE_PAGE = 4;
     private static final int DIALOG_CLOSE_ACTIVITY = 5;
+    private static final int DIALOG_RESTORE_KITS = 6;
 
     private static ArrayList<ArrayList<Integer>> defaultButtonsByCategory;
     private static void initDefaultButtonsByCategory(List<KeyboardKits.Button> buttons) {
@@ -259,12 +262,37 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_saveChanges:
+                saveChanges();
+                if(mData.mHasChanges) {
+                    mData.mHasChanges = false;
+                    setResult(Activity.RESULT_OK);
+                }
+                Snackbar.make(mRootView, R.string.changesSaved, Snackbar.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_restoreDefaultKits:
+                Bundle args = new Bundle();
+                args.putInt("id", DIALOG_RESTORE_KITS);
+                args.putInt("title", R.string.dialog_restoreKitDefaults_title);
+                args.putInt("message", R.string.dialog_restoreKitDefaults_message);
+                args.putInt("positiveBtn", R.string.yes);
+                args.putInt("negativeBtn", R.string.no);
+                IfDialogFragment dialog = new IfDialogFragment();
+                dialog.setArguments(args);
+                getFragmentManager().beginTransaction().add(dialog, "RestoreKitDefaults").commit();
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_keyboards, menu);
+        return true;
     }
 
     @Override
@@ -281,8 +309,8 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         if(getSupportFragmentManager().popBackStackImmediate()) return;
 
         boolean hasChanges = mData.mHasChanges;
-        setResult(hasChanges ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
         if(hasChanges) {
+            setResult(Activity.RESULT_OK);
             SaveDialogFragment dialog = new SaveDialogFragment();
             Bundle args = new Bundle();
             args.putInt("id", DIALOG_CLOSE_ACTIVITY);
@@ -690,6 +718,9 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         if(line == null) {
             line = mDropHereLine = new View(this);
             line.setBackgroundColor(getResources().getColor(R.color.colorAccentAlternative));
+        } else if(line.getParent() != null) {
+            Log.e(Util.LOG_TAG, "Why mDropHereLine has parent? Called: setDropHereLine().");
+            ((ViewGroup) line.getParent()).removeView(line);
         }
         boolean noItemsInPage = mDragTempPage.mButtons.length == 0;
         LinearLayout parent = (LinearLayout) (noItemsInPage ? mDragAddingNearView :
@@ -711,7 +742,10 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
 
     private void showMessageCannotEditSystemKit() {
         if(mMessageCannotEditSystemShown) return;
-        Toast.makeText(this, R.string.keyboards_message_cannotEditSystemKit, Toast.LENGTH_LONG).show();
+        Snackbar sbar = Snackbar.make(mRootView, R.string.keyboards_message_cannotEditSystemKit,
+                Snackbar.LENGTH_LONG);
+        ((TextView) sbar.getView().findViewById(android.support.design.R.id.snackbar_text)).setMaxLines(50);
+        sbar.show();
         mMessageCannotEditSystemShown = true;
     }
 
@@ -727,6 +761,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 ((TransitionDrawable) v.getBackground()).reverseTransition(80);
                 return true;
             case DragEvent.ACTION_DROP:
+                mData.mHasChanges = true;
                 if(v == mDragActionInfo)
                     editCustomButton((Integer) event.getLocalState());
                 else if(v == mDragActionDelete) {
@@ -760,20 +795,27 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
 
     @Override
     public void onDialogPositiveClick(int dialogId) {
-        if(dialogId == DIALOG_DELETE_BUTTON) {
-            deleteCustomButton(mWorkingButtonId);
-        } else if(dialogId == DIALOG_DELETE_KIT) {
-            deleteCurrentKit();
-        } else if(dialogId == DIALOG_DELETE_PAGE) {
-            deletePage(mKitPreview.getCurrentItem());
-        } else if(dialogId == DIALOG_CLOSE_ACTIVITY) {
-            try {
-                KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this, mKits);
-            } catch (IOException e) {
-                Log.e(Util.LOG_TAG, "Unable to save new kits", e);
-                Util.fatalError(this, R.string.dialog_kitsCannotBeSaved, e);
-            }
-            finish();
+        switch (dialogId) {
+            case DIALOG_DELETE_BUTTON:
+                deleteCustomButton(mWorkingButtonId);
+                break;
+            case DIALOG_DELETE_KIT:
+                deleteCurrentKit();
+                break;
+            case DIALOG_DELETE_PAGE:
+                deletePage(mKitPreview.getCurrentItem());
+                break;
+            case DIALOG_CLOSE_ACTIVITY:
+                saveChanges();
+                finish();
+                break;
+            case DIALOG_RESTORE_KITS:
+                KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
+                mData.mHasChanges = false; // Maybe it is unnecessary
+                Toast.makeText(this, R.string.dialog_restoreKitDefaults_result, Toast.LENGTH_SHORT).show();
+                setResult(Activity.RESULT_OK);
+                finish();
+                break;
         }
     }
     @Override
@@ -782,6 +824,15 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
             finish();
     }
     @Override public void onDialogNeutralClick(int dialogId) {}
+
+    private void saveChanges() {
+        try {
+            KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this, mKits);
+        } catch (IOException e) {
+            Log.e(Util.LOG_TAG, "Unable to save new kits", e);
+            Util.fatalError(this, R.string.dialog_kitsCannotBeSaved, e);
+        }
+    }
 
 
     public static class DataFragment extends Fragment {
@@ -1064,6 +1115,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 KeyboardsActivity activity = (KeyboardsActivity) getActivity();
                 ArrayList<KeyboardKits.Button> buttons = activity.mKits.mButtons;
                 View view = mDialogView;
+                activity.mData.mHasChanges = true;
 
                 KeyboardKits.Button btnInfo = index == -1 ?
                         new KeyboardKits.Button(null, null, false, KeyboardKits.ButtonCategory.CUSTOM):

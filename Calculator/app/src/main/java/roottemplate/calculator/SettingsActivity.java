@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -59,7 +58,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
     private static final int REQUEST_EDIT_NAMESPACE = 0;
     private static final int REQUEST_EDIT_KEYBOARD_KITS = 1;
     private static final int DIALOG_CLEAR_NAMESPACES = 0;
-    private static final int DIALOG_RESTORE_KITS = 1;
 
     /**
      * Determines whether to always show the simplified settings UI, where
@@ -330,24 +328,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             }
         });
 
-        findPreference("restoreKitDefaults").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Bundle args = new Bundle();
-                args.putInt("id", DIALOG_RESTORE_KITS);
-                args.putInt("title", R.string.pref_restoreKitDefaults_title);
-                args.putInt("message", R.string.pref_restoreKitDefaults_message);
-                args.putInt("positiveBtn", R.string.yes);
-                args.putInt("negativeBtn", R.string.no);
-                IfDialogFragment dialog = new IfDialogFragment();
-                dialog.setArguments(args);
-                getFragmentManager().beginTransaction()
-                        .add(dialog, "dialog")
-                        .commit();
-                return true;
-            }
-        });
-
         findPreference("darkOrangeEquals").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -387,10 +367,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             pref.setEnabled(false);
             pref.setSummary(R.string.pref_clearAllNamespaces_summary_empty);
             mResultIntent.putExtra("clearAllNamespaces", true);
-        } else if(dialogId == DIALOG_RESTORE_KITS) {
-            KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
-            mResultIntent.putExtra("updateKitViews", true);
-            Toast.makeText(this, R.string.pref_restoreKitDefaults_result, Toast.LENGTH_SHORT).show();
         }
     }
 

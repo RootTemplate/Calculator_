@@ -368,6 +368,8 @@ public class KeyboardKitsXmlManager {
                         break;
                     }
         }
+        if(kit == null)
+            kit = kits.get(0);
 
         for(KeyboardKits.KitVersion kv : kit.mKitVersions)
             if(kv.mIsLandscapeOrient == landscape)

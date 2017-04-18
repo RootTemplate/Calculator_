@@ -30,7 +30,7 @@ public class AsFractionDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         double x = getArguments().getDouble("number");
-        Util.Fraction fraction = Util.toFraction(x, 1000);
+        Util.Fraction fraction = Util.toFraction(x, 35000);
         String message = String.valueOf(fraction.num) + '/' + fraction.denom;
         if(fraction.errorPercentage != 0)
             message += ". " + String.format(getResources().getString(R.string.dialog_asFraction_message_error),

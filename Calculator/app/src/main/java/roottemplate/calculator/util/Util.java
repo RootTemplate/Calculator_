@@ -195,29 +195,6 @@ public class Util {
         return kits;
     }
 
-    public static void animateFading(View v, int visibility, int duration) {
-        if(Build.VERSION.SDK_INT >= 12) {
-            v.animate().alpha(visibility == View.VISIBLE ? 1 : 0).setDuration(duration)
-                    .setListener(new FadeListener(v, visibility));
-        } else
-            v.setVisibility(visibility);
-    }
-    private static class FadeListener extends AnimatorListenerAdapter {
-        private final View view;
-        private final int visibility;
-
-        private FadeListener(View view, int visibility) {
-            this.view = view;
-            this.visibility = visibility;
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            super.onAnimationEnd(animation);
-            view.setVisibility(visibility);
-        }
-    }
-
     public static void animateAlpha(View v, int alpha, int duration) {
         if(Build.VERSION.SDK_INT >= 12) {
             v.animate().alpha(alpha).setDuration(duration);

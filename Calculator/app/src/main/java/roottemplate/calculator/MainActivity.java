@@ -245,6 +245,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 recreate();
             }
             if(data.getBooleanExtra("updateKitViews", false)) {
+                mViewPager.setAdapter(null); // To remove all fragments to ...
+                // ... fix some problems with Fragments in KitViewPager after removing pages in edit keyboards
                 recreate();
             }
         } else if(requestCode == REQUEST_CODE_GUIDES) {
@@ -365,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
         if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 8;
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 10;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
@@ -503,16 +505,14 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             return;
         }
 
-        KeyboardKits.PageReturnType returnType =
-                mCurrentKeyboardKitVersion.mPages[mViewPager.getCurrentItem()].mMoveToMain;
+        int pageIndex = mViewPager.getCurrentItem();
+        KeyboardKits.PageReturnType returnType = mCurrentKeyboardKitVersion.mPages[pageIndex].mMoveToMain;
         long time = System.currentTimeMillis();
         boolean doubleClick = (view == mLastClickedView && (time - mLastClickedTime) <= 400);
-        boolean returnByDoubleClick = (returnType == KeyboardKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
+        boolean returnByDoubleClick = mCurrentKeyboardKitVersion.mMainPageIndex != pageIndex &&
+                (returnType == KeyboardKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
         mLastClickedView = view;
         mLastClickedTime = time;
-        // TODO: icon, edit keyboard kits button, as fractional (?)
-        // TODO: tips <- (asin = arcsin ?, editing keyboard kits, namespaces in keyboard kits)
-        // TODO: ask for permission (Location)
         // TODO: delete configChanges="..." from manifest when this bug will be fixed. Links:
         //       https://code.google.com/p/android/issues/detail?id=206394
         //       https://code.google.com/p/android/issues/detail?id=225911

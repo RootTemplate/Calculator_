@@ -34,8 +34,9 @@
         android:layout_alignParentTop="true"
         android:ems="10"
         android:hint="@string/keyboards_editKit_name"
-        android:inputType="textNoSuggestions"
-        android:maxLines="1" />
+        android:inputType="text"
+        android:maxLines="1"
+        android:maxLength="@integer/keyboards_maxNameLength" />
 
     <CheckBox
         android:id="@+id/editKit_actionBarAccess"
@@ -62,7 +63,9 @@
         android:layout_marginTop="2dp"
         android:ems="10"
         android:hint="@string/keyboards_editKit_shortName"
-        android:inputType="textPersonName" />
+        android:inputType="text"
+        android:maxLines="1"
+        android:maxLength="@integer/keyboards_maxNameLength"/>
 
     <TextView
         android:id="@+id/editKit_contentCopied"

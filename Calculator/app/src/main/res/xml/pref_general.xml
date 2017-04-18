@@ -95,10 +95,6 @@
             android:title="@string/pref_editButtonKits_title"
             android:persistent="false" />
 
-        <Preference
-            android:key="restoreKitDefaults"
-            android:title="@string/pref_restoreKitDefaults_title" />
-
     </PreferenceCategory>
 
     <PreferenceCategory

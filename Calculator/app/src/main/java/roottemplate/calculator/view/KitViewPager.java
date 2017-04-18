@@ -79,7 +79,7 @@ public class KitViewPager extends ViewPager {
     }
 
     public static class PageFragment extends Fragment {
-        private int mPageIndex;
+        private int mPageIndex = -1;
         private int mShiftState;
 
         public PageFragment setPageIndex(int mPageIndex) {
@@ -91,7 +91,7 @@ public class KitViewPager extends ViewPager {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            if(savedInstanceState != null) {
+            if(savedInstanceState != null && mPageIndex == -1) {
                 mPageIndex = savedInstanceState.getInt("pageIndex");
                 mShiftState = savedInstanceState.getInt("shiftState");
             }
@@ -175,6 +175,7 @@ public class KitViewPager extends ViewPager {
             MainActivity activity = (MainActivity) getActivity();
             ViewGroup root = (ViewGroup) getView();
             int lines = root.getChildCount();
+            boolean handled = false;
             for (int i = 0; i < lines; i++) {
                 ViewGroup line = (ViewGroup) root.getChildAt(i);
                 int buttonsCount = line.getChildCount();
@@ -182,8 +183,8 @@ public class KitViewPager extends ViewPager {
                     View view = line.getChildAt(j);
                     if(view instanceof SystemButton) {
                         SystemButton btn = (SystemButton) view;
-                        if(btn.getProperty() == property)
-                            btn.onButtonClicked(activity);
+                        if(btn.getProperty() == property && btn.onButtonClicked(activity, handled))
+                            handled = true;
                     }
                 }
             }
