@@ -50,7 +50,7 @@ public class Util {
         return doubleToStringWithE(n, maxLen, false);
     }
     public static String doubleToStringWithE(double n, int maxLen, boolean engineeringNotation) {
-        String str = String.format(Locale.US, "%.30e", n);
+        String str = String.format(Locale.US, "%.20e", n);
         int eIndex = str.indexOf('e');
         String mantissa = str.substring(0, eIndex);
         
@@ -81,12 +81,14 @@ public class Util {
             exponentV -= exponentMod3;
             exponent = String.valueOf(exponentV);
 
-            if(result.length() > 1) result.deleteCharAt(1); // Remove the point (if there is one)
+            int pointAt = result.indexOf(".");
+            if(pointAt != -1) result.deleteCharAt(pointAt); // Remove the point (if there is one)
+            else pointAt = result.length();
             int resultLen = result.length();
-            if(1 + exponentMod3 < resultLen)
-                result.insert(1 + exponentMod3, '.');
+            if(pointAt + exponentMod3 < resultLen)
+                result.insert(pointAt + exponentMod3, '.');
             else
-                for(; 1 + exponentMod3 > resultLen; resultLen++)
+                for(; pointAt + exponentMod3 > resultLen; resultLen++)
                     result.append('0');
         }
         
