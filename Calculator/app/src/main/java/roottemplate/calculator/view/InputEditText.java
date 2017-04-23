@@ -18,12 +18,10 @@
 
 package roottemplate.calculator.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -33,7 +31,6 @@ import android.text.Layout;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.ContextMenu;
@@ -41,7 +38,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 
 import roottemplate.calculator.R;
 import roottemplate.calculator.evaluator.util.ExpressionFormatUpdater;
@@ -74,7 +70,7 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
     private boolean mHighlightE;
 
     private TextType mTextType;
-    private String mMessageReplacement;
+    private String mNumberReplacement;
     private Rect r = new Rect();
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
 
@@ -103,12 +99,12 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         setTextType(ss.mTextType);
-        mMessageReplacement = ss.mMessageReplacement;
+        mNumberReplacement = ss.mMessageReplacement;
     }
 
     @Override
     public Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), mTextType, mMessageReplacement);
+        return new SavedState(super.onSaveInstanceState(), mTextType, mNumberReplacement);
     }
 
     private void init() {
@@ -218,6 +214,11 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
         clearText();
         appendText(str, true);
     }
+    public void setTextNoTextTypeChange(String str) {
+        super.setText(str);
+        setCursor(str.length());
+        updateEHighlights(0, str.length());
+    }
     public String getExprText() {
         CharSequence text = getText();
         StringBuilder sb = new StringBuilder(text.length());
@@ -233,12 +234,12 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
         return sb.toString();
     }
     public void clearText() {
-        mMessageReplacement = null; // Make sure that no text will appear after setting TextType.INPUT
+        mNumberReplacement = null; // Make sure that no text will appear after setting TextType.INPUT
         super.setText("");
         setTextType(TextType.INPUT);
     }
     public void delSymbol() {
-        mMessageReplacement = null;
+        mNumberReplacement = null;
         setTextType(TextType.INPUT);
 
         int cursor = getSelectionStart();
@@ -253,8 +254,8 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
         setSelection(cursor);
     }
 
-    public void setMessageReplacement(String messageReplacement) {
-        mMessageReplacement = messageReplacement;
+    public void setNumberReplacement(String numberReplacement) {
+        mNumberReplacement = numberReplacement;
     }
 
     public void setTextType(TextType type) {
@@ -273,9 +274,9 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
             paint.setColor(getResources().getColor(R.color.colorInputSeparator));
             setCursorVisible(true);
 
-            if(mTextType == TextType.RESULT_MESSAGE) {
+            if(mTextType == TextType.RESULT_NUMBER && mNumberReplacement != null) {
                 Editable text = getText();
-                text.replace(0, text.length(), mMessageReplacement == null ? "" : mMessageReplacement);
+                text.replace(0, text.length(), mNumberReplacement);
             }
         } else {
             setTextColor(getResources().getColor(R.color.colorEquals));

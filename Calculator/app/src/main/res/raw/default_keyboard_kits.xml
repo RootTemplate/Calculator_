@@ -1,115 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <KeyboardKits>
-    <!--
-        Describes all custom buttons used in <Button> in <Kits>.
-        Attributes:
-            ID. The unique identifier of the button. System buttons have ids >= 0, custom buttons
-                have < 0 ids.
-            NAME. [Optional] The visible name of the button.
-                  If the attribute is not specified, then the value equals to TEXT attribute.
-            TEXT. [Optional] The text that is appended to input text field after the button is pressed.
-                  If the attribute is not specified, then the value equals to NAME attribute.
-                  At least NAME or TEXT attribute must be specified.
-            TYPE. The type of the button:
-                   - EQUALS. Indicate that after pressing this button the expression must be calculated.
-                   - DIGIT. Indicate that this button is a digit or symbol which behavior equals to
-                            digit behavior (e.g. point)
-                   - BASE. Indicate that this button's appearance must equal to DIGIT appearance but
-                           not it's behavior.
-                   - SYMBOL. Indicates secondary operation
-                             (e.g. abs, pow or plus, multiplication (although they are not))
-                   - SHIFT. This button case-inverses all other buttons in the Page with
-                            ENABLE_CASE_INVERSE flag.
-                   - SYSTEM. This button toggles system properties. Property name is written in
-                             "name" field.
-                             - "amu". Toggles measurement units of angle.
-            LOCALE_EAST. Explanation requires an example. In western literature tangent's abbreviation
-                         is tan, while in eastern - tg. So this attribute specifies id of a button
-                         that should be used instead if the locale is eastern.
-            ENABLE_CASE_INVERSE. Indicates that text of this button can be case-inversed (i.e. to
-                                 upper or lower case).
-    -->
-    <CustomButtons></CustomButtons>
+    <CustomButtons />
     <Kits>
         <Kit
             isSystem="true"
             name="default"
             actionBarAccess="true"
-            shortName="Main">
-            <Version orientation="portrait">
-                <Page main="false" moveToMain="ifDouble" layoutOrientation="vertical">
-                    <PageRow>
-                        <Button id="57"/><Button id="58"/><Button id="59"/><Button id="60"/><Button id="61"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="42"/><Button id="43"/><Button id="44"/><Button id="45"/><Button id="46"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="47"/><Button id="48"/><Button id="49"/><Button id="50"/><Button id="51"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="52"/><Button id="53"/><Button id="54"/><Button id="55"/><Button id="56"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="41"/><Button id="14"/><Button id="11"/><Button id="15"/><Button id="29"/>
-                    </PageRow>
-                </Page>
-                <Page main="true" layoutOrientation="vertical">
-                    <PageRow>
-                        <Button id="11"/><Button id="12"/><Button id="13"/><Button id="14"/><Button id="15"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="27"/><Button id="8"/><Button id="9"/><Button id="10"/><Button id="20"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="21"/><Button id="5"/><Button id="6"/><Button id="7"/><Button id="19"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="22"/><Button id="2"/><Button id="3"/><Button id="4"/><Button id="18"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="23"/><Button id="1"/><Button id="24"/><Button id="0"/><Button id="17"/>
-                    </PageRow>
-                </Page>
-                <Page main="false" moveToMain="always" layoutOrientation="horizontal">
-                    <PageRow><Button id="30"/><Button id="31"/><Button id="32"/></PageRow>
-                    <PageRow><Button id="33"/><Button id="34"/><Button id="35"/></PageRow>
-                    <PageRow><Button id="38"/><Button id="39"/><Button id="40"/></PageRow>
-                    <PageRow><Button id="16"/><Button id="25"/><Button id="28"/><Button id="26"/><Button id="65"/></PageRow>
-                </Page>
-            </Version>
-            <Version orientation="landscape">
-                <Page main="false" moveToMain="ifDouble" layoutOrientation="horizontal">
-                    <PageRow><Button id="57"/><Button id="58"/><Button id="59"/><Button id="60"/></PageRow>
-                    <PageRow><Button id="62"/><Button id="61"/><Button id="63"/><Button id="64"/></PageRow>
-                    <PageRow><Button id="42"/><Button id="43"/><Button id="44"/><Button id="45"/></PageRow>
-                    <PageRow><Button id="46"/><Button id="47"/><Button id="48"/><Button id="49"/></PageRow>
-                    <PageRow><Button id="50"/><Button id="51"/><Button id="52"/><Button id="53"/></PageRow>
-                    <PageRow><Button id="54"/><Button id="55"/><Button id="56"/><Button id="41"/></PageRow>
-                    <PageRow><Button id="14"/><Button id="11"/><Button id="15"/><Button id="29"/></PageRow>
-                </Page>
-                <Page main="true" layoutOrientation="vertical">
-                    <PageRow>
-                        <Button id="14"/><Button id="15"/><Button id="8"/><Button id="9"/><Button id="10"/><Button id="20"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="21"/><Button id="11"/><Button id="5"/><Button id="6"/><Button id="7"/><Button id="19"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="22"/><Button id="13"/><Button id="2"/><Button id="3"/><Button id="4"/><Button id="18"/>
-                    </PageRow>
-                    <PageRow>
-                        <Button id="23"/><Button id="27"/><Button id="1"/><Button id="24"/><Button id="0"/><Button id="17"/>
-                    </PageRow>
-                </Page>
-                <Page main="false" moveToMain="always" layoutOrientation="horizontal">
-                    <PageRow><Button id="30"/><Button id="31"/><Button id="32"/></PageRow>
-                    <PageRow><Button id="33"/><Button id="34"/><Button id="35"/></PageRow>
-                    <PageRow><Button id="38"/><Button id="39"/><Button id="40"/></PageRow>
-                    <PageRow><Button id="12"/><Button id="28"/><Button id="25"/></PageRow>
-                    <PageRow><Button id="16"/><Button id="26"/><Button id="65"/></PageRow>
-                </Page>
-            </Version>
-        </Kit>
+            shortName="Main" />
     </Kits>
 </KeyboardKits>

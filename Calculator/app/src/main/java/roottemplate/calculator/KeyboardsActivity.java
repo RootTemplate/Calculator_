@@ -73,6 +73,7 @@ import java.util.List;
 
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
+import roottemplate.calculator.util.DialogFragmentWithRequiredFields;
 import roottemplate.calculator.util.KeyboardButtonsThemeUtils;
 import roottemplate.calculator.util.Util;
 import roottemplate.calculator.view.IfDialogFragment;
@@ -160,9 +161,12 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         kits = mKits = dataFragment.mKits;
         initDefaultButtonsByCategory(kits.mButtons);
 
-        KeyboardKits.Kit preferredKit = KeyboardKitsXmlManager.getPreferredKitVersion(kits.mKits,
-                prefs.kitName(), false).mParent;
-        setCurrentKit(kits.mKits.indexOf(preferredKit));
+        if(savedInstanceState == null) {
+            KeyboardKits.Kit preferredKit = KeyboardKitsXmlManager.getPreferredKitVersion(kits.mKits,
+                    prefs.kitName(), false).mParent;
+            setCurrentKit(kits.mKits.indexOf(preferredKit));
+        } else
+            setCurrentKit(savedInstanceState.getInt("currentKit"));
 
         // SETUP Views LINKS
         mRootView = (CoordinatorLayout) findViewById(R.id.coordinator);
@@ -287,6 +291,12 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("currentKit", mKitSpinner.getSelectedItemPosition());
     }
 
     @Override
@@ -443,7 +453,10 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                         for(int j = 0; j < buttons[i].length; j++) {
                             if(buttons[i][j] == btnIndex) {
                                 deleteButtonFromPageInternal(page, i, j);
+                                j--;
                                 buttons = page.mButtons; // Update our cache
+                                if(buttons.length <= i) // which can happen after updating cache
+                                    break; // break inner "for"
                                 if(kv == mCurrentKitV) {
                                     dataChanged = true;
                                     mKitPreviewAdapter.mInvalidatePages.add(page);
@@ -585,7 +598,6 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
     private View mDropHereLine;
 
     private boolean onRootDrag(View v, DragEvent event) {
-        Log.d(Util.LOG_TAG, v.getTag() + " " + event.getAction()); // todo clear this
         int act = event.getAction();
         if(mDragTempCannotEditKit && act != DragEvent.ACTION_DRAG_ENDED) {
             showMessageCannotEditSystemKit();
@@ -1003,32 +1015,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         }
     }
 
-    public static abstract class NamedDialogFragment extends DialogFragment {
-        protected final TextWatcher mTextListener = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void afterTextChanged(Editable s) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updatePositiveButton();
-            }
-        };
-
-        protected abstract boolean areTextFilled();
-
-        protected void updatePositiveButton() {
-            AlertDialog dialog = (AlertDialog) getDialog();
-            if (dialog != null)
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(areTextFilled());
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            updatePositiveButton();
-        }
-
-    }
-
-    public static class EditCustomButtonFragment extends NamedDialogFragment implements DialogInterface.OnClickListener {
+    public static class EditCustomButtonFragment extends DialogFragmentWithRequiredFields implements DialogInterface.OnClickListener {
         private View mDialogView;
         private EditText mName;
         private EditText mText;
@@ -1052,7 +1039,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         private void setupDialogView(View dialog) {
             mDialogView = dialog;
             mEnableTextField = (CheckBox) dialog.findViewById(R.id.editKit_actionBarAccess);
-            mName = (EditText) dialog.findViewById(R.id.editPage_orient);
+            mName = (EditText) dialog.findViewById(R.id.editKit_fullName);
             mText = (EditText) dialog.findViewById(R.id.editButton_text);
 
             mEnableTextField.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1157,7 +1144,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
             mPageIndex = getArguments().getInt("pageIndex");
             KeyboardKits.Page page = activity.mCurrentKitV.mPages[mPageIndex];
 
-            (mPageOrient = (Spinner) dialog.findViewById(R.id.editPage_orient))
+            (mPageOrient = (Spinner) dialog.findViewById(R.id.editKit_fullName))
                     .setSelection(page.mIsVerticalOrient ? 0 : 1);
             mReturnToMain = (Spinner) dialog.findViewById(R.id.editPage_returnToMain);
             mSetAsMain = (Button) dialog.findViewById(R.id.editPage_setMain);
@@ -1233,13 +1220,15 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
         }
     }
 
-    public static class EditKitFragment extends NamedDialogFragment implements DialogInterface.OnClickListener {
+    public static class EditKitFragment extends DialogFragmentWithRequiredFields implements DialogInterface.OnClickListener {
         private KeyboardsActivity mActivity;
         private KeyboardKits.Kit mKit;
         private EditText mName;
         private EditText mShortName;
         private CheckBox mActionBarAccess;
         private TextView mErrorOfExistence;
+        /*private CheckBox mOverrideOutputType;
+        private Spinner mOutputType;*/
 
         @Override
         protected boolean areTextFilled() {
@@ -1268,7 +1257,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
             mActivity = activity;
             mKit = getArguments().getBoolean("editCurrentKit") ? activity.mCurrentKitV.mParent : null;
 
-            mName = (EditText) dialog.findViewById(R.id.editPage_orient);
+            mName = (EditText) dialog.findViewById(R.id.editKit_fullName);
             mShortName = (EditText) dialog.findViewById(R.id.editKit_shortName);
             mActionBarAccess = (CheckBox) dialog.findViewById(R.id.editKit_actionBarAccess);
             mActionBarAccess.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1281,6 +1270,17 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 }
             });
             mErrorOfExistence = (TextView) dialog.findViewById(R.id.editKit_errorOfExistence);
+            /*mOutputType = (Spinner) dialog.findViewById(R.id.editKit_outputType);
+            final TextView outputTypeWarning = (TextView) dialog.findViewById(R.id.editKit_outputTypeWarning);
+            mOverrideOutputType = (CheckBox) dialog.findViewById(R.id.editKit_overrideOutputType);
+            mOverrideOutputType.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    int v = isChecked ? View.VISIBLE : View.GONE;
+                    mOutputType.setVisibility(v);
+                    outputTypeWarning.setVisibility(v);
+                }
+            });*/
 
             mName.addTextChangedListener(mTextListener);
             mShortName.addTextChangedListener(mTextListener);
@@ -1290,6 +1290,15 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 mName.setEnabled(!mKit.mIsSystem);
                 mShortName.setText(mKit.mShortName);
                 mActionBarAccess.setChecked(mKit.mActionBarAccess);
+
+                /*if(mKit.mIsSystem) {
+                    mOverrideOutputType.setChecked(false);
+                    mOverrideOutputType.setEnabled(false);
+                } else {
+                    int outputType = mKit.mNumberOutputType;
+                    mOverrideOutputType.setChecked(outputType != -1);
+                    if (outputType >= 0) mOutputType.setSelection(outputType);
+                }*/
             } else {
                 TextView tv = (TextView) dialog.findViewById(R.id.editKit_contentCopied);
                 tv.setText(
@@ -1297,6 +1306,7 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                                 activity.mCurrentKitV.mParent.mName)
                 );
                 tv.setVisibility(View.VISIBLE);
+                //mOverrideOutputType.setChecked(false);
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
@@ -1317,13 +1327,15 @@ public class KeyboardsActivity extends AppCompatActivity implements View.OnLongC
                 if(kit == null) {
                     KeyboardKits.KitVersion[] kitVers = KeyboardKits.cloneKitVersionsFrom(
                             activity.mCurrentKitV.mParent);
-                    kit = new KeyboardKits.Kit(null, null, false, false, kitVers);
+                    kit = new KeyboardKits.Kit(null, null, false, false, kitVers, -1);
                     activity.mKits.mKits.add(kit);
                 }
 
                 kit.mName = mName.getText().toString();
                 kit.mShortName = mShortName.getText().toString();
                 kit.mActionBarAccess = mActionBarAccess.isChecked();
+                /*kit.mNumberOutputType = mOverrideOutputType.isChecked() ?
+                        mOutputType.getSelectedItemPosition() : -1;*/
                 activity.notifyKitsChanged();
                 if(mKit == null)
                     activity.mKitSpinner.setSelection(activity.mKits.mKits.size() - 1);

@@ -17,73 +17,114 @@
   ~ along with Calculator_.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/dialog_horizontal_margin"
-    android:paddingRight="@dimen/dialog_horizontal_margin">
+    android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/editPage_orient"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:hint="@string/keyboards_editKit_name"
-        android:inputType="text"
-        android:maxLines="1"
-        android:maxLength="@integer/keyboards_maxNameLength" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/dialog_horizontal_margin"
+        android:paddingRight="@dimen/dialog_horizontal_margin">
 
-    <CheckBox
-        android:id="@+id/editKit_actionBarAccess"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editPage_orient"
-        android:layout_marginTop="2dp"
-        android:checked="true"
-        android:text="@string/keyboards_editKit_actionBarAccess" />
+        <EditText
+            android:id="@+id/editKit_fullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:ems="10"
+            android:hint="@string/keyboards_editKit_name"
+            android:inputType="text"
+            android:maxLines="1"
+            android:maxLength="@integer/keyboards_maxNameLength" />
 
-    <EditText
-        android:id="@+id/editKit_shortName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_actionBarAccess"
-        android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="2dp"
-        android:ems="10"
-        android:hint="@string/keyboards_editKit_shortName"
-        android:inputType="text"
-        android:maxLines="1"
-        android:maxLength="@integer/keyboards_maxNameLength"/>
+        <CheckBox
+            android:id="@+id/editKit_actionBarAccess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_fullName"
+            android:layout_marginTop="2dp"
+            android:checked="true"
+            android:text="@string/keyboards_editKit_actionBarAccess" />
 
-    <TextView
-        android:id="@+id/editKit_contentCopied"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_shortName"
-        android:layout_marginTop="8dp"
-        android:visibility="gone" />
+        <EditText
+            android:id="@+id/editKit_shortName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_actionBarAccess"
+            android:layout_marginLeft="35dp"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="2dp"
+            android:ems="10"
+            android:hint="@string/keyboards_editKit_shortName"
+            android:inputType="text"
+            android:maxLines="1"
+            android:maxLength="@integer/keyboards_maxNameLength"/>
 
-    <TextView
-        android:id="@+id/editKit_errorOfExistence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editKit_contentCopied"
-        android:layout_marginTop="8dp"
-        android:textColor="#ffcc0000"
-        android:visibility="gone" /> <!-- textColor = @android:color/holo_red_dark -->
+        <!--<CheckBox
+            android:id="@+id/editKit_overrideOutputType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_shortName"
+            android:layout_marginTop="2dp"
+            android:checked="true"
+            android:text="@string/keyboards_editKit_overrideOutputType" />
 
-</RelativeLayout>
+        <Spinner
+            android:id="@+id/editKit_outputType"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_overrideOutputType"
+            android:layout_marginLeft="35dp"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="2dp"
+            android:entries="@array/pref_outputType_entries" />
+
+        <TextView
+            android:id="@+id/editKit_outputTypeWarning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/editKit_outputType"
+            android:layout_alignStart="@+id/editKit_outputType"
+            android:layout_below="@+id/editKit_outputType"
+            android:layout_marginTop="2dp"
+            android:text="@string/keyboards_editKit_outputTypeWarning" />-->
+
+        <TextView
+            android:id="@+id/editKit_contentCopied"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_shortName"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/editKit_errorOfExistence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editKit_contentCopied"
+            android:layout_marginTop="8dp"
+            android:textColor="#ffcc0000"
+            android:visibility="gone" /> <!-- textColor = @android:color/holo_red_dark -->
+
+    </RelativeLayout>
+</ScrollView>

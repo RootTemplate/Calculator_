@@ -41,6 +41,7 @@ public class Util {
         return withE ? doubleToStringWithE(n, maxLen) : doubleToStringNoE(n, maxLen);
     }
     public static String doubleToStringInEngNotation(double n, int maxLen) {
+        if(n >= 1 && n < 10) maxLen += 2; // These 2 symbols will be truncated (they will be "E0")
         String result = doubleToStringWithE(n, maxLen, true);
         if(result.endsWith("E0")) result = result.substring(0, result.length() - 2);
         return result;
@@ -169,12 +170,12 @@ public class Util {
 
 
     /**
-     * Ideal error percentage used to toFraction(double, int. int) method.
+     * Ideal error percentage used in toFraction(double, int. int) method.
      * If method finds Fraction with error &lt;FRACTION_IDEAL_ERROR, it will return
      * found Fraction even if it could find another Fraction with lower error. It is not final, so you can
      * change the value if you need to.
      */
-    public static double FRACTION_IDEAL_ERROR = 0.000_000_1;
+    public static double FRACTION_IDEAL_ERROR = 0.000_001;
 
     /**
      * Finds closest fraction to given number.<br/>

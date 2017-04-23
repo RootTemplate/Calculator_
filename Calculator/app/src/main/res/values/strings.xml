@@ -29,6 +29,8 @@
     <string name="rad" translatable="false">RAD</string>
     <string name="deg" translatable="false">DEG</string>
 
+    <string name="message_emptyPage">No buttons on the page</string>
+
     <string name="menuItem_cut">Cut all</string>
     <string name="menuItem_copy">Copy all</string>
     <string name="menuItem_paste">Paste</string>
@@ -68,6 +70,9 @@
 
     <string name="dialog_asFraction_title" translatable="false">@string/menuItem_asFraction</string>
     <string name="dialog_asFraction_message_error">This fraction is approximately equal to result number and differs from it by %1$s%%.</string>
+    <string name="dialog_asFraction_toFraction">To fraction</string>
+    <string name="dialog_asFraction_findAccurateValue">Find more accurate fraction</string>
+    <string name="dialog_asFraction_currentMaxQ">Denominator &lt; %1$s.</string>
 
     <string name="dialog_save_title">Save changes?</string>
     <string name="dialog_save_positive" translatable="false">@string/save</string>
@@ -157,6 +162,9 @@
     <string name="keyboards_editKit_deleteKit">Delete kit</string>
     <string name="keyboards_editKit_contentCopied">Kit content will be copied from \"%1$s\".</string>
     <string name="keyboards_editKit_alreadyExists">Kit named \"%1$s\" already exists.</string>
+    <!-- The string below must be synchronized with "pref_outputType_title" -->
+    <string name="keyboards_editKit_overrideOutputType">Override \"Way to express numbers in result\" in this kit</string>
+    <string name="keyboards_editKit_outputTypeWarning">When this kit is selected, the option will use the value above, rather than the one specified in the settings.</string>
 
     <string name="keyboards_editPage_title">Page</string>
     <string name="keyboards_editPage_setMain">Set this page as home</string>

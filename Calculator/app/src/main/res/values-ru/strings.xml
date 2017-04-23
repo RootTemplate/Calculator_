@@ -331,4 +331,10 @@
     <string name="dialog_save_title">Сохранить изменения?</string>
     <string name="dialog_save_negative">Не сохранять</string>
     <string name="changesSaved">Изменения сохранены</string>
+    <string name="keyboards_editKit_outputTypeWarning">Когда выбран этот набор, для данной опции будет использоваться значение выше, а не то, что указано в настройках.</string>
+    <string name="keyboards_editKit_overrideOutputType">Переопределить «Вывод чисел в результате» для данного набора</string>
+    <string name="dialog_asFraction_currentMaxQ">Знаменатель &lt; %1$s.</string>
+    <string name="dialog_asFraction_findAccurateValue">Найти более точную дробь</string>
+    <string name="dialog_asFraction_toFraction">В дробь</string>
+    <string name="message_emptyPage">На странице нет кнопок</string>
 </resources>

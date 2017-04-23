@@ -62,10 +62,9 @@ public class KeyboardKits {
         public boolean mEnableCaseInverse;
         public ButtonCategory mCategory;
 
-        public Button(String name, String text, String type, String localeEast, boolean inverseOnLongClick,
+        public Button(String name, String text, String type, int localeEast, boolean inverseOnLongClick,
                       ButtonCategory category) {
-            this(name, text, ButtonType.valueOf(type.toUpperCase()),
-                    localeEast == null ? -1 : Integer.parseInt(localeEast), inverseOnLongClick,
+            this(name, text, ButtonType.valueOf(type.toUpperCase()), localeEast, inverseOnLongClick,
                     category);
         }
         public Button(String text, ButtonType type, boolean enableCaseInverse, ButtonCategory category) {
@@ -188,15 +187,17 @@ public class KeyboardKits {
         public String mShortName;
         public boolean mActionBarAccess;
         public KitVersion[] mKitVersions;
-        public boolean mIsSystem;
+        public final boolean mIsSystem;
+        public int mNumberOutputType;
 
         public Kit(String name, String shortName, boolean actionBarAccess, boolean isSystem,
-                   KitVersion[] kitVersions) {
+                   KitVersion[] kitVersions, int numberOutputType) {
             mName = name;
             mShortName = shortName;
             mActionBarAccess = actionBarAccess;
             mKitVersions = kitVersions;
             mIsSystem = isSystem;
+            mNumberOutputType = numberOutputType;
 
             for(KitVersion kv : kitVersions)
                 kv.mParent = this;
@@ -217,6 +218,7 @@ public class KeyboardKits {
                     .append("shortName: ").append(mShortName).append(", ")
                     .append("actionBarAccess: ").append(mActionBarAccess).append(", ")
                     .append("isSystem: ").append(mIsSystem).append(", ")
+                    .append("numberOutputType: ").append(mNumberOutputType).append(", ")
                     .append("kitVersions: [");
             for (int i = 0; i < mKitVersions.length; i++) {
                 if (i != 0)
@@ -231,10 +233,13 @@ public class KeyboardKits {
                     .attribute("", "isSystem", Boolean.toString(mIsSystem))
                     .attribute("", "name", mName)
                     .attribute("", "actionBarAccess", Boolean.toString(mActionBarAccess));
-            if(mShortName != null)
-                f.attribute("", "shortName", mShortName);
-            for(KitVersion kv : mKitVersions)
-                kv.dumpToXml(f);
+            if(mShortName != null) f.attribute("", "shortName", mShortName);
+            if(mNumberOutputType != -1)
+                f.attribute("", "numberOutputType", Integer.toString(mNumberOutputType));
+
+            if(!mIsSystem)
+                for(KitVersion kv : mKitVersions)
+                    kv.dumpToXml(f);
             f.endTag("", "Kit");
         }
     }
@@ -317,6 +322,7 @@ public class KeyboardKits {
 
 
     public static final int DEFAULT_BUTTONS_COUNT = 66;
+    public static final String DEFAULT_KIT_NAME = "default";
     public static Button[] generateDefaultButtonArray() {
         Button[] r = new Button[DEFAULT_BUTTONS_COUNT];
         r[0] = new Button("=", ButtonType.EQUALS, false, ButtonCategory.SYSTEM);
@@ -391,5 +397,55 @@ public class KeyboardKits {
         // 66 elements; if you change this value, don't forget to change it in the
         // DEFAULT_BUTTONS_COUNT field
         return r;
+    }
+
+    public static KitVersion[] generateDefaultKitVersions() {
+        KitVersion portrait = new KitVersion(new Page[] {
+                        new Page(PageReturnType.IF_DOUBLE_CLICK, true, new int[][] {
+                                new int[] {57, 58, 59, 60, 61},
+                                new int[] {42, 43, 44, 45, 46},
+                                new int[] {47, 48, 49, 50, 51},
+                                new int[] {52, 53, 54, 55, 56},
+                                new int[] {41, 14, 11, 15, 29},
+                        }),
+                        new Page(PageReturnType.NEVER, true, new int[][] {
+                                new int[] {11, 12, 13, 14, 15},
+                                new int[] {27, 8, 9, 10, 20},
+                                new int[] {21, 5, 6, 7, 19},
+                                new int[] {22, 2, 3, 4, 18},
+                                new int[] {23, 1, 24, 0, 17},
+                        }),
+                        new Page(PageReturnType.ALWAYS, false, new int[][] {
+                                new int[] {30, 31, 32},
+                                new int[] {33, 34, 35},
+                                new int[] {38, 39, 40},
+                                new int[] {16, 25, 28, 26, 65},
+                        })
+        }, false, 1);
+        KitVersion landscape = new KitVersion(new Page[] {
+                        new Page(PageReturnType.IF_DOUBLE_CLICK, false, new int[][] {
+                                new int[] {57, 58, 59, 60},
+                                new int[] {62, 61, 63, 64},
+                                new int[] {42, 43, 44, 45},
+                                new int[] {46, 47, 48, 49},
+                                new int[] {50, 51, 52, 53},
+                                new int[] {54, 55, 56, 41},
+                                new int[] {14, 11, 15, 29},
+                        }),
+                        new Page(PageReturnType.NEVER, true, new int[][] {
+                                new int[] {14, 15, 8, 9, 10, 20},
+                                new int[] {21, 11, 5, 6, 7, 19},
+                                new int[] {22, 13, 2, 3, 4, 18},
+                                new int[] {23, 27, 1, 24, 0, 17},
+                        }),
+                        new Page(PageReturnType.ALWAYS, false, new int[][] {
+                                new int[] {30, 31, 32},
+                                new int[] {33, 34, 35},
+                                new int[] {38, 39, 40},
+                                new int[] {12, 28, 25},
+                                new int[] {16, 26, 65},
+                        })
+        }, true, 1);
+        return new KitVersion[] {portrait, landscape};
     }
 }

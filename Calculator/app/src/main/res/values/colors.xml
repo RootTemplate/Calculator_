@@ -10,6 +10,7 @@
 
     <color name="colorInputText">#2C2C2C</color>
     <color name="colorInputTextBackground">#FAFAFA</color>
+    <color name="colorMessageEmptyPage">#FFFFFF</color>
     <color name="colorInputSeparator">#85000000</color>
     <color name="colorInputSeparatorResult">@color/colorEquals</color>
     <!--<color name="colorInputHighlightE">#a6a6a6</color>

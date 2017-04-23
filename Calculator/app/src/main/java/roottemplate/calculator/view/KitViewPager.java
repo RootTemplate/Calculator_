@@ -19,6 +19,7 @@
 package roottemplate.calculator.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,16 +28,19 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import roottemplate.calculator.MainActivity;
 import roottemplate.calculator.PreferencesManager;
+import roottemplate.calculator.R;
 import roottemplate.calculator.data.KeyboardKits;
 import roottemplate.calculator.data.KeyboardKitsXmlManager;
 import roottemplate.calculator.util.Util;
@@ -81,6 +85,7 @@ public class KitViewPager extends ViewPager {
     public static class PageFragment extends Fragment {
         private int mPageIndex = -1;
         private int mShiftState;
+        private boolean mHasButtons = true;
 
         public PageFragment setPageIndex(int mPageIndex) {
             this.mPageIndex = mPageIndex;
@@ -94,6 +99,7 @@ public class KitViewPager extends ViewPager {
             if(savedInstanceState != null && mPageIndex == -1) {
                 mPageIndex = savedInstanceState.getInt("pageIndex");
                 mShiftState = savedInstanceState.getInt("shiftState");
+                mHasButtons = savedInstanceState.getBoolean("hasButtons");
             }
         }
 
@@ -102,6 +108,7 @@ public class KitViewPager extends ViewPager {
             super.onSaveInstanceState(outState);
             outState.putInt("pageIndex", mPageIndex);
             outState.putInt("shiftState", mShiftState);
+            outState.putBoolean("hasButtons", mHasButtons);
         }
 
         @Override
@@ -110,9 +117,21 @@ public class KitViewPager extends ViewPager {
             boolean isEastLocale = !Util.isWestLocale(this.getContext());
             PreferencesManager prefs = activity.getPrefs();
 
-            return KeyboardKitsXmlManager.createContentViewFromPage(this.getContext(),
+            ViewGroup view = (ViewGroup) KeyboardKitsXmlManager.createContentViewFromPage(this.getContext(),
                     activity.getKeyboardKits().mButtons, activity.getPreferredKeyboardKitVersion().mPages[mPageIndex],
                     inflater, isEastLocale, prefs.getAppTheme(), prefs.darkOrangeEquals(), activity);
+            if(view.getChildCount() == 0) {
+                mHasButtons = false;
+                TextView tv = new TextView(getContext());
+                tv.setText(R.string.message_emptyPage);
+                tv.setTextColor(getResources().getColor(R.color.colorMessageEmptyPage));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                params.gravity = Gravity.CENTER;
+                view.addView(tv, params);
+            } else
+                mHasButtons = true;
+            return view;
         }
 
         @Override
@@ -122,7 +141,7 @@ public class KitViewPager extends ViewPager {
         }
 
         private void setShiftState(int shiftState, boolean forceUpdate) {
-            if(mShiftState == shiftState && !forceUpdate) return;
+            if(mShiftState == shiftState && !forceUpdate || !mHasButtons) return;
 
             boolean doInverse = ShiftButton.isInverseEnabled(shiftState);
             boolean changeText = forceUpdate || ShiftButton.isInverseEnabled(mShiftState) != doInverse;
@@ -172,6 +191,8 @@ public class KitViewPager extends ViewPager {
         }
 
         public void onSystemButtonClick(int property) {
+            if(!mHasButtons) return;
+
             MainActivity activity = (MainActivity) getActivity();
             ViewGroup root = (ViewGroup) getView();
             int lines = root.getChildCount();

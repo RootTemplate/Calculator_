@@ -113,41 +113,6 @@ public class EvaluatorManager {
         return expr;
     }
 
-    public static String[] doubleToPreferableString(double x, int maxLen, PreferencesManager prefs) {
-        String res = null;
-        String showText = null;
-        int digitGrouping = prefs.digitGrouping();
-        if(prefs.doRound()) {
-            maxLen -= digitGrouping > 0 ? 1 : 0; // Reserve 1 digit for commas and stuff
-            int outputType = prefs.outputType();
-            switch(outputType) {
-                case 0:
-                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen,
-                            Math.round(maxLen * 0.8F), Math.round(maxLen * 0.6F));
-                    break;
-                case 1:
-                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen, 1, 0);
-                    break;
-                case 2:
-                case 3:
-                    res = roottemplate.calculator.evaluator.util.Util.doubleToStringInEngNotation(x, maxLen);
-                    break;
-            }
-
-            int indexOfE;
-            if(outputType == 3 && (indexOfE = res.indexOf('E')) != -1) {
-                int exponent = Integer.parseInt(res.substring(indexOfE + 1));
-                String prefix = exponentToSIPrefix(exponent, prefs.getResources());
-                if(prefix != null) {
-                    showText = res.substring(0, indexOfE) + " " + prefix;
-                }
-            }
-        } else
-            res = Double.toString(x);
-
-        return new String[] {res, showText};
-    }
-
 
     private final Context mContext;
     private final PreferencesManager mPrefs;
@@ -191,7 +156,45 @@ public class EvaluatorManager {
         mEvaluatorUpdaterThread.start();
     }
 
-    public EvalResult eval(String text, int maxDigitsToFit) {
+    public String[] doubleToPreferableString(double x, int maxLen, int outputType) {
+        String res = null;
+        String showText = null;
+        int digitGrouping = mPrefs.digitGrouping();
+        if(mPrefs.doRound()) {
+            maxLen -= digitGrouping > 0 ? 1 : 0; // Reserve 1 digit for commas and stuff
+            if(outputType == -1)
+                outputType = mPrefs.outputType();
+            switch(outputType) {
+                case 0:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen,
+                            Math.round(maxLen * 0.8F), Math.round(maxLen * 0.6F));
+                    break;
+                case 1:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToString(x, maxLen, 1, 0);
+                    break;
+                case 2:
+                case 3:
+                    res = roottemplate.calculator.evaluator.util.Util.doubleToStringInEngNotation(x, maxLen);
+                    break;
+            }
+
+            int indexOfE;
+            if(outputType == 3 && (indexOfE = res.indexOf('E')) != -1) {
+                int exponent = Integer.parseInt(res.substring(indexOfE + 1));
+                String prefix = exponentToSIPrefix(exponent, mPrefs.getResources());
+                if(prefix != null) {
+                    showText = res.substring(0, indexOfE) + " " + prefix;
+                }
+            }
+        } else
+            res = Double.toString(x);
+
+        res = EvaluatorManager.replaceEngineToApp(res); // To convert "Infinity" -> symbol
+        showText = EvaluatorManager.replaceEngineToApp(showText);
+        return new String[] {res, showText};
+    }
+
+    public EvalResult eval(String text, int maxDigitsToFit, int numberOutputType) {
         if(mFragment.mEvaluator == null) return new EvalResult(null, null, null, -1, null);
         // Namespace had not been created by UpdateThread; this should not happen often
 
@@ -209,12 +212,11 @@ public class EvaluatorManager {
 
             if (n != null) {
                 mLastResultNumber = n.doubleValue();
-                String[] results = EvaluatorManager.doubleToPreferableString(mLastResultNumber,
-                        maxDigitsToFit, mPrefs);
-                result = EvaluatorManager.replaceEngineToApp(results[0]); // To convert "Infinity" -> symbol
-                showText = EvaluatorManager.replaceEngineToApp(results[1]);
-
-                type = showText == null ? InputEditText.TextType.RESULT_NUMBER : InputEditText.TextType.RESULT_MESSAGE;
+                String[] results = doubleToPreferableString(mLastResultNumber, maxDigitsToFit,
+                        numberOutputType);
+                result = results[0];
+                showText = results[1];
+                type = InputEditText.TextType.RESULT_NUMBER;
             } else {
                 type = InputEditText.TextType.RESULT_MESSAGE;
                 result = text_;

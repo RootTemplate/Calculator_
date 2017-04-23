@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeyboardKits>
+    <!--
+      ~ Copyright (c) 2017 RootTemplate Group 1.
+      ~ This file is part of Calculator_.
+      ~
+      ~ Calculator_ is free software: you can redistribute it and/or modify
+      ~ it under the terms of the GNU General Public License as published by
+      ~ the Free Software Foundation, either version 3 of the License, or
+      ~ (at your option) any later version.
+      ~
+      ~ Calculator_ is distributed in the hope that it will be useful,
+      ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+      ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      ~ GNU General Public License for more details.
+      ~
+      ~ You should have received a copy of the GNU General Public License
+      ~ along with Calculator_.  If not, see <http://www.gnu.org/licenses/>.
+      -->
+
+
+    <CustomButtons>
+        <!--
+        Describes all custom buttons used in <Button> in <Kits>.
+        Attributes:
+            ID. The unique identifier of the button. System buttons have ids >= 0, custom buttons
+                have < 0 ids.
+            NAME. [Optional] The visible name of the button.
+                  If the attribute is not specified, then the value equals to TEXT attribute.
+            TEXT. [Optional] The text that is appended to input text field after the button is pressed.
+                  If the attribute is not specified, then the value equals to NAME attribute.
+                  At least NAME or TEXT attribute must be specified.
+            TYPE. The type of the button:
+                   - EQUALS. Indicate that after pressing this button the expression must be calculated.
+                   - DIGIT. Indicate that this button is a digit or symbol which behavior equals to
+                            digit behavior (e.g. point)
+                   - BASE. Indicate that this button's appearance must equal to DIGIT appearance but
+                           not it's behavior.
+                   - SYMBOL. Indicates secondary operation
+                             (e.g. abs, pow or plus, multiplication (although they are not))
+                   - SHIFT. This button case-inverses all other buttons in the Page with
+                            ENABLE_CASE_INVERSE flag.
+                   - SYSTEM. This button toggles system properties. Property name is written in
+                             "name" field.
+                             - "amu". Toggles measurement units of angle (rad/deg).
+            LOCALE_EAST. Explanation requires an example. In western literature tangent's abbreviation
+                         is tan, while in eastern - tg. So this attribute specifies id of a button
+                         that should be used instead if the locale is eastern.
+            ENABLE_CASE_INVERSE. Indicates that text of this button can be case-inversed (i.e. to
+                                 upper or lower case).
+        -->
+        <!-- In this example a button with localeEast presented. Actually, custom buttons cannot have this
+             attribute (system buttons only). No exception will be thrown reading this document, however,
+             in Edit Keyboard Kits both buttons will be shown. -->
+        <Button id="-1" name="Hello, World!" text="Western locale!" type="symbol" localeEast="-2" enableCaseInverse="true"/>
+        <Button id="-2" name="Hello, World!" text="Eastern locale!" type="symbol" enableCaseInverse="true"/>
+    </CustomButtons>
+    <Kits>
+        <Kit
+            isSystem="true"
+            name="default"
+            actionBarAccess="false"
+            shortName="Edited short name of system kit" />
+        <Kit
+            isSystem="false"
+            name="default2"
+            actionBarAccess="true"
+            shortName="Main">
+
+            <!-- orientation="portrait | landscape" -->
+            <Version orientation="portrait">
+                <!-- moveToMain="ifDouble | never | always" layoutOrientation="vertical | horizontal" -->
+                <Page main="false" moveToMain="ifDouble" layoutOrientation="vertical">
+                    <PageRow>
+                        <Button id="57"/><Button id="58"/><Button id="59"/>
+                    </PageRow>
+                    <PageRow>
+                        <!-- Button id="-1" will be replaced with id="-2" if user's locale is 'east' -->
+                        <Button id="-1"/><Button id="-2"/>
+                    </PageRow>
+                </Page>
+                <!-- Every <Version> must contain a Page with main="true" -->
+                <Page main="true" layoutOrientation="vertical">
+                    <!-- Page layout here... -->
+                </Page>
+            </Version>
+        </Kit>
+    </Kits>
+</KeyboardKits>

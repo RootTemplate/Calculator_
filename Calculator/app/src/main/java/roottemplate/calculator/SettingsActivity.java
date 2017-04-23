@@ -95,6 +95,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
             }
 
             switch (preference.getKey()) {
+                case "outputType":
+                    if(!initialCall) mResultIntent.putExtra("outputTypeChanged", true);
                 case "digitGrouping":
                     boolean enabled = !value.equals("0");
                     findPreference("digitGroupingSeparatorLeft").setEnabled(enabled);

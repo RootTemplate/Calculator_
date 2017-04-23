@@ -21,13 +21,11 @@ package roottemplate.calculator;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -249,6 +247,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 // ... fix some problems with Fragments in KitViewPager after removing pages in edit keyboards
                 recreate();
             }
+            if(data.getBooleanExtra("outputTypeChanged", false))
+                reprintResultNumber();
         } else if(requestCode == REQUEST_CODE_GUIDES) {
             mTipsPageIndex = data.getIntExtra("guideIndex", 0);
         }
@@ -367,7 +367,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return; // Error
         if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 11;
+        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 11
+                || latestVer == 12;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
@@ -381,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 dialog.setArguments(args);
                 dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
 
-                KeyboardKitsXmlManager.invalidateInstalledKeyboardKits(this);
+                KeyboardKitsXmlManager.updateInstalledKeyboardKits(this, thisVer, latestVer);
                 /*readKeyboardKits(); This will be invoked later in onCreate
                 invalidateCurrentKeyboardKit();*/
             } else {
@@ -408,10 +409,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         mEvalManager.setKit(kitVersion.mParent.mName);
 
         if(mPrefs.separateNamespace()) {
-            if(mInputText.getTextType() != InputEditText.TextType.INPUT)
+            if(mInputText.getTextType() == InputEditText.TextType.RESULT_MESSAGE)
                 mInputText.clearText();
         }
 
+        reprintResultNumber();
         invalidateActionBarMenu();
     }
 
@@ -541,11 +543,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         String text = mInputText.getExprText();
         if(text.isEmpty()) return;
 
-        EvaluatorManager.EvalResult res = mEvalManager.eval(text, mInputText.getMaxDigitsToFit());
+        EvaluatorManager.EvalResult res = mEvalManager.eval(text, mInputText.getMaxDigitsToFit(),
+                mCurrentKeyboardKitVersion.mParent.mNumberOutputType);
         if(res.mMessage == null) {
             if(res.mShowText != null) {
                 mInputText.setText(res.mShowText);
-                mInputText.setMessageReplacement(res.mText);
+                mInputText.setNumberReplacement(res.mText);
             } else if(res.mText != null)
                 mInputText.setText(res.mText);
         }
@@ -557,6 +560,18 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if(res.mErrorIndex != -1)
                 mInputText.setCursor(res.mErrorIndex + 1);
         }
+    }
+    private void reprintResultNumber() {
+        // TODO: repeating lines with eval(). Fix it
+        if(mInputText.getTextType() != InputEditText.TextType.RESULT_NUMBER) return;
+        String[] s = mEvalManager.doubleToPreferableString(mEvalManager.getLastResultNumber(),
+                mInputText.getMaxDigitsToFit(),
+                mCurrentKeyboardKitVersion.mParent.mNumberOutputType);
+        if(s[1] != null) {
+            mInputText.setTextNoTextTypeChange(s[1]);
+            mInputText.setNumberReplacement(s[0]);
+        } else
+            mInputText.setTextNoTextTypeChange(s[0]);
     }
 
     @Override
