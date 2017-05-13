@@ -21,7 +21,10 @@ package roottemplate.calculator.evaluator.impls;
 import roottemplate.calculator.evaluator.EvaluatorException;
 import roottemplate.calculator.evaluator.MoreMath;
 import roottemplate.calculator.evaluator.Number;
+import roottemplate.calculator.evaluator.Reader;
 import roottemplate.calculator.evaluator.util.IndexedString;
+
+import static roottemplate.calculator.evaluator.impls.RealNumber.RealNumberManager.ABSTRACTION_LEVEL;
 
 public class RealNumber extends Number {
     public static final NumberManager NUMBER_MANAGER = new RealNumberManager();
@@ -37,40 +40,28 @@ public class RealNumber extends Number {
         }
     }
     
-    private double number;
-    private final boolean isModifiable;
+    public final double number;
     
     public RealNumber(double n) {
         number = n;
-        isModifiable = false;
-    }
-    protected RealNumber(double n, boolean isModifiable) {
-        number = n;
-        this.isModifiable = isModifiable;
-    }
-    
-    @Override
-    public boolean isModifiable() {
-        return isModifiable;
-    }
-    
-    protected void setValue(double n) {
-        if(!isModifiable) throw new UnsupportedOperationException();
-        number = n;
-    }
-    protected void addDelta(double n) {
-        if(!isModifiable) throw new UnsupportedOperationException();
-        number += n;
     }
 
     @Override
-    public double doubleValue() {
-        return number;
+    public boolean isModifiable() {
+        return false;
     }
     
     @Override
-    public Number applyOperation(String operation, Number with) {
-        double n = with == null ? 0 : with.doubleValue();
+    public Number applyOperation(String operation, Number with) throws EvaluatorException {
+        int absLevel;
+        if(with != null && (absLevel = with.getNumberManager().getAbstractionLevel()) != ABSTRACTION_LEVEL) {
+            if(absLevel > ABSTRACTION_LEVEL)
+                return with.getNumberManager().cast(this).applyOperation(operation, with);
+            else
+                throw new UnsupportedOperationException("There are no numbers with abstraction level < 1");
+        }
+
+        double n = with == null ? 0 : ((RealNumber) with.toNumber()).number;
         switch(operation) {
             case "+": return new RealNumber(number + n);
             case "-": 
@@ -81,7 +72,10 @@ public class RealNumber extends Number {
             case "*": return new RealNumber(number * n);
             case "/": return new RealNumber(number / n);
             case "%": return new RealNumber(number % n);
-            case "^": return new RealNumber(Math.pow(number, n));
+            case "^":
+                double res = Math.pow(number, n);
+                if(Double.isNaN(res)) break; // reapply operation in complex
+                return new RealNumber(res);
             case "!": return new RealNumber(MoreMath.factorial(number));
                 
             case "toRadians": return new RealNumber(Math.toRadians(number));
@@ -92,10 +86,15 @@ public class RealNumber extends Number {
                     return new RealNumber(Math.log(number));
                 return new RealNumber(MoreMath.log(number, n));
             case "abs": return new RealNumber(Math.abs(number));
+            case "gcd": return new RealNumber(MoreMath.gcd(number, n));
             case "round": return new RealNumber(Math.round(number));
             case "floor": return new RealNumber(Math.floor(number));
             case "ceil": return new RealNumber(Math.ceil(number));
-            case "sqrt": return new RealNumber(Math.sqrt(number));
+            case "sqrt":
+            case "root":
+                res = MoreMath.root(number, Math.round(with == null ? 2 : n));
+                if(Double.isNaN(res)) break;
+                return new RealNumber(res);
             case "cbrt": return new RealNumber(Math.cbrt(number));
             case "sin": return new RealNumber(MoreMath.sin(number));
             case "cos": return new RealNumber(MoreMath.cos(number));
@@ -103,9 +102,19 @@ public class RealNumber extends Number {
             case "asin": return new RealNumber(Math.asin(number));
             case "acos": return new RealNumber(Math.acos(number));
             case "atan": return new RealNumber(Math.atan(number));
-            case "root": return new RealNumber(MoreMath.root(number, Math.round(with == null ? 2 : n)));
-            default: throw new IllegalArgumentException("Operation " + operation + " is undefined");
+            case "sinh": return new RealNumber(Math.sinh(number));
+            case "cosh": return new RealNumber(Math.cosh(number));
+            case "tanh": return new RealNumber(Math.tanh(number));
+            case "asinh": return new RealNumber(MoreMath.asinh(number));
+            case "acosh": return new RealNumber(MoreMath.acosh(number));
+            case "atanh": return new RealNumber(MoreMath.atanh(number));
+            default: throw new UnsupportedOperationException("Operation " + operation + " is undefined");
         }
+
+        // If we are here, case this number to complex (abs. level + 1)
+        // TODO: if result is NaN, then cast this number to higher abs. level (using getNumberManagers() in
+        // Evaluator) and reapply operation
+        return ComplexNumber.NUMBER_MANAGER.cast(this).applyOperation(operation, with);
     }
 
     @Override
@@ -119,23 +128,77 @@ public class RealNumber extends Number {
     }
 
     @Override
+    public double toDouble() {
+        return number;
+    }
+
+    @Override
+    public String stringValue() {
+        return Double.toString(number);
+    }
+
+    @Override
     public NumberManager getNumberManager() {
         return NUMBER_MANAGER;
     }
-    
-    
-    
+
+
     
     
     public static class RealNumberManager extends NumberManager {
+        public static final int ABSTRACTION_LEVEL = 1;
+
+        @Override
+        public Reader.ReadResult<? extends Number> readNumber(IndexedString expr, int i) throws EvaluatorException {
+            int j;
+            boolean gotPoint = false;
+            boolean gotE = false;
+            boolean gotSign = false;
+            boolean gotDigit = false;
+            for(j = 0; j < expr.length(); j++) {
+                char at = expr.charAt(j);
+                if(at == '+' || at == '-') {
+                    if(gotSign) break;
+                    gotSign = true;
+                } else if(at == '.') {
+                    if(gotPoint)
+                        throw new EvaluatorException("Two points in one number. At: " + i, i);
+                    else if(gotE)
+                        throw new EvaluatorException("In exponent section points are prohibited", i);
+                    else {
+                        gotPoint = true;
+                    }
+                } else if(Character.isDigit(at)) {
+                    gotSign = true;
+                    gotDigit = true;
+                } else if(!gotDigit)
+                    return null; // Not a number
+                else if(at == 'E') {
+                    if(gotE)
+                        throw new EvaluatorException("Two E in one number. At: " + i, i);
+                    gotE = true;
+                    gotSign = false;
+                } else
+                    break;
+            }
+
+            IndexedString str = expr.substring(0, j);
+            return new Reader.ReadResult<>(RealNumber.parse(str), j);
+        }
+
         @Override
         public int getAbstractionLevel() {
-            return 1;
+            return ABSTRACTION_LEVEL;
         }
 
         @Override
         public roottemplate.calculator.evaluator.Number cast(Number number) {
             throw new UnsupportedOperationException("There are no numbers that have lower abstraction levels than Real");
+        }
+
+        @Override
+        public Number castToLowerAbstractionLevel(Number n) {
+            return null;
         }
     }
 }

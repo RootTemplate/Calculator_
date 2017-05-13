@@ -73,7 +73,7 @@ public class AsFractionDialogFragment extends DialogFragment implements View.OnC
                 .setTitle(R.string.dialog_asFraction_title)
                 .setMessage(genMessage())
                 .setPositiveButton(R.string.ok, null)
-                .setNeutralButton("8", null)
+                .setNeutralButton("_", null)
                 .create();
     }
 

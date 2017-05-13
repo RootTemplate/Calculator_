@@ -48,6 +48,6 @@ public class Variable extends SameNumber implements Named {
 
     @Override
     public String toString() {
-        return "Variable {name: " + name + ", value: " + doubleValue() + "}";
+        return "Variable {name: " + name + ", value: " + stringValue() + "}";
     }
 }

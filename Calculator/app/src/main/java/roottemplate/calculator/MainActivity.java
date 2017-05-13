@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         // UPDATE VERSION
-        updateVersion();
+        boolean updateVersionData = updateVersion();
 
         // INIT KEYBOARD KITS
         mKeyboardKits = Util.readKeyboardKits(this);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         mEvalManager = new EvaluatorManager(this, nsFragment, mPrefs, mDatabase,
                 savedInstanceState == null, savedInstanceState != null ?
-                savedInstanceState.getDouble("lastResultNumber") : Double.NaN);
+                savedInstanceState.getDoubleArray("lastResultNumbers") : null);
 
         // INIT KitViewPager
         mViewPager = (KitViewPager) findViewById(R.id.activity_main_viewPager);
@@ -170,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         // MISCELLANEOUS INITIALIZATIONS
         mTipsPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt("tipsPageIndex");
+        postUpdateVersion(updateVersionData);
     }
 
     @Override
@@ -189,8 +190,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("tipsPageIndex", mTipsPageIndex);
-        outState.putDouble("lastResultNumber", mEvalManager == null ? Double.NaN :
-                mEvalManager.getLastResultNumber());
+        outState.putDoubleArray("lastResultNumbers", mEvalManager == null ? null :
+                mEvalManager.getLastResultNumbers());
     }
 
     @Override
@@ -267,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             Random random = new Random();
             int i = 0;
             for(KeyboardKits.Kit kit : kits) {
-                if(kit.mActionBarAccess) { // todo: action bar access
+                if(kit.mActionBarAccess) {
                     MenuItem item = menu.add(GROUP_KIT_MAGIC, random.nextInt(), i, kit.mShortName);
                     MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
                 }
@@ -363,36 +364,33 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
 
-    private void updateVersion() {
+    private boolean updateVersion() {
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
-        if(latestVer == -1) return; // Error
-        if(latestVer == thisVer) return;
-        boolean hasNewKKits = latestVer == 2 || latestVer == 3 || latestVer == 11
-                || latestVer == 12;
+        if(latestVer == -1) return false; // Error
+        if(latestVer == thisVer) return false;
+        boolean hasNewKKits = thisVer <= 12;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
                     FirstLaunchDialogFragment.FRAGMENT_TAG);
         } else if(hasNewKKits) {
-            if(true) {
-                NotifyDialogFragment dialog = new NotifyDialogFragment();
-                Bundle args = new Bundle();
-                args.putInt("title", R.string.dialog_kitsUpdated_title);
-                args.putInt("message", R.string.dialog_kitsUpdated_message);
-                dialog.setArguments(args);
-                dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
-
-                KeyboardKitsXmlManager.updateInstalledKeyboardKits(this, thisVer, latestVer);
-                /*readKeyboardKits(); This will be invoked later in onCreate
-                invalidateCurrentKeyboardKit();*/
-            } else {
-                /* TODO. Update KeyboardKits if new version provides new default kits.
-                    If user has already specified custom ButtonKits, ask to try new default;
-                    also provide button in options menu to roll back to custom.
-                 */
-            }
+            KeyboardKitsXmlManager.updateInstalledKeyboardKits(this, thisVer, latestVer);
         }
         mPrefs.version(latestVer);
+        return hasNewKKits && thisVer != -1;
+    }
+    private void postUpdateVersion(boolean data) {
+        if(data) {
+            int message = mCurrentKeyboardKitVersion.mParent.mIsSystem ? R.string
+                    .dialog_kitsUpdated_message : R.string.dialog_kitsUpdated_message_lookAtDefault;
+
+            NotifyDialogFragment dialog = new NotifyDialogFragment();
+            Bundle args = new Bundle();
+            args.putInt("title", R.string.dialog_kitsUpdated_title);
+            args.putInt("message", message);
+            dialog.setArguments(args);
+            dialog.show(getSupportFragmentManager(), "KeyboardKitsUpdated");
+        }
     }
 
     public void invalidateCurrentKeyboardKit() {
@@ -508,16 +506,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         int pageIndex = mViewPager.getCurrentItem();
-        KeyboardKits.PageReturnType returnType = mCurrentKeyboardKitVersion.mPages[pageIndex].mMoveToMain;
+        KeyboardKits.PageReturnType returnType = btn.mOverriddenPageReturn;
+        if(returnType == null)
+            returnType = mCurrentKeyboardKitVersion.mPages[pageIndex].mMoveToMain;
         long time = System.currentTimeMillis();
         boolean doubleClick = (view == mLastClickedView && (time - mLastClickedTime) <= 400);
         boolean returnByDoubleClick = mCurrentKeyboardKitVersion.mMainPageIndex != pageIndex &&
                 (returnType == KeyboardKits.PageReturnType.IF_DOUBLE_CLICK && doubleClick);
         mLastClickedView = view;
         mLastClickedTime = time;
-        // TODO: delete configChanges="..." from manifest when this bug will be fixed. Links:
-        //       https://code.google.com/p/android/issues/detail?id=206394
-        //       https://code.google.com/p/android/issues/detail?id=225911
 
         KitViewPager.PageFragment fragment = mViewPager.getCurrentPageFragment();
         if(!returnByDoubleClick) {
@@ -564,27 +561,24 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private void reprintResultNumber() {
         // TODO: repeating lines with eval(). Fix it
         if(mInputText.getTextType() != InputEditText.TextType.RESULT_NUMBER) return;
-        String[] s = mEvalManager.doubleToPreferableString(mEvalManager.getLastResultNumber(),
-                mInputText.getMaxDigitsToFit(),
+        String[] s = mEvalManager.numberToPrintableString(mInputText.getMaxDigitsToFit(),
                 mCurrentKeyboardKitVersion.mParent.mNumberOutputType);
-        if(s[1] != null) {
-            mInputText.setTextNoTextTypeChange(s[1]);
-            mInputText.setNumberReplacement(s[0]);
-        } else
-            mInputText.setTextNoTextTypeChange(s[0]);
+        mInputText.setTextNoTextTypeChange(s[1] != null ? s[1]: s[0]);
+        mInputText.setNumberReplacement(s[1] != null ? s[0] : null);
     }
 
     @Override
     public boolean canShowResultAsFraction(InputEditText v) {
-        double x = mEvalManager.getLastResultNumber();
-        return !Double.isInfinite(x) && !Double.isNaN(x) && Math.round(x) != x;
+        double[] xs = mEvalManager.getLastResultNumbers();
+        double x = xs[0];
+        return !(xs.length > 1 || Double.isInfinite(x) || Double.isNaN(x) || Math.round(x) == x);
     }
 
     @Override
     public void onShowResultAsFraction(InputEditText v) {
         AsFractionDialogFragment fragment = new AsFractionDialogFragment();
         Bundle args = new Bundle();
-        args.putDouble("number", mEvalManager.getLastResultNumber());
+        args.putDouble("number", mEvalManager.getLastResultNumbers()[0]);
         fragment.setArguments(args);
         getFragmentManager().beginTransaction().add(fragment, "AsFraction").commit();
     }

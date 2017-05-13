@@ -12,6 +12,10 @@
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
 
+    <string name="action_saveChanges" translatable="false">@string/saveChanges</string>
+    <string name="action_advancedSettings">Advanced settings</string>
+    <string name="action_restoreKitDefaults" translatable="false">@string/dialog_restoreKitDefaults_title</string>
+
     <string name="action_guide_left">Back</string>
     <string name="action_guide_right">Forward</string>
 
@@ -29,7 +33,7 @@
     <string name="rad" translatable="false">RAD</string>
     <string name="deg" translatable="false">DEG</string>
 
-    <string name="message_emptyPage">No buttons on the page</string>
+    <string name="message_emptyPage">There are no buttons added to this page.</string>
 
     <string name="menuItem_cut">Cut all</string>
     <string name="menuItem_copy">Copy all</string>
@@ -57,9 +61,11 @@
 
     <string name="dialog_kitsUpdated_title">Keyboard kits were updated</string>
     <string name="dialog_kitsUpdated_message">The kit was unpacked moments ago</string>
+    <string name="dialog_kitsUpdated_message_lookAtDefault">You should take a look at the default kit as
+        there may be new cool features</string>
 
     <string name="dialog_kitsCannotBeSaved">Sorry, but new keyboards kits cannot be saved by unknown
-        reason. Here are some details. Please, send screenshot of this window to the author (RootTemplate).
+        reason. Here are some details. Please, send screenshot of this window to RootTemplate.
         We would be grateful if you could do this.</string>
 
     <string name="dialog_update_title">Check for Updates</string>
@@ -154,6 +160,9 @@
     <string name="keyboards_editButton_name">Name</string>
     <string name="keyboards_editButton_enableTextField">Override the text added when button is clicked</string>
     <string name="keyboards_editButton_enableCaseInverse">Inverse the case when shift is pressed</string>
+    <string name="keyboards_editButton_overridePageReturn">Override return type to home page</string>
+    <string name="keyboards_editButton_pageReturnWarn">When this button is clicked, the return to home page will occur
+            as specified, regardless of what type is chosen in page settings.</string>
 
     <string name="keyboards_editKit_title">Kit</string>
     <string name="keyboards_editKit_name">Full name</string>
@@ -189,6 +198,9 @@
     <string name="keyboards_message_cannotEditSystemKit">Unfortunately, you cannot edit the button
         set that is available by default. You need to create a new set by choosing \"New kit\" from
         the menu at the top of the screen.</string>
+    <string name="keyboards_message_advancedSettingsTurnedOff_title">Advanced settings disabled</string>
+    <string name="keyboards_message_advancedSettingsTurnedOff">Advanced settings are no longer displayed,
+        but their values are not deleted. You can get back to editing by turning them on again.</string>
 
 
     <!-- Strings related to Settings -->
@@ -355,6 +367,25 @@
 
     <!-- Strings related to Guides -->
 
+    <string-array name="guide_19_functions">
+        <item>sin, cos, tan, cot; asin, acos, atan, acot</item>
+        <item>sinh, cosh, tanh; asinh, acosh, atanh</item>
+        <item>&#x221A;, log, lg, ln</item>
+        <item>abs</item>
+        <item>floor</item>
+        <item>gcd</item>
+        <item>arg, conjugate</item>
+    </string-array>
+    <string-array name="guide_19_remarks">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Absolute value</item>
+        <item></item>
+        <item>Greatest common divisor</item>
+        <item>Functions for obtaining an argument and a conjugate number (for complex numbers)</item>
+    </string-array>
+
     <string name="guide_1_title">Welcome to Calculator_!</string>
     <string name="guide_1_text">\tHaving read all the tips, you\'ll know all features of this application.
         \n\tNow click on \"Forward\" button in the upper right corner to continue.</string>
@@ -456,6 +487,9 @@
         standard \"Copy / Paste\" menu and click on corresponding item (\"As&#160;fraction\").
         \n\n\tAttention! If you try to convert a decimal with a very large denominator or even
         irrational, the app will output an approximately equal fraction. Try to do this with a pi number!</string>
+    <string name="guide_19_title">Full list of mathematical functions</string>
+    <string name="guide_19_title_functions">Functions</string>
+    <string name="guide_19_title_remark">Remarks</string>
     <string name="guide_final_title">That\'s all</string>
     <string name="guide_final_text">Now you know everything about the app</string>
 </resources>

@@ -36,6 +36,7 @@ import roottemplate.calculator.evaluator.Named;
 import roottemplate.calculator.evaluator.Number;
 import roottemplate.calculator.evaluator.Processor;
 import roottemplate.calculator.evaluator.Variable;
+import roottemplate.calculator.evaluator.impls.ComplexNumber;
 import roottemplate.calculator.evaluator.impls.DefaultFunction;
 import roottemplate.calculator.evaluator.impls.RealNumber;
 import roottemplate.calculator.util.Util;
@@ -121,23 +122,23 @@ public class EvaluatorManager {
     private final AppDatabase mDb;
     private volatile Thread mEvaluatorUpdaterThread;
     private volatile boolean mFirstUpdateAfterLaunch;
-    private double mLastResultNumber = Double.NaN;
+    private double[] mLastResultNumbers = null;
 
     public EvaluatorManager(Context context, NamespaceFragment fragment, PreferencesManager prefs,
-                            AppDatabase db, boolean isAppJustLaunched, double lastResultNumber) {
+                            AppDatabase db, boolean isAppJustLaunched, double[] lastResultNumbers) {
         mContext = context;
         mFragment = fragment;
         mPrefs = prefs;
         mDb = db;
         mFirstUpdateAfterLaunch = isAppJustLaunched;
-        mLastResultNumber = lastResultNumber;
+        mLastResultNumbers = lastResultNumbers;
     }
 
     private String getKitName() {
         return mPrefs.separateNamespace() ? mKitName : null;
     }
-    public double getLastResultNumber() {
-        return mLastResultNumber;
+    public double[] getLastResultNumbers() {
+        return mLastResultNumbers;
     }
 
     public void setKit(String kitName) {
@@ -187,11 +188,38 @@ public class EvaluatorManager {
                 }
             }
         } else
-            res = Double.toString(x);
+            res = Util.doubleToString(x);
 
         res = EvaluatorManager.replaceEngineToApp(res); // To convert "Infinity" -> symbol
         showText = EvaluatorManager.replaceEngineToApp(showText);
         return new String[] {res, showText};
+    }
+
+    public String[] numberToPrintableString(int maxDigitsToFit, int numberOutputType) {
+        String[] results;
+        double[] xs = mLastResultNumbers;
+        if(xs.length == 1) {
+            results = doubleToPreferableString(xs[0], maxDigitsToFit, numberOutputType);
+        } else if(xs.length == 2) {
+            double re = xs[0], im = xs[1];
+
+            int maxLen = mPrefs.doRound() ? maxDigitsToFit * 3 / 4 : 100;
+            String sRe = roottemplate.calculator.evaluator.util.Util.doubleToStringNoE(re, maxLen);
+            String sIm = roottemplate.calculator.evaluator.util.Util.doubleToStringNoE(im, maxLen);
+            StringBuilder sb = new StringBuilder();
+            if(!sRe.equals("0") && !sRe.equals("-0")) {
+                sb.append(sRe);
+                if (!sIm.startsWith("-")) sb.append('+');
+            }
+            if(sIm.equals("-1")) sb.append('-');
+            else if(!sIm.equals("1")) sb.append(sIm);
+            sb.append('i');
+            results = new String[] {replaceEngineToApp(sb.toString()), null};
+        } else {
+            results = new String[] {"", null};
+            Log.e(Util.LOG_TAG, "Please add support for a new Number!");
+        }
+        return results;
     }
 
     public EvalResult eval(String text, int maxDigitsToFit, int numberOutputType) {
@@ -211,9 +239,17 @@ public class EvaluatorManager {
                     .process(expr);
 
             if (n != null) {
-                mLastResultNumber = n.doubleValue();
-                String[] results = doubleToPreferableString(mLastResultNumber, maxDigitsToFit,
-                        numberOutputType);
+                n = n.toNumber();
+                if(n instanceof RealNumber) {
+                    mLastResultNumbers = new double[] {n.toDouble()};
+                } else if(n instanceof ComplexNumber) {
+                    ComplexNumber complex = (ComplexNumber) n;
+                    mLastResultNumbers = new double[] {complex.getRe(), complex.getIm()};
+                } else {
+                    Log.e(Util.LOG_TAG, "Please add support for a new Number! Abstraction level: "
+                            + n.getNumberManager().getAbstractionLevel());
+                }
+                String[] results = numberToPrintableString(maxDigitsToFit, numberOutputType);
                 result = results[0];
                 showText = results[1];
                 type = InputEditText.TextType.RESULT_NUMBER;
@@ -297,19 +333,25 @@ public class EvaluatorManager {
 
                 String name = cursor.getString(cursor.getColumnIndex(
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_NAME));
-                String expr = cursor.getString(cursor.getColumnIndex(
-                        NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
+                String[] args = cursor.getString(cursor.getColumnIndex(
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION)).split(";");
 
                 Named n;
                 switch (cursor.getInt(cursor.getColumnIndex(
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_TYPE))) {
                     case 0:
                         // NUMBER
-                        n = new Variable(name, Double.valueOf(expr));
+                        Number res;
+                        if(args.length == 1) {
+                            res = new RealNumber(Double.valueOf(args[0]));
+                        } else {
+                            res = new ComplexNumber(Double.valueOf(args[0]), Double.valueOf(args[1]));
+                        }
+
+                        n = new Variable(name, res);
                         break;
                     case 1:
                         // DefaultFunction
-                        String[] args = expr.split(";");
                         Variable[] vars = new Variable[args.length - 1];
                         for(int i = 0; i < vars.length; i++)
                             vars[i] = new Variable(args[i + 1]);
@@ -347,11 +389,18 @@ public class EvaluatorManager {
             String expr;
             switch (n.getElementType()) {
                 case NUMBER:
-                    if(!(n instanceof Variable) || !(((Number) n).toNumber() instanceof RealNumber))
-                        Log.e(Util.LOG_TAG, "[Namespace] New Number class found - " +
-                                "no support added");
                     type = 0;
-                    expr = Double.toString(((Number) n).doubleValue());
+                    Number n_ = ((Number) n).toNumber();
+                    if(n_ instanceof RealNumber)
+                        expr = Double.toString(n_.toDouble());
+                    else if(n_ instanceof ComplexNumber) {
+                        ComplexNumber complex = (ComplexNumber) n_;
+                        expr = Double.toString(complex.getRe()) + ";" + Double.toString(complex.getIm());
+                    } else {
+                        Log.e(Util.LOG_TAG, "[Namespace] New Number class found (without support): " +
+                                n_.getClass().toString());
+                        expr = "";
+                    }
                     break;
                 case OPERATOR:
                     if(!(n instanceof DefaultFunction)) {

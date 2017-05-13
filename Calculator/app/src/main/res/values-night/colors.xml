@@ -36,7 +36,7 @@
     <color name="colorButtonShiftText">#CECECE</color>
     <color name="colorButtonSystem">#404040</color>
     <color name="colorButtonSystemText">@color/colorButtonSymbolText</color>
-    <color name="colorButtonSystemFocused">#333333</color> <!--2F2F2F--> <!--8c2708--> <!--TODO-->
+    <color name="colorButtonSystemFocused">#333333</color> <!--2F2F2F--> <!--8c2708-->
 
     <color name="colorDialogActionBarBackground">#333333</color>
     <color name="colorDialogListDivider">#3E3E3E</color>

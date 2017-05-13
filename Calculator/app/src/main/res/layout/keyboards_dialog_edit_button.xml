@@ -16,75 +16,114 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Calculator_.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- TODO: fix id names -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/dialog_horizontal_margin"
-    android:paddingRight="@dimen/dialog_horizontal_margin">
+    android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/editKit_fullName"
-        android:layout_width="wrap_content"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:hint="@string/keyboards_editButton_name"
-        android:inputType="text"
-        android:maxLines="1"
-        android:maxLength="@integer/keyboards_maxNameLength"/>
+        android:paddingLeft="@dimen/dialog_horizontal_margin"
+        android:paddingRight="@dimen/dialog_horizontal_margin">
 
-    <CheckBox
-        android:id="@+id/editKit_actionBarAccess"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editButton_enableCaseInverse"
-        android:layout_marginTop="5dp"
-        android:text="@string/keyboards_editButton_enableTextField" />
+        <EditText
+            android:id="@+id/editButton_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:ems="10"
+            android:hint="@string/keyboards_editButton_name"
+            android:inputType="text"
+            android:maxLines="1"
+            android:maxLength="@integer/keyboards_maxNameLength"/>
 
-    <EditText
-        android:id="@+id/editButton_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_actionBarAccess"
-        android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="5dp"
-        android:ems="10"
-        android:enabled="false"
-        android:inputType="text"
-        android:maxLines="1"
-        android:maxLength="@integer/keyboards_maxNameLength"/>
+        <Spinner
+            android:id="@+id/editButton_style"
+            android:layout_width="wrap_content"
+            android:layout_height="27dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editButton_name"
+            android:layout_marginTop="3dp"
+            android:entries="@array/keyboards_editButton_styles"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
-    <Spinner
-        android:id="@+id/editButton_style"
-        android:layout_width="wrap_content"
-        android:layout_height="27dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_fullName"
-        android:layout_marginTop="5dp"
-        android:entries="@array/keyboards_editButton_styles"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        <CheckBox
+            android:id="@+id/editButton_enableCaseInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/keyboards_editButton_enableCaseInverse"
+            android:layout_below="@+id/editButton_style"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
-    <CheckBox
-        android:id="@+id/editButton_enableCaseInverse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/keyboards_editButton_enableCaseInverse"
-        android:layout_below="@+id/editButton_style"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        <CheckBox
+            android:id="@+id/editKit_actionBarAccess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editButton_enableCaseInverse"
+            android:layout_marginTop="5dp"
+            android:text="@string/keyboards_editButton_enableTextField" />
 
-</RelativeLayout>
+        <EditText
+            android:id="@+id/editButton_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editKit_actionBarAccess"
+            android:layout_marginLeft="@dimen/keyboards_layout_padding"
+            android:layout_marginStart="@dimen/keyboards_layout_padding"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="text"
+            android:maxLines="1"
+            android:maxLength="@integer/keyboards_maxNameLength"/>
+
+        <CheckBox
+            android:id="@+id/editButton_overridePageReturn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editButton_text"
+            android:layout_marginTop="5dp"
+            android:text="@string/keyboards_editButton_overridePageReturn" />
+
+        <Spinner
+            android:id="@+id/editButton_pageReturn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editButton_overridePageReturn"
+            android:layout_marginLeft="@dimen/keyboards_layout_padding"
+            android:layout_marginStart="@dimen/keyboards_layout_padding"
+            android:layout_marginTop="5dp"
+            android:entries="@array/keyboards_editPage_returnToMain"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/editButton_pageReturnWarn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/editButton_pageReturn"
+            android:layout_alignStart="@+id/editButton_pageReturn"
+            android:layout_below="@+id/editButton_pageReturn"
+            android:layout_marginTop="5dp"
+            android:text="@string/keyboards_editButton_pageReturnWarn"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+</ScrollView>

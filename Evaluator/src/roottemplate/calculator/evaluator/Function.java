@@ -28,7 +28,7 @@ public abstract class Function extends Operator {
     
     
     
-    private final int argsCount;
+    protected final int argsCount;
     
     public Function(PriorityManager prManager, String name, int argsCount) {
         this(prManager, name, name, argsCount);

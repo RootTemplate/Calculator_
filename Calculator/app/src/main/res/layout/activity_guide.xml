@@ -407,6 +407,32 @@
                     style="@style/guide_text"
                     android:text="@string/guide_12_text2"/>
             </LinearLayout>
+            <TableLayout
+                style="@style/guide"
+                android:id="@+id/guide_funcList">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_height="match_parent"
+                        android:text="@string/guide_19_title_functions"
+                        style="@style/guide_text_table"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:gravity="center_horizontal|bottom"/>
+
+                    <TextView
+                        android:layout_height="match_parent"
+                        android:text="@string/guide_19_title_remark"
+                        style="@style/guide_text_table"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:gravity="center_horizontal|bottom" />
+
+                </TableRow>
+            </TableLayout>
             <LinearLayout
                 style="@style/guide"
                 android:id="@+id/guide_final" >

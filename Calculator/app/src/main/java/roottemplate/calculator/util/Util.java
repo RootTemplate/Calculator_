@@ -70,6 +70,12 @@ public class Util {
         return false;
     }
 
+    public static String doubleToString(double x) {
+        String result = Double.toString(x);
+        if(result.endsWith(".0")) result = result.substring(0, result.length() - 2);
+        return result;
+    }
+
     public static String intToHexColor(int color) {
         return "#" + Integer.toHexString(color & 0xffffff);
     }

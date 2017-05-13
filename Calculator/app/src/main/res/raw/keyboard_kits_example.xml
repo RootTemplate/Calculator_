@@ -48,12 +48,17 @@
                          that should be used instead if the locale is eastern.
             ENABLE_CASE_INVERSE. Indicates that text of this button can be case-inversed (i.e. to
                                  upper or lower case).
+            OVERRIDDEN_PAGE_RETURN. When the button is clicked, the user will be returned to home page
+                                    as specified here, regardless of which type is chosen in page's moveToMain.
+                                    Values: never | ifDouble | always.
         -->
         <!-- In this example a button with localeEast presented. Actually, custom buttons cannot have this
              attribute (system buttons only). No exception will be thrown reading this document, however,
-             in Edit Keyboard Kits both buttons will be shown. -->
+             in Edit Keyboard Kits both buttons will be shown.
+             Note that in this example ONLY eastern locale button has different page return type. -->
         <Button id="-1" name="Hello, World!" text="Western locale!" type="symbol" localeEast="-2" enableCaseInverse="true"/>
-        <Button id="-2" name="Hello, World!" text="Eastern locale!" type="symbol" enableCaseInverse="true"/>
+        <Button id="-2" name="Hello, World!" text="Eastern locale!" type="symbol" enableCaseInverse="true"
+            overriddenPageReturn="ifDouble"/>
     </CustomButtons>
     <Kits>
         <Kit

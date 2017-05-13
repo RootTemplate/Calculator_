@@ -19,6 +19,7 @@
 package roottemplate.calculator;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.StrikethroughSpan;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -47,6 +49,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import roottemplate.calculator.data.AppDatabase;
@@ -66,6 +70,7 @@ public class GuideActivity extends AppCompatActivity {
             R.id.guide_longClks, // LONG CLICKS ON BUTTONS
             R.id.guide_empty, // DOUBLE CLICKS TO MOVE TO MAIN
             R.id.guide_namespaces, // NAMESPACES
+            R.id.guide_funcList, // FULL FUNCTION LIST
             //R.id.guide_historyClks, // HISTORY CLICKS
             R.id.guide_nan, // NaN
             R.id.guide_empty, // SETTINGS IS YOUR FRIEND
@@ -103,6 +108,7 @@ public class GuideActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
+        Resources resources = getResources();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -153,11 +159,22 @@ public class GuideActivity extends AppCompatActivity {
         findViewById(R.id.guide_longClks_btn2).setOnLongClickListener(longClkLongListener);
         findViewById(R.id.guide_longClks_btn3).setOnLongClickListener(longClkLongListener);
 
-        PorterDuffColorFilter pd = new PorterDuffColorFilter(getResources().getColor(R.color.colorButtonShiftText),
+        PorterDuffColorFilter pd = new PorterDuffColorFilter(resources.getColor(R.color.colorButtonShiftText),
                 PorterDuff.Mode.MULTIPLY);
         int[] ids = {R.id.guide_longClks_arrow1, R.id.guide_longClks_arrow2, R.id.guide_longClks_arrow3};
         for(int id : ids)
             ((ImageView) findViewById(id)).setColorFilter(pd);
+
+        LayoutInflater inflater = getLayoutInflater();
+        TableLayout table = (TableLayout) findViewById(R.id.guide_funcList);
+        String[] funcs = resources.getStringArray(R.array.guide_19_functions);
+        String[] remarks = resources.getStringArray(R.array.guide_19_remarks);
+        for(int i = 0; i < funcs.length; i++) {
+            View view = inflater.inflate(R.layout.guide_tablerow_2texts, table, false);
+            ((TextView) view.findViewById(R.id.tablerow_text1)).setText(funcs[i]);
+            ((TextView) view.findViewById(R.id.tablerow_text2)).setText(remarks[i]);
+            table.addView(view);
+        }
 
         mResult = new Intent();
         setGuideIndex(savedInstanceState == null ? intent.getIntExtra("guideIndex", 0) :
@@ -293,6 +310,10 @@ public class GuideActivity extends AppCompatActivity {
                 mText.setText(R.string.guide_17_text1);
                 break;
             case 14:
+                mTitle.setText(R.string.guide_19_title);
+                mText.setText("");
+                break;
+            case 15:
                 mTitle.setText(R.string.guide_10_title);
                 mText.setText(R.string.guide_10_text);
                 break;
@@ -300,11 +321,11 @@ public class GuideActivity extends AppCompatActivity {
                 mTitle.setText(R.string.guide_12_title);
                 mText.setText(R.string.guide_12_text);
                 break;*/
-            case 15:
+            case 16:
                 mTitle.setText(R.string.guide_14_title);
                 mText.setText(R.string.guide_14_text);
                 break;
-            case 16:
+            case 17:
                 mTitle.setText(R.string.guide_final_title);
                 mText.setText("");
                 break;

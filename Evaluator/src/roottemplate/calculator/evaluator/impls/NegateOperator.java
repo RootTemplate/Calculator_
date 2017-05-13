@@ -21,7 +21,6 @@ package roottemplate.calculator.evaluator.impls;
 import roottemplate.calculator.evaluator.Function;
 import roottemplate.calculator.evaluator.Operator;
 import roottemplate.calculator.evaluator.PriorityManager;
-import roottemplate.calculator.evaluator.util.IndexedString;
 
 public class NegateOperator extends Operator {
     public NegateOperator(PriorityManager prManager) {
@@ -35,7 +34,7 @@ public class NegateOperator extends Operator {
         // Using this code, Evaluator will calculate "-2^2" = "4", should be "-4".
 
         if(exactlyThis || expr.isEmpty()) return true;
-        char[] acceptable = new char[] {'.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}; // real numbers; not complex
+        char[] acceptable = new char[] {'.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         char at = expr.charAt(0);
         for (char symbol : acceptable)
             if (symbol == at)

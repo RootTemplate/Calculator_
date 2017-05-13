@@ -19,10 +19,10 @@
 package roottemplate.calculator.evaluator;
 
 import roottemplate.calculator.evaluator.util.IndexedString;
-import roottemplate.calculator.evaluator.impls.RealNumber;
-import roottemplate.calculator.evaluator.util.Util;
 
-public abstract class Number extends java.lang.Number implements ExpressionElement {
+import java.util.List;
+
+public abstract class Number implements ExpressionElement {
     public static final long serialVersionUID = 1;
     
     /**
@@ -38,50 +38,41 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
         return ElementType.NUMBER;
     }
     
-    @Override
-    public long longValue() {
-        return Math.round(doubleValue());
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) doubleValue();
-    }
-
-    @Override
-    public int intValue() {
-        return (int) longValue();
-    }
-    
     /**
      * @return Real this number
      */
     public abstract Number toNumber();
+
+    public abstract double toDouble();
     
     /**
      * Generates and returns a printable string of the value
      * @return the stringed value
      */
-    public String stringValue() {
-        return Util.doubleToString(doubleValue(), 10, 7, 4);
-    }
-    
+    public abstract String stringValue();
+
     /**
      * Applies arithmetic operation on this number. Supported operations:
-     * "+", "-" (minus), "-" (negate; <code>with</code> must be <code>null</code>), "*", "/", "%" (modulo), "^" (pow), "!",
-     * "toRadians", "toDegrees", "log10" (10-base log), "log" (1 arg: <code>n</code>. Returns base-e log of <code>n</code>),
-     * "log" (2 args: <code>n</code>, <code>base</code>), "abs", "round", "floor", "ceil", "sqrt", "cbrt", "sin", "cos", "tan",
-     * "asin", "acos", "atan", "root" (returns the <code>with</code>-th root of this number; <code>with</code> must be equivalent
-     * to mathematical integer, otherwise it will be rounded).
+     * <ul>
+     * <li>"+", "-" (minus), "-" (negate; when <code>with</code> is <code>null</code>), "*", "/", "%" (modulo), "^" (pow)</li>
+     * <li>"!", "abs", "gcd" (greatest common divisor)</li>
+     * <li>"log10" (10-base log), "log" (1 arg: <code>n</code>. Returns base-e log of <code>n</code>),
+     * "log" (2 args: <code>n</code>, <code>base</code>)</li>
+     * <li>"toRadians", "toDegrees"</li>
+     * <li>"round", "floor", "ceil"</li>
+     * <li>"sqrt", "cbrt", "root" (returns the <code>with</code>-th root of this number; <code>with</code> must be equivalent
+     * to mathematical integer, otherwise it will be rounded)</li>
+     * <li>"sin", "cos", "tan", "asin", "acos", "atan"</li>
+     * <li>"sinh", "cosh", "tanh", "asinh", "acosh", "atanh"</li>
+     * </ul>
      * @param operation The operation to be applied
-     * @param with Number with that operation will be applied
-     * @return Result number
-     * @throws ClassCastException if this and <code>with</code> numbers have different abstraction levels
-     * (but the throw is not guaranteed)
+     * @param with Number with that operation will be applied (may be {@code null}). It can have any abstraction level.
+     * @return Result number.
+     * @throws UnsupportedOperationException if {@code operation} is unknown (not from the list above).
      */
-    public abstract Number applyOperation(String operation, Number with);
+    public abstract Number applyOperation(String operation, Number with) throws EvaluatorException;
     
-    public Number applyOperation(String operation) {
+    public Number applyOperation(String operation) throws EvaluatorException {
         return applyOperation(operation, null);
     }
 
@@ -93,12 +84,23 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
 
     @Override
     public String toString() {
-        return "Number {value: " + doubleValue() + "}";
+        return "Number {value: " + stringValue() + "}";
     }
     
     
     
     public static abstract class NumberManager {
+        /**
+         * Reads number from given string.
+         * @param str The string to be read (the string starts with the number)
+         * @param i {@code errorIndex}, which may be used in {@code EvaluatorException}, if such will be thrown.
+         * @return {@code ReadResult} or {@code null} if number represented in the string is not this (with this
+         * abstraction level) number.
+         * @throws EvaluatorException when NumberManager understands that number in given string is this
+         * (with this abstraction level) number but contains errors.
+         */
+        public abstract Reader.ReadResult<? extends Number> readNumber(IndexedString str, int i) throws EvaluatorException;
+
         /**
          * Returns number abstraction level. For example, complex numbers
          * have higher level than real numbers.
@@ -113,12 +115,24 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
          * @return Casted number
          */
         public abstract Number cast(Number number);
+
+        /**
+         * Tries to cast this number to number whose abstraction level is 1 less.
+         * @param n The number trying to cast (abstraction level = {@link #getAbstractionLevel()}).
+         * @return casted number or {@code null} if the number cannot be casted.
+         */
+        public abstract Number castToLowerAbstractionLevel(Number n);
     }
     
     
     
     static class NumberReader extends Modifier {
         public static final String FRIENDLY_NAME = "NUMBER_MODIFIER";
+        private final List<NumberManager> numberManagers;
+
+        NumberReader(List<NumberManager> numberManagers) {
+            this.numberManagers = numberManagers;
+        }
 
         @Override
         public int getModifies() {
@@ -132,39 +146,12 @@ public abstract class Number extends java.lang.Number implements ExpressionEleme
 
         @Override
         public Reader.ReadResult<? extends ExpressionElement> read(IndexedString expr, Evaluator namespace, int i) throws EvaluatorException {
-            int j;
-            boolean gotPoint = false;
-            boolean gotE = false;
-            boolean gotSign = false;
-            boolean gotDigit = false;
-            for(j = 0; j < expr.length(); j++) {
-                char at = expr.charAt(j);
-                if(at == '+' || at == '-') {
-                    if(gotSign) break;
-                    gotSign = true;
-                } else if(at == '.') {
-                    if(gotPoint)
-                        throw new EvaluatorException("Two points in one number. At: " + i, i);
-                    else if(gotE)
-                        throw new EvaluatorException("In exponent section points are prohibited", i);
-                    else {
-                        gotPoint = true;
-                    }
-                } else if(Character.isDigit(at)) {
-                    gotSign = true;
-                    gotDigit = true;
-                } else if(!gotDigit)
-                    return null; // Not a number
-                else if(at == 'E') {
-                    if(gotE)
-                        throw new EvaluatorException("Two E in one number. At: " + i, i);
-                    gotE = true;
-                    gotSign = false;
-                } else
-                    break;
+            Reader.ReadResult<? extends Number> result = null;
+            for(NumberManager nm : numberManagers) {
+                result = nm.readNumber(expr, i);
+                if(result != null) break;
             }
-
-            return new Reader.ReadResult<>(RealNumber.parse(expr.substring(0, j)), j);
+            return result;
         }
     }
 }

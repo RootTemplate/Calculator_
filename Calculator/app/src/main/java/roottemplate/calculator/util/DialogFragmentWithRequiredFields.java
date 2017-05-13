@@ -23,6 +23,9 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 public abstract class DialogFragmentWithRequiredFields extends DialogFragment {
     protected final TextWatcher mTextListener = new TextWatcher() {
@@ -35,6 +38,26 @@ public abstract class DialogFragmentWithRequiredFields extends DialogFragment {
 
     protected abstract boolean areTextFilled();
 
+    protected static void setDependency_visibility(CheckBox view, final View... dependent) {
+        view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int value = isChecked ? View.VISIBLE : View.GONE;
+                for(View v : dependent)
+                    v.setVisibility(value);
+            }
+        });
+    }
+    protected static void setDependency_enabled(CheckBox view, final View... dependent) {
+        view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                for(View v : dependent)
+                    v.setEnabled(isChecked);
+            }
+        });
+    }
+
     protected void updatePositiveButton() {
         AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null)
@@ -46,5 +69,4 @@ public abstract class DialogFragmentWithRequiredFields extends DialogFragment {
         super.onResume();
         updatePositiveButton();
     }
-
 }

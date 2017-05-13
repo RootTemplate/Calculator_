@@ -18,40 +18,42 @@
 
 package roottemplate.calculator.evaluator.impls;
 
-import roottemplate.calculator.evaluator.*;
+import roottemplate.calculator.evaluator.Evaluator;
+import roottemplate.calculator.evaluator.EvaluatorException;
 import roottemplate.calculator.evaluator.Number;
+import roottemplate.calculator.evaluator.PriorityManager;
 
-public class CotangentFunctions {
-    public static class CtgFunction extends Function {
+public class ComplexNumberFunctions {
+    public static class Arg extends NativeFunction {
         private final Evaluator.Options options;
 
-        public CtgFunction(PriorityManager prManager, String name, Evaluator.Options options) {
-            super(prManager, "ctg", name, 1);
+        public Arg(PriorityManager prManager, Evaluator.Options options) {
+            super(prManager, "arg");
             this.options = options;
         }
 
         @Override
         protected Number eval0(Number... numbers) throws EvaluatorException {
-            Number arg = options.ANGLE_MEASURING_UNITS == 1 ? numbers[0] :
-                    numbers[0].applyOperation("toRadians", null);
-            return new RealNumber(1).applyOperation("/", arg.applyOperation("tan"));
+            if(numbers[0].getNumberManager().getAbstractionLevel() < 2)
+                return new RealNumber(0);
+
+            Number res = super.eval0(numbers);
+            if(options.ANGLE_MEASURING_UNITS == 2)
+                res = res.applyOperation("toDegrees");
+            return res;
         }
     }
 
-    public static class ArcctgFunction extends Function {
-        private final Evaluator.Options options;
-
-        public ArcctgFunction(PriorityManager prManager, String name, Evaluator.Options options) {
-            super(prManager, "atan", name, 1);
-            this.options = options;
+    public static class Conjugate extends NativeFunction {
+        public Conjugate(PriorityManager prManager) {
+            super(prManager, "conjugate");
         }
 
         @Override
         protected Number eval0(Number... numbers) throws EvaluatorException {
-            Number result = new RealNumber(Math.PI / 2).applyOperation("-", numbers[0].applyOperation("atan"));
-            if(options.ANGLE_MEASURING_UNITS == 2)
-                result = result.applyOperation("toDegrees");
-            return result;
+            if(numbers[0].getNumberManager().getAbstractionLevel() < 2)
+                return numbers[0].copy();
+            return super.eval0(numbers);
         }
     }
 }

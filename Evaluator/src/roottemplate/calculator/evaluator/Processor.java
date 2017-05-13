@@ -100,7 +100,13 @@ public class Processor {
      * @throws EvaluatorException if exception occur
      */
     public Number eval(String expr) throws EvaluatorException {
-        return Expression.parse(expr, namespace).eval();
+        Number result = Expression.parse(expr, namespace).eval();
+
+        Number temp;
+        while((temp = result.getNumberManager().castToLowerAbstractionLevel(result)) != null)
+            result = temp;
+
+        return result;
     }
     
     /**
@@ -169,12 +175,12 @@ public class Processor {
 
                     boolean firstApp = false;
                     Named obj = namespace.getOther(var);
-                    if(obj == null) {
+                    if(obj == null || (obj instanceof Constant && ((Constant) obj).canBeOverridden()) ) {
                         obj = new Variable(var);
                         namespace.add(obj, isStandard);
                         firstApp = true;
                     } else if(!(obj instanceof Variable))
-                        throw new EvaluatorException(var + " has been already defined as non variable");
+                        throw new EvaluatorException(var + " has been already defined as not a variable");
                     ((Variable) obj).changeValue(evaluated);
                     if(mDefListener != null)
                         mDefListener.onDefine(obj, var, equalsTo, firstApp, isStandard);

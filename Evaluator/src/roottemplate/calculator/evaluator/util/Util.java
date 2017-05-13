@@ -51,6 +51,8 @@ public class Util {
         return doubleToStringWithE(n, maxLen, false);
     }
     public static String doubleToStringWithE(double n, int maxLen, boolean engineeringNotation) {
+        if(Double.isNaN(n) || Double.isInfinite(n))
+            return Double.toString(n);
         String str = String.format(Locale.US, "%.20e", n);
         int eIndex = str.indexOf('e');
         String mantissa = str.substring(0, eIndex);
@@ -74,6 +76,8 @@ public class Util {
             }
             exponent = String.valueOf(exponentV);
         }
+        if(result.charAt(result.length() - 1) == '0')
+            truncate(result, result.length() - 1, mantissa.indexOf('.'));
 
         int exponentMod3 = exponentV % 3;
         if(engineeringNotation && exponentMod3 != 0) {

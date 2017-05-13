@@ -214,8 +214,8 @@ public class NamespaceActivity extends AppCompatActivity
                 int type = cursor.getInt(cursor.getColumnIndex(
                         NamespaceContract.NamespaceEntry.COLUMN_NAME_TYPE));
                 String name = cursor.getString(columnIndex);
-                String expr = cursor.getString(cursor.getColumnIndex(
-                        NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION));
+                String[] expr = cursor.getString(cursor.getColumnIndex(
+                        NamespaceContract.NamespaceEntry.COLUMN_NAME_EXPRESSION)).split(";");
                 SpannableStringBuilder ssb = new SpannableStringBuilder();
 
                 int start = 0;
@@ -223,17 +223,25 @@ public class NamespaceActivity extends AppCompatActivity
                     // NUMBER
                     ssb.append(name).append(" = ");
                     start = ssb.length();
-                    ssb.append(expr);
+
+                    if(expr.length == 1)
+                        ssb.append(expr[0]);
+                    else {
+                        String expr0 = expr[0], expr1 = expr[1];
+                        if(!expr0.equals("0.0") && !expr0.equals("-0.0")) {
+                            ssb.append(expr0).append(" + ");
+                        }
+                        ssb.append(expr[1]).append('i');
+                    }
                 } else if(type == 1) {
-                    String[] func = expr.split(";");
                     ssb.append(name).append("(");
-                    for(int i = 1; i < func.length; i++) {
+                    for(int i = 1; i < expr.length; i++) {
                         if(i != 1) ssb.append(", ");
-                        ssb.append(func[i]);
+                        ssb.append(expr[i]);
                     }
                     ssb.append(") = ");
                     start = ssb.length();
-                    ssb.append(func[0]);
+                    ssb.append(expr[0]);
                 } else
                     Log.e(Util.LOG_TAG, "[NamespaceActivity] Found new type but no support added: "
                             + type);
@@ -241,7 +249,9 @@ public class NamespaceActivity extends AppCompatActivity
                 ssb.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorNamespaceEquals)),
                         start, ssb.length(), 0);
 
-                ((TextView) view).setText(ssb);
+                TextView tv = (TextView) view;
+                tv.setText(ssb);
+                tv.setTextIsSelectable(true);
                 break;
             case R.id.isStandard:
                 ((CheckBox) view).setChecked(cursor.getInt(columnIndex) == 1);

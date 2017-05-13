@@ -56,6 +56,13 @@ public class PreferencesManager {
         mPrefs.edit().putInt("version", ver).apply();
     }
 
+    public boolean keyboardsAdvancedSettings() {
+        return mPrefs.getBoolean("keyboard_advancedSettings", false);
+    }
+    public void keyboardsAdvancedSettings(boolean newValue) {
+        mPrefs.edit().putBoolean("keyboard_advancedSettings", newValue).apply();
+    }
+
     public int bracketClosingType() {
         return Integer.parseInt(mPrefs.getString(
                 "bracketClosingType", mResources.getString(R.string.pref_def_brClosingType)));

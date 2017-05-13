@@ -18,6 +18,7 @@
  */
 package roottemplate.calculator.evaluator.impls;
 
+import roottemplate.calculator.evaluator.EvaluatorException;
 import roottemplate.calculator.evaluator.Number;
 
 public class SameNumber extends Number {
@@ -36,11 +37,6 @@ public class SameNumber extends Number {
     public boolean isModifiable() {
         return true;
     }
-
-    @Override
-    public double doubleValue() {
-        return this.n.doubleValue();
-    }
     
     @Override
     public Number copy() {
@@ -53,7 +49,17 @@ public class SameNumber extends Number {
     }
 
     @Override
-    public Number applyOperation(String operation, Number with) {
+    public double toDouble() {
+        return n.toDouble();
+    }
+
+    @Override
+    public String stringValue() {
+        return n.stringValue();
+    }
+
+    @Override
+    public Number applyOperation(String operation, Number with) throws EvaluatorException {
         return this.n.applyOperation(operation, with);
     }
 }

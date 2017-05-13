@@ -23,12 +23,19 @@ import roottemplate.calculator.evaluator.impls.SameNumber;
 
 public class Constant extends SameNumber implements Named {
     private final String name;
+    private final boolean canBeOverridden;
     
     public Constant(String name, double value) {
         this(name, new RealNumber(value));
     }
+
     public Constant(String name, Number value) {
+        this(name, value, false);
+    }
+
+    public Constant(String name, Number value, boolean canBeOverridden) {
         super(value);
+        this.canBeOverridden = canBeOverridden;
         if(!Evaluator.isValidName(name))
             throw new IllegalArgumentException("Unacceptable name: " + name);
         this.name = name;
@@ -38,6 +45,9 @@ public class Constant extends SameNumber implements Named {
     public boolean isModifiable() {
         return false;
     }
+    public boolean canBeOverridden() {
+        return canBeOverridden;
+    }
     
     @Override
     public String getName() {
@@ -46,6 +56,6 @@ public class Constant extends SameNumber implements Named {
 
     @Override
     public String toString() {
-        return "Constant {name: " + name + ", value: " + doubleValue() + "}";
+        return "Constant {name: " + name + ", value: " + stringValue() + "}";
     }
 }

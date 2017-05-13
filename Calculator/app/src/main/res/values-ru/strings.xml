@@ -95,6 +95,24 @@
         <item>Возврат. на дом. после двойного клика</item>
         <item>Возврат. на дом. после одинарного клика</item>
     </string-array>
+    <string-array name="guide_19_functions">
+        <item>sin, cos, tg, ctg; asin, acos, atg, actg</item>
+        <item>sinh, cosh, tanh; asinh, acosh, atanh</item>
+        <item>&#x221A;, log, lg, ln</item>
+        <item>abs</item>
+        <item>floor</item>
+        <item>gcd</item>
+        <item>arg, conjugate</item>
+    </string-array>
+    <string-array name="guide_19_remarks">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Модуль числа</item>
+        <item>Целая часть от числа</item>
+        <item>Наибольший общий делитель</item>
+        <item>Функции получения аргумента и сопряженного числа (для комплексных чисел)</item>
+    </string-array>
 
     <string name="yotta">И</string>
     <string name="zetta">З</string>
@@ -240,6 +258,9 @@
         («В виде дроби»).
         \n\n\tВнимание! Если вы попробуете перевести в дробь число с очень большим знаменателем или даже иррациональное,
         приложение выведет приблезительно равную дробь. Попробуйте сделать это с числом &#x3c0;!</string>
+    <string name="guide_19_title">Полный список математических функций</string>
+    <string name="guide_19_title_functions">Функции</string>
+    <string name="guide_19_title_remark">Примечание</string>
     <string name="guide_final_title">Это всё</string>
     <string name="guide_final_text">Теперь вы всё знаете о приложении.</string>
 
@@ -336,5 +357,11 @@
     <string name="dialog_asFraction_currentMaxQ">Знаменатель &lt; %1$s.</string>
     <string name="dialog_asFraction_findAccurateValue">Найти более точную дробь</string>
     <string name="dialog_asFraction_toFraction">В дробь</string>
-    <string name="message_emptyPage">На странице нет кнопок</string>
+    <string name="message_emptyPage">На этой странице нет добавленных кнопок</string>
+    <string name="keyboards_editButton_overridePageReturn">Переопределить тип возврата на домашнюю страницу</string>
+    <string name="keyboards_editButton_pageReturnWarn">При нажатии этой кнопки возврат на домашнюю страницу будет происходить как указано, независимо от того, какой тип выбран в настройках страницы.</string>
+    <string name="keyboards_message_advancedSettingsTurnedOff">Расширенные настройки больше не отображаются, но их значения не удалены. Вы можете вернуться к редактированию, включив их отображение снова.</string>
+    <string name="keyboards_message_advancedSettingsTurnedOff_title">Расширенные настройки отключены</string>
+    <string name="action_advancedSettings">Расширенные настройки</string>
+    <string name="dialog_kitsUpdated_message_lookAtDefault">Взгляните на набор, доступный по умолчанию, поскольку там могут быть новые интересные функции</string>
 </resources>

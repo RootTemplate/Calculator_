@@ -24,8 +24,6 @@ import java.util.*;
 import roottemplate.calculator.evaluator.ExpressionElement.ElementType;
 import roottemplate.calculator.evaluator.impls.*;
 
-// TODO: casting numbers
-
 public class Evaluator {
     public static final char[] RESERVED_CHARS = "(){}[]#E.,;".toCharArray();
     public static boolean isValidName(String name) {
@@ -43,6 +41,7 @@ public class Evaluator {
     public final Processor processor;
     private Evaluator parent;
     private PriorityManager priorityManager;
+    private final ArrayList<Number.NumberManager> numberManagers;
     private final HashMap<Character, CharacterLine> namespace;
     private final ArrayList<Modifier> modifiers;
     private final HashSet<Object> standardList;
@@ -56,6 +55,7 @@ public class Evaluator {
         this.modifiers = new ArrayList<>();
         this.standardList = new HashSet<>();
         this.processor = new Processor(this);
+        this.numberManagers = parent != null ? parent.numberManagers : new ArrayList<Number.NumberManager>(2);
         
         changeParent(parent);
         if(parent == null)
@@ -63,48 +63,62 @@ public class Evaluator {
     }
 
     private void setupStandardNamespace() {
-        PriorityManager priorityManager = this.priorityManager;
+        PriorityManager prMn = this.priorityManager;
         Evaluator.Options options = this.options;
+
+        numberManagers.add(RealNumber.NUMBER_MANAGER);
+        numberManagers.add(ComplexNumber.NUMBER_MANAGER);
 
         Operator higherMultiplyOp;
         add(new BracketsReader(), true);
-        add(new Operator(priorityManager.createPriority("+-", true), "+"), true);
-        Named minusOp = new Operator(priorityManager.createPriority("+-", true), "-"); // Must be added after negate
-        add(new Operator(priorityManager.createPriority("* /", true), "*"), true);
-        add(new Operator(priorityManager.createPriority("* /", true), "/"), true);
-        higherMultiplyOp = new Operator(priorityManager.createPriority("HIGH_MULTIPLY", true), "*", Operator.Uses.TWO_NUMBERS);
-        add(new Operator(priorityManager.createPriority(Function.PRIORITY_FRIENDLY_NAME, Function.PRIORITY_LEFT_DIRECTION),
+        add(new Operator(prMn.createPriority("+-", true), "+"), true);
+        Named minusOp = new Operator(prMn.createPriority("+-", true), "-"); // Must be added after negate
+        add(new Operator(prMn.createPriority("* /", true), "*"), true);
+        add(new Operator(prMn.createPriority("* /", true), "/"), true);
+        higherMultiplyOp = new Operator(prMn.createPriority("HIGH_MULTIPLY", true), "*", Operator.Uses.TWO_NUMBERS);
+        add(new Operator(prMn.createPriority(Function.PRIORITY_FRIENDLY_NAME, Function.PRIORITY_LEFT_DIRECTION),
                 "^", false), true);
 
-        add(new TrigonometricFunction(priorityManager, "sin", options), true);
-        add(new TrigonometricFunction(priorityManager, "cos", options), true);
-        add(new TrigonometricFunction(priorityManager, "tan", options), true); // tan
-        add(new TrigonometricFunction(priorityManager, "tan", "tg", options), true); // tg
-        add(new CotangentFunctions.CtgFunction(priorityManager, "cot", options), true);
-        add(new CotangentFunctions.CtgFunction(priorityManager, "ctg", options), true); // ctg
-        add(new TrigonometricFunction(priorityManager, "asin", options), true);
-        add(new TrigonometricFunction(priorityManager, "acos", options), true);
-        add(new TrigonometricFunction(priorityManager, "atan", options), true); // atan
-        add(new TrigonometricFunction(priorityManager, "atan", "atg", options), true); // atg
-        add(new CotangentFunctions.ArcctgFunction(priorityManager, "acot", options), true);
-        add(new CotangentFunctions.ArcctgFunction(priorityManager, "actg", options), true); // actg
+        add(new TrigonometricFunction(prMn, "sin", options), true);
+        add(new TrigonometricFunction(prMn, "cos", options), true);
+        add(new TrigonometricFunction(prMn, "tan", options), true); // tan
+        add(new TrigonometricFunction(prMn, "tan", "tg", options), true); // tg
+        add(new CotangentFunctions.CtgFunction(prMn, "cot", options), true);
+        add(new CotangentFunctions.CtgFunction(prMn, "ctg", options), true); // ctg
+        add(new TrigonometricFunction(prMn, "asin", options), true);
+        add(new TrigonometricFunction(prMn, "acos", options), true);
+        add(new TrigonometricFunction(prMn, "atan", options), true); // atan
+        add(new TrigonometricFunction(prMn, "atan", "atg", options), true); // atg
+        add(new CotangentFunctions.ArcctgFunction(prMn, "acot", options), true);
+        add(new CotangentFunctions.ArcctgFunction(prMn, "actg", options), true); // actg
 
-        add(new NativeFunction(priorityManager, "toRadians", "torad"), true);
-        add(new NativeFunction(priorityManager, "toDegrees", "todeg"), true);
-        add(new NativeFunction(priorityManager, "log10", "lg"), true);
-        add(new NativeFunction(priorityManager, "log", "ln"), true);
-        add(new LogFunction(priorityManager), true); // log. Base-e if 1 arg. Args: "n" or "base, n"
-        add(new NativeFunction(priorityManager, "abs"), true);
-        add(new NativeFunction(priorityManager, "round"), true);
-        add(new NativeFunction(priorityManager, "sqrt"), true);
-        add(new NativeFunction(priorityManager, "cbrt"), true);
-        add(new RootFunction(priorityManager, "root", false), true); // Args: "n" or "thRoot, n"
+        add(new NativeFunction(prMn, "sinh"));
+        add(new NativeFunction(prMn, "cosh"));
+        add(new NativeFunction(prMn, "tanh"));
+        add(new NativeFunction(prMn, "asinh"));
+        add(new NativeFunction(prMn, "acosh"));
+        add(new NativeFunction(prMn, "atanh"));
 
-        add(new RootFunction(priorityManager, "\u221A", true), true); // Unicode root
-        add(new NegateOperator(priorityManager), true); // Negate
+        add(new NativeFunction(prMn, "toRadians", "torad"), true);
+        add(new NativeFunction(prMn, "toDegrees", "todeg"), true);
+        add(new NativeFunction(prMn, "log10", "lg"), true);
+        add(new NativeFunction(prMn, "log", "ln"), true);
+        add(new LogFunction(prMn), true); // log. Base-e if 1 arg. Args: "n" or "base, n"
+        add(new NativeFunction(prMn, "abs"), true);
+        add(new NativeFunction(prMn, "gcd", "gcd", true), true);
+        add(new NativeFunction(prMn, "floor"), true);
+        add(new NativeFunction(prMn, "sqrt"), true);
+        add(new NativeFunction(prMn, "cbrt"), true);
+        add(new RootFunction(prMn, "root", false), true); // Args: "n" or "thRoot, n"
+
+        add(new ComplexNumberFunctions.Arg(prMn, options)); // arg(), returns argument of a complex number
+        add(new ComplexNumberFunctions.Conjugate(prMn)); // conjugate()
+
+        add(new RootFunction(prMn, "\u221A", true), true); // Unicode root
+        add(new NegateOperator(prMn), true); // Negate
         add(minusOp, true);
 
-        add(new Operator(priorityManager.createPriority("!", true), "!", Operator.Uses.ONE_LEFT_NUMBER), true);
+        add(new Operator(prMn.createPriority("!", true), "!", Operator.Uses.ONE_LEFT_NUMBER), true);
 
         add(new Constant("PI", Math.PI), true);
         add(new Constant("\u03C0", Math.PI), true);
@@ -113,11 +127,12 @@ public class Evaluator {
         add(new Constant("\u221E", Double.POSITIVE_INFINITY), true);
         add(new Constant("NaN", Double.NaN), true);
         add(new Constant("%", 0.01), true);
+        add(new Constant("i", new ComplexNumber(0, 1), true), true);
         add(new Variable("x"), true);
         add(new Variable("y"), true);
 
         addModifier(new StandardPreevaluator(higherMultiplyOp), true);
-        addModifier(new Number.NumberReader(), true);
+        addModifier(new Number.NumberReader(numberManagers), true);
     }
 
     public void changeParent(Evaluator newParent) {
@@ -172,8 +187,18 @@ public class Evaluator {
         if(isStandard)
             standardList.add(m);
     }
-    
-    public void addAll() {}
+
+    public void addNumberManager(Number.NumberManager nm) {
+        int absLevel = nm.getAbstractionLevel();
+        ListIterator<Number.NumberManager> it = numberManagers.listIterator();
+        while(it.hasNext())
+            if(it.next().getAbstractionLevel() > absLevel) {
+                it.previous();
+                it.add(nm);
+                return;
+            }
+        it.add(nm);
+    }
     
     public Named get(String name) {
         return get(name, 0, null);
@@ -188,6 +213,8 @@ public class Evaluator {
         return get(name, 3, null);
     }
     private Named get(String name, int what, Operator.Uses uses) {
+        if(name.isEmpty()) return null;
+
         char c = name.charAt(0);
         Evaluator cur = this;
         while(cur != null) {
@@ -296,6 +323,10 @@ public class Evaluator {
             cur = cur.parent;
         }
         return false;
+    }
+
+    public boolean removeNumberManager(Number.NumberManager nm) {
+        return numberManagers.remove(nm);
     }
 
     public void clearNamespace() {

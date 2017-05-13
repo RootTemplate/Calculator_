@@ -28,19 +28,25 @@ public class NativeFunction extends Function {
         this(prManager, name, name);
     }
     public NativeFunction(PriorityManager prManager, String realName, String name) {
-        super(prManager, realName, name, 1);
+        this(prManager, realName, name, false);
+    }
+    public NativeFunction(PriorityManager prManager, String realName, String name, boolean twoArgs) {
+        super(prManager, realName, name, twoArgs ? 2 : 1);
     }
     protected NativeFunction(PriorityManager.PriorityStorage prStorage, String realName, String name) {
-        super(prStorage, realName, name, 1);
+        this(prStorage, realName, name, false);
+    }
+    protected NativeFunction(PriorityManager.PriorityStorage prStorage, String realName, String name, boolean twoArgs) {
+        super(prStorage, realName, name, twoArgs ? 2 : 1);
     }
 
     @Override
     protected Number eval0(Number... numbers) throws EvaluatorException {
-        return numbers[0].applyOperation(realName);
+        return numbers[0].applyOperation(realName, argsCount > 1 ? numbers[1] : null);
     }
 
     @Override
     public String toString() {
-        return super.toString() + "method: " + realName + "}";
+        return super.toString() + "method: " + realName + ", argsCount: " + argsCount + "}";
     }
 }

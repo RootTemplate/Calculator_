@@ -52,6 +52,12 @@ public class KeyboardKits {
             }
             return null;
         }
+
+        public static PageReturnType getValueOf(String str) {
+            if(str == null) return null;
+            return str.equalsIgnoreCase("ifDouble") ? PageReturnType.IF_DOUBLE_CLICK :
+                    PageReturnType.valueOf(str.toUpperCase());
+        }
     }
 
     public static class Button {
@@ -61,30 +67,49 @@ public class KeyboardKits {
         public int mLocaleEastId;
         public boolean mEnableCaseInverse;
         public ButtonCategory mCategory;
+        public PageReturnType mOverriddenPageReturn;
 
         public Button(String name, String text, String type, int localeEast, boolean inverseOnLongClick,
-                      ButtonCategory category) {
+                      ButtonCategory category, String pageReturn) {
             this(name, text, ButtonType.valueOf(type.toUpperCase()), localeEast, inverseOnLongClick,
-                    category);
+                    category, PageReturnType.getValueOf(pageReturn));
         }
         public Button(String text, ButtonType type, boolean enableCaseInverse, ButtonCategory category) {
             this(text, text, type, -1, enableCaseInverse, category);
         }
         public Button(String name, String text, ButtonType type, int localeEastId, boolean enableCaseInverse,
                       ButtonCategory category) {
+            this(name, text, type, localeEastId, enableCaseInverse, category, null);
+        }
+        public Button(String name, String text, ButtonType type, int localeEastId, boolean enableCaseInverse,
+                      ButtonCategory category, PageReturnType pageReturn) {
             mName = name;
             mText = text;
             mType = type;
             mLocaleEastId = localeEastId;
             mEnableCaseInverse = enableCaseInverse;
             mCategory = category;
+            mOverriddenPageReturn = pageReturn;
+        }
+
+        public void dumpToXml(XmlSerializer f, int btnId) throws IOException {
+            f.startTag("", "Button")
+                    .attribute("", "id", Integer.toString(btnId))
+                    .attribute("", "name", mName)
+                    .attribute("", "text", mText)
+                    .attribute("", "type", mType.toString())
+                    .attribute("", "enableCaseInverse", Boolean.toString(mEnableCaseInverse));
+                    // Custom buttons cannot have localeEastId
+            if(mOverriddenPageReturn != null)
+                f.attribute("", "overriddenPageReturn", mOverriddenPageReturn.toString());
+            f.endTag("", "Button");
         }
 
         @Override
         public String toString() {
             return "Button {name: " + mName + ", text: " + mText + ", type: " + mType.toString() +
                     ", localeEast: " + mLocaleEastId + ", enableCaseInverse: " + mEnableCaseInverse
-                    + ", category: " + mCategory + "}";
+                    + ", category: " + mCategory + ", pageReturn: " + mOverriddenPageReturn + "}";
         }
     }
 
@@ -95,10 +120,7 @@ public class KeyboardKits {
         public int[][] mButtons;
 
         public Page(String moveToMain, boolean isVerticalOrient, int[][] buttons) {
-            this(moveToMain != null ? (moveToMain.equalsIgnoreCase("ifDouble") ?
-                            PageReturnType.IF_DOUBLE_CLICK : PageReturnType.valueOf(moveToMain.toUpperCase()))
-                    : null,
-                    isVerticalOrient, buttons);
+            this(PageReturnType.getValueOf(moveToMain), isVerticalOrient, buttons);
         }
         public Page(PageReturnType moveToMain, boolean isVerticalOrient, int[][] buttons) {
             mMoveToMain = moveToMain;
@@ -282,14 +304,7 @@ public class KeyboardKits {
         ListIterator<Button> it = mButtons.listIterator(DEFAULT_BUTTONS_COUNT);
         for(int i = -1; it.hasNext(); i--) {
             Button btn = it.next();
-            f.startTag("", "Button")
-                    .attribute("", "id", Integer.toString(i))
-                    .attribute("", "name", btn.mName)
-                    .attribute("", "text", btn.mText)
-                    .attribute("", "type", btn.mType.toString())
-                    .attribute("", "enableCaseInverse", Boolean.toString(btn.mEnableCaseInverse))
-                    .endTag("", "Button");
-            // Custom buttons cannot have localeEastId
+            btn.dumpToXml(f, i);
         }
         f.endTag("", "CustomButtons");
         f.startTag("", "Kits");
@@ -404,7 +419,7 @@ public class KeyboardKits {
                         new Page(PageReturnType.IF_DOUBLE_CLICK, true, new int[][] {
                                 new int[] {57, 58, 59, 60, 61},
                                 new int[] {42, 43, 44, 45, 46},
-                                new int[] {47, 48, 49, 50, 51},
+                                new int[] {48, 63, 49, 50, 51},
                                 new int[] {52, 53, 54, 55, 56},
                                 new int[] {41, 14, 11, 15, 29},
                         }),

@@ -25,7 +25,7 @@
     android:paddingTop="5dp">
 
     <Spinner
-        android:id="@+id/editKit_fullName"
+        android:id="@+id/editPage_linesOrient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/editKit_fullName"
+        android:layout_below="@+id/editPage_linesOrient"
         android:layout_marginTop="10dp"
         android:entries="@array/keyboards_editPage_returnToMain" />
 

@@ -143,7 +143,8 @@ public class KeyboardKitsXmlManager {
                                 parser.getAttributeValue(null, "type"),
                                 localeEast,
                                 Boolean.parseBoolean(parser.getAttributeValue(null, "enableCaseInverse")),
-                                KeyboardKits.ButtonCategory.CUSTOM
+                                KeyboardKits.ButtonCategory.CUSTOM,
+                                parser.getAttributeValue(null, "overriddenPageReturn")
                         )
                 );
             } catch(Exception e) {

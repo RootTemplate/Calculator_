@@ -277,7 +277,8 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
             if(mTextType == TextType.RESULT_NUMBER && mNumberReplacement != null) {
                 Editable text = getText();
                 text.replace(0, text.length(), mNumberReplacement);
-            }
+            } else if(mTextType == TextType.RESULT_MESSAGE)
+            	super.setText("");
         } else {
             setTextColor(getResources().getColor(R.color.colorEquals));
             paint.setColor(getResources().getColor(R.color.colorInputSeparatorResult));

@@ -16,14 +16,75 @@
  * You should have received a copy of the GNU General Public License
  * along with Calculator_ Engine (Evaluator).  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/*
+    Some methods below were taken from:
+        Arity, a java library by Javia, which is licensed under Apache License v. 2.0
+    The methods are:
+        - asinh, acosh, atanh, gcd, lgamma, factorial, isPiMultiple
+    And field:
+        - GAMMA, FACT
+    Some methods were also modified:
+        - sin, cos, tan
+
+    Previous class location of MoreMath:
+        org.javia.arity.MoreMath
+        http://javia.org.
+    Source code:
+        https://github.com/Xlythe/Arity/blob/master/src/org/javia/arity/MoreMath.java
+
+    The copyright of the library is represented below.
+ */
+
+/*
+ * Copyright (C) 2008-2009 Mihai Preda.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package roottemplate.calculator.evaluator;
 
-/* !!!SOME!!! OF THE CODE BELOW HAS BEEN TAKEN FROM Arity PROJECT BY Javia */
-/* PREVIOUS CLASS LOCATION: org.javia.arity.MoreMath. License: Apache License v. 2 */
-/* Javia's Copyright (C) 2007-2008 Mihai Preda. */
-/* http://javia.org. SOURCE: https://github.com/Xlythe/Arity/blob/master/src/org/javia/arity/MoreMath.java */
 public class MoreMath {
-    static final double GAMMA[] = {
+    public static final double LOG10 = Math.log(10);
+
+    public static final double asinh(double x) {
+        return (x < 0) ? -asinh(-x) : Math.log(x + x + 1/(Math.sqrt(x*x + 1) + x));
+    }
+
+    public static final double acosh(double x) {
+        return Math.log(x + x - 1/(Math.sqrt(x*x - 1) + x));
+    }
+
+    public static final double atanh(double x) {
+        return (x < 0) ? -atanh(-x) : 0.5 * Math.log(1. + (x + x)/(1 - x));
+    }
+
+    public static final double gcd(double x, double y) {
+        if (Double.isNaN(x) || Double.isNaN(y) ||
+                Double.isInfinite(x) || Double.isInfinite(y)) {
+            return Double.NaN;
+        }
+        x = Math.abs(x);
+        y = Math.abs(y);
+        while (x < y * 1e15) {
+            final double save = y;
+            y = x % y;
+            x = save;
+        }
+        return x;
+    }
+
+    public static final double GAMMA[] = {
         57.156235665862923517,
         -59.597960355475491248,
         14.136097974741747174,
@@ -122,17 +183,17 @@ public class MoreMath {
         return Math.tan(x);
     }
 
-    public static double root(double number, long round) {
-        if(round == 2)
+    public static double root(double number, long of) {
+        if(of == 2)
             return Math.sqrt(number);
-        if(round == 3)
+        if(of == 3)
             return Math.cbrt(number);
         if(number < 0) {
-            if(round % 2 == 0)
+            if(of % 2 == 0)
                 return Double.NaN;
-            return -Math.pow(-number, 1 / (double) round);
+            return -Math.pow(-number, 1 / (double) of);
         } else
-            return Math.pow(number, 1 / (double) round);
+            return Math.pow(number, 1 / (double) of);
     }
 
     public static double log(double n, double base) {
