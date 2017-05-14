@@ -295,7 +295,7 @@
         <item>Last 30 entries</item>
         <item>Last 50 entries</item>
         <item>Last 100 entries</item>
-        <item>Last 200 entries</item>
+        <item>Last 300 entries</item>
     </string-array>
     <string-array name="pref_storingNamespace_list_entries">
         <item>Until app is closed</item>
@@ -347,7 +347,7 @@
         <item>30</item>
         <item>50</item>
         <item>100</item>
-        <item>200</item>
+        <item>300</item>
     </string-array>
     <string-array name="pref_storingNamespace_list_values" translatable="false">
         <item>0</item>

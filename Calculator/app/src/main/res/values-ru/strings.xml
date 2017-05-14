@@ -50,7 +50,7 @@
         <item>Последние 30 вычислений</item>
         <item>Последние 50 вычислений</item>
         <item>Последние 100 вычислений</item>
-        <item>Последние 200 вычислений</item>
+        <item>Последние 300 вычислений</item>
     </string-array>
     <string-array name="pref_digitGrouping_separator_entries">
         <item>Нет</item>
