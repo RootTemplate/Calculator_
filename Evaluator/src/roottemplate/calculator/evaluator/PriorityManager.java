@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +39,6 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         PriorityStorage elem = it.previous();
         if(elem.leftDirection != leftDirection)
             throw new IllegalArgumentException("Priority with name \"" + name + "\" already defined with wrong leftDirection");
-        elem.usingCount++;
         return elem;
     }
     private void add(ListIterator<PriorityStorage> it, PriorityStorage storage) {
@@ -51,13 +49,13 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         } 
     }
     
-    public PriorityStorage createPriority(int priority, boolean isLeftDirection) {
-        return PriorityManager.this.createPriority(null, priority, isLeftDirection);
+    public PriorityStorage create(int priority, boolean isLeftDirection) {
+        return PriorityManager.this.create(null, priority, isLeftDirection);
     }
-    public PriorityStorage createPriority(String friendlyName, boolean isLeftDirection) {
-        return PriorityManager.this.createPriority(friendlyName, priorities.size(), isLeftDirection);
+    public PriorityStorage create(String friendlyName, boolean isLeftDirection) {
+        return PriorityManager.this.create(friendlyName, priorities.size(), isLeftDirection);
     }
-    public PriorityStorage createPriority(String friendlyName, int priority, boolean isLeftDirection) {
+    public PriorityStorage create(String friendlyName, int priority, boolean isLeftDirection) {
         if(priority < 0) throw new IllegalArgumentException("Negative priority: " + priority);
         ListIterator<PriorityStorage> it = getListItrByFriendlyName(friendlyName);
         if(it != null) return onCreateAlreadyDefined(it, friendlyName, isLeftDirection);
@@ -69,7 +67,7 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         updatePrioritiesStorage(it, 1);
         return elem;
     }
-    public PriorityStorage createPriority(String after, String friendlyName, boolean isLeftDirection) {
+    public PriorityStorage create(String after, String friendlyName, boolean isLeftDirection) {
         ListIterator<PriorityStorage> it = getListItrByFriendlyName(friendlyName);
         if(it != null) return onCreateAlreadyDefined(it, friendlyName, isLeftDirection);
         it = getListItrByFriendlyName(after);
@@ -90,21 +88,18 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         return (priorities.size() > priority) ? priorities.get(priority) : null;
     }
     
-    private boolean removeIfNeeded(ListIterator<PriorityStorage> it) {
+    private boolean remove(ListIterator<PriorityStorage> it) {
         if(it == null) return false;
-        PriorityStorage elem = it.next();
-        if(--elem.usingCount <= 0) {
-            it.remove();
-            updatePrioritiesStorage(it, -1);
-            return true;
-        }
-        return false;
+        it.remove();
+        updatePrioritiesStorage(it, -1);
+        return true;
     }
-    public boolean removeIfNeeded(int priority) {
-        if(priority >= priorities.size()) return false;
-        return removeIfNeeded(priorities.listIterator(priority));
+    public boolean remove(int priority) {
+        return priority < priorities.size() && remove(priorities.listIterator(priority));
     }
-    public boolean removeIfNeeded(String friendlyName) { return removeIfNeeded(getListItrByFriendlyName(friendlyName)); }
+    public boolean remove(String friendlyName) {
+        return remove(getListItrByFriendlyName(friendlyName));
+    }
 
     @Override
     public Iterator<PriorityStorage> iterator() { return listIterator(0); }
@@ -128,8 +123,6 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         private int priority;
         public final String friendlyName;
         public final boolean leftDirection; // true if left to right direction
-        private int usingCount = 1;
-        
         
         private PriorityStorage(int priority, String friendlyName, boolean leftDirection) {
             this.priority = priority;
@@ -138,7 +131,6 @@ public class PriorityManager implements Iterable<PriorityManager.PriorityStorage
         }
         
         public int getPriority() { return priority; }
-        public int getUsingCount() { return usingCount; }
         
         public boolean wouldBeExecutedBeforeThen(PriorityStorage storage, boolean isThisBefore) {
             if(priority != storage.priority) return priority > storage.priority;

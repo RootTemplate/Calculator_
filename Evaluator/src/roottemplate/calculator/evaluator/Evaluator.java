@@ -1,8 +1,7 @@
 /*
- * Copyright 2016 RootTemplate Group 1
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,10 +21,11 @@ package roottemplate.calculator.evaluator;
 import java.util.*;
 
 import roottemplate.calculator.evaluator.ExpressionElement.ElementType;
-import roottemplate.calculator.evaluator.impls.*;
+import roottemplate.calculator.evaluator.namespace.*;
+import static roottemplate.calculator.evaluator.PriorityManager.PriorityStorage;
 
 public class Evaluator {
-    public static final char[] RESERVED_CHARS = "(){}[]#E.,;".toCharArray();
+    public static final char[] RESERVED_CHARS = "(){}[]#E.,;%".toCharArray();
     public static boolean isValidName(String name) {
         if(name.isEmpty()) return false;
         
@@ -69,15 +69,28 @@ public class Evaluator {
         numberManagers.add(RealNumber.NUMBER_MANAGER);
         numberManagers.add(ComplexNumber.NUMBER_MANAGER);
 
-        Operator higherMultiplyOp;
+        PriorityStorage st1 = prMn.create("+-", true);
+        PriorityStorage st2 = prMn.create("*/", true);
+        PriorityStorage st3 = prMn.create("HIGH_MULTIPLY", true);
+        PriorityStorage st4 = prMn.create(Function.PRIORITY_NAME_NO_BRACKETS, false);
+        PriorityStorage st5 = prMn.create("!%", true);
+        PriorityStorage st6 = prMn.create(Function.PRIORITY_NAME_BRACKETS, false);
+        PriorityStorage st7 = prMn.create("%_HELPER", false);
+
+        Operator multiplyOp;
+        Operator higherMultiplyOp = new Operator(st3, "*", Operator.Uses.TWO_NUMBERS);
+
         add(new BracketsReader(), true);
-        add(new Operator(prMn.createPriority("+-", true), "+"), true);
-        Named minusOp = new Operator(prMn.createPriority("+-", true), "-"); // Must be added after negate
-        add(new Operator(prMn.createPriority("* /", true), "*"), true);
-        add(new Operator(prMn.createPriority("* /", true), "/"), true);
-        higherMultiplyOp = new Operator(prMn.createPriority("HIGH_MULTIPLY", true), "*", Operator.Uses.TWO_NUMBERS);
-        add(new Operator(prMn.createPriority(Function.PRIORITY_FRIENDLY_NAME, Function.PRIORITY_LEFT_DIRECTION),
-                "^", false), true);
+        add(new Operator(st1, "+"), true);
+        Named minusOp = new Operator(st1, "-"); // Must be added after negate
+        add(multiplyOp = new Operator(st2, "*"), true);
+        add(new Operator(st2, "/"), true);
+        add(new Operator(st4, "^", false), true);
+        add(new RootFunction(st4, "\u221A"), true); // Unicode root
+        add(new NegateOperator(st4), true); // Negate
+        add(new Operator(st5, "!", Operator.Uses.ONE_LEFT_NUMBER), true);
+        add(new PercentOperator(st5, st7), true);
+        add(minusOp, true);
 
         add(new TrigonometricFunction(prMn, "sin", options), true);
         add(new TrigonometricFunction(prMn, "cos", options), true);
@@ -109,16 +122,10 @@ public class Evaluator {
         add(new NativeFunction(prMn, "floor"), true);
         add(new NativeFunction(prMn, "sqrt"), true);
         add(new NativeFunction(prMn, "cbrt"), true);
-        add(new RootFunction(prMn, "root", false), true); // Args: "n" or "thRoot, n"
+        add(new RootFunction(prMn, "root"), true); // Args: "n" or "thRoot, n"
 
         add(new ComplexNumberFunctions.Arg(prMn, options)); // arg(), returns argument of a complex number
         add(new ComplexNumberFunctions.Conjugate(prMn)); // conjugate()
-
-        add(new RootFunction(prMn, "\u221A", true), true); // Unicode root
-        add(new NegateOperator(prMn), true); // Negate
-        add(minusOp, true);
-
-        add(new Operator(prMn.createPriority("!", true), "!", Operator.Uses.ONE_LEFT_NUMBER), true);
 
         add(new Constant("PI", Math.PI), true);
         add(new Constant("\u03C0", Math.PI), true);
@@ -126,12 +133,11 @@ public class Evaluator {
         add(new Constant("Infinity", Double.POSITIVE_INFINITY), true);
         add(new Constant("\u221E", Double.POSITIVE_INFINITY), true);
         add(new Constant("NaN", Double.NaN), true);
-        add(new Constant("%", 0.01), true);
         add(new Constant("i", new ComplexNumber(0, 1), true), true);
         add(new Variable("x"), true);
         add(new Variable("y"), true);
 
-        addModifier(new StandardPreevaluator(higherMultiplyOp), true);
+        addModifier(new StandardPreevaluator(options, multiplyOp, higherMultiplyOp), true);
         addModifier(new Number.NumberReader(numberManagers), true);
     }
 
@@ -536,5 +542,10 @@ public class Evaluator {
         public int ANGLE_MEASURING_UNITS = 1;
         
         public boolean ENABLE_HASH_COMMANDS = false;
+
+        /**
+         * If true, then it will replace (e.g.) "100+15%" with "100*115%".
+         */
+        public boolean USE_PERCENT_HELPER = true;
     }
 }

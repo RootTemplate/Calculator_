@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 RootTemplate Group 1
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
@@ -40,13 +40,11 @@
 package roottemplate.calculator.evaluator.util;
 
 
-import roottemplate.calculator.evaluator.MoreMath;
-
 /**
- A complex value, composed of the real part (re) and the imaginary part (im).
- All the methods that return a Complex (such as add(), mul(), etc)
- modify the object on which they are called and return it (this), in order
- to avoid new object creation.
+ * A complex value, composed of the real part (re) and the imaginary part (im).
+ * All the methods that return a Complex (such as add(), mul(), etc)
+ * modify the object on which they are called and return it (this), in order
+ * to avoid new object creation.
  */
 public class Complex {
     /** The real component. */

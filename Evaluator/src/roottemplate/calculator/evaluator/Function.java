@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,25 +21,34 @@ import roottemplate.calculator.evaluator.PriorityManager.PriorityStorage;
 import roottemplate.calculator.evaluator.util.IndexedString;
 
 public abstract class Function extends Operator {
-    public static final String PRIORITY_FRIENDLY_NAME = "F";
+    public static final String PRIORITY_NAME_BRACKETS = "F()";
+    public static final String PRIORITY_NAME_NO_BRACKETS = "F";
     public static final boolean PRIORITY_LEFT_DIRECTION = false;
     public static final Uses FUNCTION_USES = Uses.RIGHT_NUMBER_ENUM;
-    
-    
-    
+
+    protected final PriorityStorage prStNoBrackets;
     protected final int argsCount;
     
     public Function(PriorityManager prManager, String name, int argsCount) {
         this(prManager, name, name, argsCount);
     }
     public Function(PriorityManager prManager, String realName, String name, int argsCount) {
-        super(prManager.createPriority(PRIORITY_FRIENDLY_NAME, PRIORITY_LEFT_DIRECTION), realName, name, FUNCTION_USES);
+        this(
+                prManager.getPriorityStorageByFriendlyName(PRIORITY_NAME_BRACKETS),
+                prManager.getPriorityStorageByFriendlyName(PRIORITY_NAME_NO_BRACKETS),
+                realName, name, argsCount
+        );
+    }
+    public Function(PriorityStorage prStBrackets, PriorityStorage prStNoBrackets, String realName, String name,
+                    int argsCount) {
+        super(prStBrackets, realName, name, FUNCTION_USES);
+        this.prStNoBrackets = prStNoBrackets;
         this.argsCount = argsCount;
     }
-
-    protected Function(PriorityStorage prStorage, String realName, String name, int argsCount) {
-        super(prStorage, realName, name, FUNCTION_USES);
-        this.argsCount = argsCount;
+    protected Function(Function bracketCopy) {
+        super(bracketCopy.prStNoBrackets, bracketCopy.realName, bracketCopy.name, bracketCopy.uses);
+        prStNoBrackets = null;
+        this.argsCount = bracketCopy.argsCount;
     }
 
     @Override
@@ -51,22 +59,28 @@ public abstract class Function extends Operator {
         return eval0(numbers);
     }
     protected abstract Number eval0(Number... numbers) throws EvaluatorException;
-    
+
+    protected abstract Function copyForNoBrackets();
+
     @Override
-    public boolean checkUses(Object before, IndexedString expr, boolean exactlyThis) {
+    public Operator checkUses(Object before, IndexedString expr, boolean exactlyThis) {
         if(!exactlyThis) {
             int startingIndex = expr.index;
+            boolean brackets = false;
             while(!expr.isEmpty()) {
                 char at = expr.charAt();
                 if(Character.isWhitespace(at))
                     expr.index++;
                 else {
                     expr.index = startingIndex;
-                    return at == '(';
+                    brackets = at == '(';
+                    break;
                 }
             }
+
+            return brackets ? this : copyForNoBrackets();
         }
-        return true;
+        return this;
     }
 
     @Override

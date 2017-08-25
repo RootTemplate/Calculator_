@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,14 +17,7 @@
  */
 package roottemplate.calculator.evaluator;
 
-import roottemplate.calculator.evaluator.impls.StandardExpression;
-
-// Warning: Expression is not an Operator. Impossible to understand if Expression contains modifiable numbers
 public abstract class Expression {
-    public static Expression parse(String expr, Evaluator namespace) throws EvaluatorException {
-        return StandardExpression.createFromString(expr, namespace);
-    }
-    
     /**
      * Evaluates expression.
      * @return result
@@ -37,5 +29,5 @@ public abstract class Expression {
      * Returns <code>EVMCompiler</code> which have compiled this <code>Expression</code>.
      * @return EVMCompiler
      */
-    public abstract EVMCompiler getEVMManager();
+    public abstract EVMCompiler getEVMCompiler();
 }

@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,8 +17,8 @@
  */
 package roottemplate.calculator.evaluator;
 
-import roottemplate.calculator.evaluator.impls.RealNumber;
-import roottemplate.calculator.evaluator.impls.SameNumber;
+import roottemplate.calculator.evaluator.namespace.RealNumber;
+import roottemplate.calculator.evaluator.util.SameNumber;
 
 public class Variable extends SameNumber implements Named {
     private final String name;

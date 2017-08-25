@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -48,7 +47,7 @@ public class Instruction {
         elems[elemIndex] = value;
     }
 
-    public Number do_(Number[] buffer) throws EvaluatorException {
+    public Number execute(Number[] buffer) throws EvaluatorException {
         Number result = op.eval(genNsArray(buffer));
         if(buffer != null) buffer[resultIndex] = result;
         return result;
@@ -64,7 +63,7 @@ public class Instruction {
         return cacheArray;
     }
 
-    public int findUnmodifNumberIndex() {
+    public int findUnmodifiableNumber() {
         int index = 0;
         for(ExpressionElement elem : elems) {
             if(elem.getElementType() == ExpressionElement.ElementType.NUMBER && !((Number) elem).isModifiable())

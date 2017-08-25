@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -121,7 +120,8 @@ public abstract class Reader implements ExpressionElement {
                     Operator op = (Operator) obj;
                     Operator.Uses u = op.getUses();
                     expr.index += name.length(); // Now expr is without name
-                    if(!op.checkUses(before, expr, false)) continue;
+                    op = op.checkUses(before, expr, false);
+                    if(op == null) continue;
                     
                     if(u.doesUseLeft()) {
                         if(before == null) continue;
@@ -153,7 +153,8 @@ public abstract class Reader implements ExpressionElement {
                         }
                     }
 
-                    if(!op.checkUses(before, expr, true)) continue;
+                    obj = op.checkUses(before, expr, true);
+                    if(obj == null) continue;
                 }
                 
                 next = _next;
@@ -177,7 +178,7 @@ public abstract class Reader implements ExpressionElement {
         expr.index = startIndex;
         if(result == null)
             if(throws_)
-                throw new EvaluatorException("Unknown char found at " + (i + 1) + ": " + at, i);
+                throw new EvaluatorException("Unknown element found at " + (i + 1) + ": " + at, i);
             else
                 return new ReadNextResult<>(null, iOffset, null);
 

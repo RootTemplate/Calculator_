@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,9 +17,9 @@
  */
 package roottemplate.calculator.evaluator;
 
-import roottemplate.calculator.evaluator.impls.RealNumber;
+import roottemplate.calculator.evaluator.namespace.RealNumber;
 import java.util.ArrayList;
-import roottemplate.calculator.evaluator.impls.DefaultFunction;
+import roottemplate.calculator.evaluator.namespace.DefaultFunction;
 
 public class Processor {
     private final Evaluator namespace;
@@ -100,7 +99,7 @@ public class Processor {
      * @throws EvaluatorException if exception occur
      */
     public Number eval(String expr) throws EvaluatorException {
-        Number result = Expression.parse(expr, namespace).eval();
+        Number result = StandardExpression.parse(expr, namespace).eval();
 
         Number temp;
         while((temp = result.getNumberManager().castToLowerAbstractionLevel(result)) != null)

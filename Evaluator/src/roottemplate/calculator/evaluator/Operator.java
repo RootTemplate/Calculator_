@@ -1,8 +1,7 @@
-/* 
- * Copyright 2016 RootTemplate Group 1
+/*
+ * Copyright 2016-2017 RootTemplate Group 1
  *
  * This file is part of Calculator_ Engine (Evaluator).
- *
  * Calculator_ Engine (Evaluator) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -50,10 +49,6 @@ public class Operator implements Named {
         this.uses = uses;
         this.isCommutative = isCommutative;
     }
-
-    public Operator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
     @Override
     public String getName() {
@@ -83,35 +78,17 @@ public class Operator implements Named {
     public Number eval(Number... numbers) throws EvaluatorException {
         return numbers[0].applyOperation(realName, uses != Uses.TWO_NUMBERS ? null : numbers[1]);
     }
-    
-    public void compile(ExpressionElement[] elems, EVMCompiler evmc, Object kit,
-            Object... args) throws EvaluatorException {
-        throw new EvaluatorException(toString() + " cannot be compiled"); // TODO
-    }
-    
-    /* Analyzing methods */
-    /* DEPRECATED!!! */
-    /*public Object createGapKit() {
-        return null;
-    }
-    public Number gapEval(Object kit, boolean rightSide, Number... numbers) throws EvaluatorException {
-        return eval(numbers);
-    }
-    // This method must be called after calling gapEval() method!!!
-    public boolean wasGap(Object kit, Number... numbers) {
-        return false;
-    }*/
-    
+
     /**
      * Checks if this operator can be placed in this place
      * @param before The element before
      * @param expr the string expression after the operator
      * @param exactlyThis true if name and uses matches with the string expression,
      * false if name matches but uses haven't been checked yet
-     * @return true if this can be this operator
+     * @return {#code Operator} to place in the {#code Expression} or null if this cannot be this operator.
      */
-    public boolean checkUses(Object before, IndexedString expr, boolean exactlyThis) {
-        return true;
+    public Operator checkUses(Object before, IndexedString expr, boolean exactlyThis) {
+        return this;
     }
     
     
@@ -123,7 +100,6 @@ public class Operator implements Named {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Util.hashCode(this.priority.getPriority());
         hash = 97 * hash + Util.hashCode(this.realName);
         hash = 97 * hash + Util.hashCode(this.uses);
         hash = 97 * hash + (this.isCommutative ? 1 : 0);
@@ -132,23 +108,11 @@ public class Operator implements Named {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        if (obj == null || getClass() != obj.getClass()) return false;
         final Operator other = (Operator) obj;
-        if (this.priority.getPriority() != other.priority.getPriority()) {
-            return false;
-        }
-        if (!Util.equals(this.realName, other.realName)) {
-            return false;
-        }
-        if (this.uses != other.uses) {
-            return false;
-        }
-        return this.isCommutative == other.isCommutative;
+        return Util.equals(this.realName, other.realName) &&
+               this.uses == other.uses &&
+               this.isCommutative == other.isCommutative;
     }
     
     
