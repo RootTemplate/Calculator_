@@ -58,6 +58,11 @@ public class SameNumber extends Number {
     }
 
     @Override
+    public boolean isNaN() {
+        return n.isNaN();
+    }
+
+    @Override
     public Number applyOperation(String operation, Number with) throws EvaluatorException {
         return this.n.applyOperation(operation, with);
     }

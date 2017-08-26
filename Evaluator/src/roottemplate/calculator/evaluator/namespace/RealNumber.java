@@ -137,6 +137,11 @@ public class RealNumber extends Number {
     }
 
     @Override
+    public boolean isNaN() {
+        return Double.isNaN(number);
+    }
+
+    @Override
     public NumberManager getNumberManager() {
         return NUMBER_MANAGER;
     }

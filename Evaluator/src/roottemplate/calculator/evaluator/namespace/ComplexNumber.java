@@ -76,6 +76,11 @@ public class ComplexNumber extends Number {
         return sb.toString();
     }
 
+    @Override
+    public boolean isNaN() {
+        return Double.isNaN(number.re) || Double.isNaN(number.im);
+    }
+
     /**
      * {@inheritDoc}
      * Also supports "conjugate" and "arg" (returns the argument (angle) in polar coordinates) operations.

@@ -50,6 +50,8 @@ public abstract class Number implements ExpressionElement {
      */
     public abstract String stringValue();
 
+    public abstract boolean isNaN();
+
     /**
      * Applies arithmetic operation on this number. Supported operations:
      * <ul>
