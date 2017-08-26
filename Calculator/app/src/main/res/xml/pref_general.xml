@@ -9,14 +9,6 @@
             android:title="@string/pref_doRound_title"
             android:summary="@string/pref_doRound_summary"/>
 
-        <ListPreference
-            android:key="outputType"
-            android:dependency="doRound"
-            android:title="@string/pref_outputType_title"
-            android:entries="@array/pref_outputType_entries"
-            android:entryValues="@array/pref_outputType_values"
-            android:defaultValue="@string/pref_def_outputType" />
-
         <!--<CheckBoxPreference
             android:key="autoBracketClosing"
             android:defaultValue="@bool/pref_def_autoBracketClosing"
@@ -37,21 +29,28 @@
             android:entryValues="@array/pref_amu_list_values"
             android:defaultValue="@string/pref_def_amu" />
 
+        <!--<CheckBoxPreference
+            android:key="usePercentHelper"
+            android:defaultValue="@bool/pref_def_usePercentHelper"
+            android:title="@string/pref_usePercentHelper_title"
+            android:summary="@string/pref_usePercentHelper_summary"/>-->
+
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/pref_category_output" >
 
-        <ListPreference
+        <CheckBoxPreference
             android:key="digitGrouping"
             android:title="@string/pref_digitGrouping_title"
             android:entries="@array/pref_digitGrouping_entries"
             android:entryValues="@array/pref_digitGrouping_values"
-            android:defaultValue="@string/pref_def_digitGrouping" />
+            android:defaultValue="@bool/pref_def_digitGrouping" />
 
         <ListPreference
             android:key="digitGroupingSeparatorLeft"
             android:title="@string/pref_digitGrouping_separator_left_title"
+            android:dependency="digitGrouping"
             android:entries="@array/pref_digitGrouping_separator_entries"
             android:entryValues="@array/pref_digitGrouping_separator_values"
             android:defaultValue="@string/pref_def_digitGrouping_separator_left" />
@@ -59,6 +58,7 @@
         <ListPreference
             android:key="digitGroupingSeparatorFract"
             android:title="@string/pref_digitGrouping_separator_fract_title"
+            android:dependency="digitGrouping"
             android:entries="@array/pref_digitGrouping_separator_entries"
             android:entryValues="@array/pref_digitGrouping_separator_values"
             android:defaultValue="@string/pref_def_digitGrouping_separator_fract" />
@@ -68,6 +68,14 @@
             android:defaultValue="@bool/pref_def_highlightE"
             android:title="@string/pref_highlightE_title"
             android:summary="@string/pref_highlightE_summary" />
+
+        <ListPreference
+            android:defaultValue="@string/pref_def_outputType"
+            android:dependency="doRound"
+            android:entries="@array/pref_outputType_entries"
+            android:entryValues="@array/pref_outputType_values"
+            android:key="outputType"
+            android:title="@string/pref_outputType_title" />
 
     </PreferenceCategory>
 
@@ -149,7 +157,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
+    <!--<PreferenceCategory
         android:title="@string/pref_category_tips">
 
         <CheckBoxPreference
@@ -158,6 +166,6 @@
             android:title="@string/pref_enabledTips_title"
             android:summary="@string/pref_enabledTips_summary" />
 
-    </PreferenceCategory>
+    </PreferenceCategory>-->
 
 </PreferenceScreen>

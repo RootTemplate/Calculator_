@@ -49,16 +49,34 @@ import roottemplate.calculator.util.Util;
 import roottemplate.calculator.view.SystemButton;
 
 public class KeyboardKitsXmlManager {
+    public static final int LAST_UPDATED_KEYBOARD_KITS_VERSION = 15;
     public static final String PADS_FILENAME = "keyboard_kits.xml";
 
     public static void invalidateInstalledKeyboardKits(Context context) {
         context.deleteFile(PADS_FILENAME);
     }
-    public static void updateInstalledKeyboardKits(Context context, int curVersion, int latestVersion) {
+    public static void updateInstalledKeyboardKits(Context context, int curVersion) {
         if(curVersion <= 12)
             invalidateInstalledKeyboardKits(context);
         else {
-            // Do nothing
+            if(curVersion < 15) {
+                // Was removed "NaN" button with id=26
+                try {
+                    KeyboardKits kits = parse(context);
+                    for(KeyboardKits.Kit kit : kits.mKits)
+                        for(KeyboardKits.KitVersion kitVer : kit.mKitVersions)
+                            for(KeyboardKits.Page page : kitVer.mPages)
+                                for(int[] butRow : page.mButtons)
+                                    for(int i = 0; i < butRow.length; i++)
+                                        if (butRow[i] >= 26 && butRow[i] <= 65)
+                                            // However, the first custom button will also be replaced with RAD/DEG
+                                            butRow[i]--;
+                    invalidateInstalledKeyboardKits(context, kits);
+                } catch (XmlPullParserException | IOException e) {
+                    Log.e(Util.LOG_TAG, "Error while updating KeyboardKits from " + curVersion + " to 15.", e);
+                    invalidateInstalledKeyboardKits(context);
+                }
+            }
         }
     }
 

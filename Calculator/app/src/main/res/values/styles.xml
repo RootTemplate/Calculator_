@@ -119,7 +119,7 @@
         <item name="textAllCaps">false</item>
         <item name="android:textStyle">normal</item>
         <item name="android:typeface">sans</item>
-        <item name="android:stateListAnimator">@null</item>
+        <!--<item name="android:stateListAnimator">@null</item>-->
     </style>
 
     <style name="panelElem.button.base" parent="panelElem.button">

@@ -64,7 +64,7 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
 
     private final ExpressionFormatUpdater mUpdater = new ExpressionFormatUpdater(DIGIT_DELIMITER, '.', 0);
     private byte mExprDigitGroupingMask;
-    private byte mExprWhenGroupDigits;
+    private boolean mExprDoGroupDigits;
     private String mDigitSeparatorLeft;
     private String mDigitSeparatorFract;
     private boolean mHighlightE;
@@ -142,13 +142,13 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
         setSelection(u.cursor());
     }
 
-    public void initDigitFormatting(int when, int left, int fractional, boolean highlightE) {
+    public void initDigitFormatting(boolean doGroup, int left, int fractional, boolean highlightE) {
         int mask = 0;
         if(left > 0) mask |= ExpressionFormatter.DIGIT_GROUPING_LEFT;
         if(fractional > 0) mask |= ExpressionFormatter.DIGIT_GROUPING_FRACTIONAL;
 
         mExprDigitGroupingMask = (byte) mask;
-        mExprWhenGroupDigits = (byte) when;
+        mExprDoGroupDigits = doGroup;
         mDigitSeparatorLeft = intToDigitSeparator(left);
         mDigitSeparatorFract = intToDigitSeparator(fractional);
         mHighlightE = highlightE;
@@ -261,11 +261,7 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
     public void setTextType(TextType type) {
         if(type == mTextType) return;
 
-        int mask;
-        if (mExprWhenGroupDigits == 2 || (mExprWhenGroupDigits == 1 && type != TextType.INPUT))
-            mask = mExprDigitGroupingMask;
-        else
-            mask = ExpressionFormatter.DIGIT_GROUPING_NONE;
+        int mask = mExprDoGroupDigits ? mExprDigitGroupingMask : ExpressionFormatter.DIGIT_GROUPING_NONE;
         mUpdater.setGrouping(mask);
         updateDigitGrouping(0, getText().length() - 1, true);
 
@@ -320,7 +316,7 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
 
 
 
-    private boolean isFromMakeBlink() {
+    /*private boolean isFromMakeBlink() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         for(StackTraceElement elem : stack) {
             if(     elem.getClassName().endsWith("$Blink") &&
@@ -347,7 +343,7 @@ public class InputEditText extends android.support.v7.widget.AppCompatEditText {
     public void invalidate(int l, int t, int r, int b) {
         if(isFromMakeBlink()) return;
         super.invalidate(l, t, r, b);
-    }
+    }*/
 
 
     @Override

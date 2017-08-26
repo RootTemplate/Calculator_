@@ -163,7 +163,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <TextView
-                        android:text="!"
+                        android:text="@string/guide_7_functions"
+                        style="@style/guide_text_table" />
+                    <TextView
+                        android:text="@string/guide_7_order_rightLeft"
+                        style="@style/guide_text_table" />
+                </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:text="!, %"
                         style="@style/guide_text_table" />
                     <TextView
                         android:text="@string/guide_7_order_leftRight"
@@ -173,7 +183,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <TextView
-                        android:text="@string/guide_7_functionsRootPowNegate"
+                        android:text="@string/guide_7_powRootNegateFunctions"
                         style="@style/guide_text_table" />
                     <TextView
                         android:text="@string/guide_7_order_rightLeft"

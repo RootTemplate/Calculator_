@@ -29,6 +29,7 @@
     <string name="save">Save</string>
     <string name="saveChanges">Save changes</string>
     <string name="changesSaved">Changes saved</string>
+    <string name="NaN">Not a number</string>
 
     <string name="rad" translatable="false">RAD</string>
     <string name="deg" translatable="false">DEG</string>
@@ -208,7 +209,6 @@
     <string name="pref_def_brClosingType" translatable="false">2</string>
     <string name="pref_def_amu" translatable="false">1</string>
     <string name="pref_def_storingHistory" translatable="false">50</string>
-    <string name="pref_def_digitGrouping" translatable="false">0</string>
     <string name="pref_def_digitGrouping_separator_left" translatable="false">1</string>
     <string name="pref_def_digitGrouping_separator_fract" translatable="false">0</string>
     <string name="pref_def_outputType" translatable="false">0</string>
@@ -229,6 +229,8 @@
     <string name="pref_doRound_summary">Round result number to fit the screen</string>
     <string name="pref_autoBracketClosing_title">Append closing brackets</string>
     <string name="pref_autoBracketClosing_summary">Automatically append closing brackets in input field</string>
+    <string name="pref_usePercentHelper_title">Extended percent operations</string>
+    <string name="pref_usePercentHelper_summary">For example, 100+10% = 110</string>
     <string name="pref_digitGrouping_title">Digit grouping</string>
     <string name="pref_digitGrouping_separator_left_title">Separator of left part</string>
     <string name="pref_digitGrouping_separator_fract_title">Separator of fractional part</string>
@@ -288,14 +290,13 @@
     </string-array>
     <string-array name="pref_storingHistory_list_entries">
         <item>Until app is closed</item>
-        <item>For 15 minutes</item>
-        <item>For 30 minutes</item>
-        <item>For 1 hour</item>
-        <item>For 2 hours</item>
-        <item>Last 30 entries</item>
+        <item>For 1 day</item>
+        <item>For 1 week</item>
+        <item>For 10 days</item>
         <item>Last 50 entries</item>
         <item>Last 100 entries</item>
         <item>Last 300 entries</item>
+        <item>Last 500 entries</item>
     </string-array>
     <string-array name="pref_storingNamespace_list_entries">
         <item>Until app is closed</item>
@@ -340,14 +341,13 @@
     </string-array>
     <string-array name="pref_storingHistory_list_values" translatable="false">
         <item>0</item>
-        <item>-15</item>
-        <item>-30</item>
-        <item>-60</item>
-        <item>-120</item>
-        <item>30</item>
+        <item>-24</item>
+        <item>-168</item>
+        <item>-240</item>
         <item>50</item>
         <item>100</item>
         <item>300</item>
+        <item>500</item>
     </string-array>
     <string-array name="pref_storingNamespace_list_values" translatable="false">
         <item>0</item>
@@ -416,7 +416,8 @@
     <string name="guide_7_order">Associativity</string>
     <string name="guide_7_order_leftRight">Left-to-right</string>
     <string name="guide_7_order_rightLeft">Right-to-left</string>
-    <string name="guide_7_functionsRootPowNegate">Functions, ^, √, −&#x00A0;(negate)</string>
+    <string name="guide_7_powRootNegateFunctions">^, √, −&#x00A0;(negate)</string>
+    <string name="guide_7_functions">Functions</string>
     <string name="guide_8_title">log</string>
     <string name="guide_8_text1">\tLog function can take one or two input variable(s) (also known as arguments).
         \n\n\tIf only one argument is passed, then log(n) returns natural logarithm of the input:</string>
@@ -452,17 +453,17 @@
     <string name="guide_12_openHistory">Open history</string>
     <string name="guide_12_text2">\tBy the way, history can be opened from the options menu that appears after
         clicking on three dots in the upper right corner in the background.</string>
-    <string name="guide_14_title">Settings is your Friend</string>
+    <string name="guide_14_title">Settings are your friend</string>
     <string name="guide_14_text">\tThis page is just a reminder that if you want something to change, check,
         whether it is possible to change in the settings.
         \n\tDo you need to view typed variables, change the period
-        of storing the history or enable digit grouping — open the settings!</string>
+        of storing the history or change digit grouping separator — open the settings!</string>
     <string name="guide_15_title">Double Clicks</string>
     <string name="guide_15_text">\tPages (in the background) are designed as follows: there is a home page and
         \"side\" pages. The home page opens immediately after the application is launched.
         \n\t\"Side\" pages can automatically return to home: (1) after a button is clicked, (2) return after
         a button is double clicked or (3) do not return al all.
-        \n\tFor instance, the left page (with the letters of the Latin/Greek alphabets) will return you
+        \n\tFor instance, the left page (with the letters of alphabets) will return you
         to the home page after double clicking on any button there.</string>
     <string name="guide_16_title">E notation</string>
     <string name="guide_16_text1">\t\"E\" is used for presenting numbers in scientific notation and means
@@ -490,6 +491,10 @@
     <string name="guide_19_title">Full list of mathematical functions</string>
     <string name="guide_19_title_functions">Functions</string>
     <string name="guide_19_title_remark">Remarks</string>
+    <string name="guide_20_title">Complex numbers</string>
+    <string name="guide_20_text">\tYep, we have them too, don\'t forget ;). There is \"i\" in the left page
+        (with the letters of the Latin/Greek alphabets).
+         \n\n\tUnfortunately, «As fraction» does not work with complex numbers yet.</string>
     <string name="guide_final_title">That\'s all</string>
     <string name="guide_final_text">Now you know everything about the app</string>
 </resources>

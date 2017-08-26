@@ -98,10 +98,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
                 case "outputType":
                     if(!initialCall) mResultIntent.putExtra("outputTypeChanged", true);
                 case "digitGrouping":
-                    boolean enabled = !value.equals("0");
-                    findPreference("digitGroupingSeparatorLeft").setEnabled(enabled);
-                    findPreference("digitGroupingSeparatorFract").setEnabled(enabled);
-                    // Fall through
                 case "digitGroupingSeparatorLeft":
                 case "digitGroupingSeparatorFract":
                     if(!initialCall) onInputDigitGroupingChanged();
@@ -265,7 +261,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements OnD
         bindPreferenceSummaryToValue(findPreference("digitGroupingSeparatorFract"));
         bindPreferenceSummaryToValue(findPreference("outputType"));
         bindPreferenceSummaryToValue(findPreference("storingNamespace"));
-        bindPreferenceSummaryToValue(findPreference("digitGrouping"));
         bindPreferenceSummaryToValue(findPreference("dayNightTheme"));
 
         findPreference("highlightE").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

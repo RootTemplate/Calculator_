@@ -24,6 +24,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 
 import roottemplate.calculator.util.Util;
 
@@ -73,6 +74,11 @@ public class PreferencesManager {
                 mResources.getBoolean(R.bool.pref_def_autoBracketClosing));
     }
 
+    public boolean usePercentHelper() {
+        return mPrefs.getBoolean("usePercentHelper",
+                mResources.getBoolean(R.bool.pref_def_usePercentHelper));
+    }
+
     public boolean doRound() {
         return mPrefs.getBoolean("doRound", mResources.getBoolean(R.bool.pref_def_doRound));
     }
@@ -97,9 +103,17 @@ public class PreferencesManager {
         return mPrefs.getBoolean("enabledTips", mResources.getBoolean(R.bool.pref_def_enabledTips));
     }
 
-    public int digitGrouping() {
-        return Integer.parseInt(mPrefs.getString("digitGrouping",
-                mResources.getString(R.string.pref_def_digitGrouping)));
+    public boolean digitGrouping() {
+        try {
+            return mPrefs.getBoolean("digitGrouping",
+                    mResources.getBoolean(R.bool.pref_def_digitGrouping));
+        } catch(Exception e) {
+            Log.e(Util.LOG_TAG, "While reading digitGrouping key", e);
+            // Before build 15 it was a String, not a boolean
+            boolean res = Integer.parseInt(mPrefs.getString("digitGrouping", "0")) > 0;
+            mPrefs.edit().remove("digitGrouping").putBoolean("digitGrouping", res).apply();
+            return res;
+        }
     }
 
     public int digitSeparatorLeft() {

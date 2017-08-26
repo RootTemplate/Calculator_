@@ -66,13 +66,14 @@ public class GuideActivity extends AppCompatActivity {
             R.id.guide_empty, R.id.guide_same_button, R.id.guide_same_button, R.id.guide_same_button, // SAME BUTTONS
             R.id.guide_empty, // AS FRACTION
             R.id.guide_log, R.id.guide_root, // log, root
-            R.id.guide_eNotation, // EXPONENT NOTAION
+            R.id.guide_eNotation, // EXPONENT NOTATION
+            R.id.guide_empty, // COMPLEX NUMBERS
             R.id.guide_longClks, // LONG CLICKS ON BUTTONS
             R.id.guide_empty, // DOUBLE CLICKS TO MOVE TO MAIN
             R.id.guide_namespaces, // NAMESPACES
             R.id.guide_funcList, // FULL FUNCTION LIST
             //R.id.guide_historyClks, // HISTORY CLICKS
-            R.id.guide_nan, // NaN
+            //R.id.guide_nan, // NaN
             R.id.guide_empty, // SETTINGS IS YOUR FRIEND
             R.id.guide_final
     };
@@ -199,12 +200,12 @@ public class GuideActivity extends AppCompatActivity {
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             switch (item.getItemId()) {
-                case R.id.action_guide_left:
+                /*case R.id.action_guide_left:
                     item.setEnabled(mCurGuideIndex > 0);
                     break;
                 case R.id.action_guide_right:
                     item.setEnabled(mCurGuideIndex < GUIDES.length - 1);
-                    break;
+                    break;*/
                 case R.id.action_guide_page:
                     item.setTitle((mCurGuideIndex + 1) + " / " + GUIDES.length);
                     break;
@@ -244,8 +245,8 @@ public class GuideActivity extends AppCompatActivity {
 
     private void setGuideIndex(int index) {
         if (mCurGuideIndex == index) return;
-        if(index < 0) index = 0;
-        else if(index >= GUIDES.length) index = GUIDES.length - 1;
+        if(index < 0) index += GUIDES.length;
+        else if(index >= GUIDES.length) index -= GUIDES.length;
 
         if(mCurGuideIndex == -1) {
             findViewById(GUIDES[index]).setVisibility(View.VISIBLE);
@@ -298,28 +299,32 @@ public class GuideActivity extends AppCompatActivity {
                 mText.setText(R.string.guide_16_text1);
                 break;
             case 11:
+                mTitle.setText(R.string.guide_20_title);
+                mText.setText(R.string.guide_20_text);
+                break;
+            case 12:
                 mTitle.setText(R.string.guide_11_title);
                 mText.setText(R.string.guide_11_text);
                 break;
-            case 12:
+            case 12 + 1:
                 mTitle.setText(R.string.guide_15_title);
                 mText.setText(R.string.guide_15_text);
                 break;
-            case 12 + 1:
+            case 14:
                 mTitle.setText(R.string.guide_17_title);
                 mText.setText(R.string.guide_17_text1);
                 break;
-            case 14:
+            case 15:
                 mTitle.setText(R.string.guide_19_title);
                 mText.setText("");
-                break;
-            case 15:
-                mTitle.setText(R.string.guide_10_title);
-                mText.setText(R.string.guide_10_text);
                 break;
             /*case 14:
                 mTitle.setText(R.string.guide_12_title);
                 mText.setText(R.string.guide_12_text);
+                break;
+            case 15:
+                mTitle.setText(R.string.guide_10_title);
+                mText.setText(R.string.guide_10_text);
                 break;*/
             case 16:
                 mTitle.setText(R.string.guide_14_title);

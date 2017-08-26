@@ -36,9 +36,9 @@ import roottemplate.calculator.evaluator.Named;
 import roottemplate.calculator.evaluator.Number;
 import roottemplate.calculator.evaluator.Processor;
 import roottemplate.calculator.evaluator.Variable;
-import roottemplate.calculator.evaluator.impls.ComplexNumber;
-import roottemplate.calculator.evaluator.impls.DefaultFunction;
-import roottemplate.calculator.evaluator.impls.RealNumber;
+import roottemplate.calculator.evaluator.namespace.ComplexNumber;
+import roottemplate.calculator.evaluator.namespace.DefaultFunction;
+import roottemplate.calculator.evaluator.namespace.RealNumber;
 import roottemplate.calculator.util.Util;
 import roottemplate.calculator.view.InputEditText;
 
@@ -160,9 +160,8 @@ public class EvaluatorManager {
     public String[] doubleToPreferableString(double x, int maxLen, int outputType) {
         String res = null;
         String showText = null;
-        int digitGrouping = mPrefs.digitGrouping();
         if(mPrefs.doRound()) {
-            maxLen -= digitGrouping > 0 ? 1 : 0; // Reserve 1 digit for commas and stuff
+            maxLen -= mPrefs.digitGrouping() ? 1 : 0; // Reserve 1 digit for commas and stuff
             if(outputType == -1)
                 outputType = mPrefs.outputType();
             switch(outputType) {
@@ -235,10 +234,12 @@ public class EvaluatorManager {
 
         try {
             String expr = replaceAppToEngine(text);
-            roottemplate.calculator.evaluator.Number n = mFragment.mEvaluator
-                    .process(expr);
+            roottemplate.calculator.evaluator.Number n = mFragment.mEvaluator.process(expr);
 
-            if (n != null) {
+            if(n != null && n.isNaN()) {
+                result = mContext.getResources().getString(R.string.NaN);
+                type = InputEditText.TextType.RESULT_MESSAGE;
+            } else if (n != null) {
                 n = n.toNumber();
                 if(n instanceof RealNumber) {
                     mLastResultNumbers = new double[] {n.toDouble()};
@@ -246,8 +247,8 @@ public class EvaluatorManager {
                     ComplexNumber complex = (ComplexNumber) n;
                     mLastResultNumbers = new double[] {complex.getRe(), complex.getIm()};
                 } else {
-                    Log.e(Util.LOG_TAG, "Please add support for a new Number! Abstraction level: "
-                            + n.getNumberManager().getAbstractionLevel());
+                    Log.e(Util.LOG_TAG, "Please add support for a new Number! Class: "
+                            + n.getClass().toString());
                 }
                 String[] results = numberToPrintableString(maxDigitsToFit, numberOutputType);
                 result = results[0];
@@ -261,8 +262,8 @@ public class EvaluatorManager {
         } catch (EvaluatorException e) {
             message = EvaluatorManager.replaceEngineToApp(e.getLocalizedMessage());
             result = mContext.getResources().getString(R.string.error);
-            type = InputEditText.TextType.INPUT;
             errorIndex = e.errorIndex;
+            type = InputEditText.TextType.INPUT;
         }
 
         if(mPrefs.enabledHistory()) {
@@ -296,6 +297,7 @@ public class EvaluatorManager {
     private void updateEvaluatorOptions(Evaluator e) {
         e.options.ANGLE_MEASURING_UNITS = mPrefs.getAMU();
         e.options.ENABLE_HASH_COMMANDS = false;
+        e.options.USE_PERCENT_HELPER = mPrefs.usePercentHelper();
     }
 
     public void clearAllNamespace() {
@@ -359,7 +361,9 @@ public class EvaluatorManager {
                         try {
                             n = new DefaultFunction(eval, name, args[0], vars);
                         } catch (EvaluatorException e) {
-                            Log.wtf(Util.LOG_TAG, "Why error while updating Evaluator?", e);
+                            Log.e(Util.LOG_TAG, "While installing " + name + "(...) = " + args[0], e);
+                            mDb.getNamespace().removeNamespaceElement(cursor.getInt(
+                                    cursor.getColumnIndex(NamespaceContract.NamespaceEntry._ID)), false);
                             continue;
                         }
                         break;

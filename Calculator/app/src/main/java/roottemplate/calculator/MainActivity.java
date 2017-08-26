@@ -368,13 +368,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int latestVer = Util.getAppVersion(this), thisVer = mPrefs.version();
         if(latestVer == -1) return false; // Error
         if(latestVer == thisVer) return false;
-        boolean hasNewKKits = thisVer <= 12;
+        boolean hasNewKKits = thisVer <= KeyboardKitsXmlManager.LAST_UPDATED_KEYBOARD_KITS_VERSION;
 
         if(thisVer == -1) {
             new FirstLaunchDialogFragment().show(getSupportFragmentManager(),
                     FirstLaunchDialogFragment.FRAGMENT_TAG);
         } else if(hasNewKKits) {
-            KeyboardKitsXmlManager.updateInstalledKeyboardKits(this, thisVer, latestVer);
+            KeyboardKitsXmlManager.updateInstalledKeyboardKits(this, thisVer);
         }
         mPrefs.version(latestVer);
         return hasNewKKits && thisVer != -1;

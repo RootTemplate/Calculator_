@@ -43,14 +43,13 @@
     </string-array>
     <string-array name="pref_storingHistory_list_entries">
         <item>До закрытия приложения</item>
-        <item>15 минут</item>
-        <item>30 минут</item>
-        <item>1 час</item>
-        <item>2 часа</item>
-        <item>Последние 30 вычислений</item>
+        <item>1 день</item>
+        <item>1 неделю</item>
+        <item>10 дней</item>
         <item>Последние 50 вычислений</item>
         <item>Последние 100 вычислений</item>
         <item>Последние 300 вычислений</item>
+        <item>Последние 500 вычислений</item>
     </string-array>
     <string-array name="pref_digitGrouping_separator_entries">
         <item>Нет</item>
@@ -184,7 +183,8 @@
     <string name="guide_7_order">Порядок выполнения</string>
     <string name="guide_7_order_leftRight">Слева направо</string>
     <string name="guide_7_order_rightLeft">Справа налево</string>
-    <string name="guide_7_functionsRootPowNegate">Функции, √, ^, −&#x00A0;(отрицание)</string>
+    <string name="guide_7_powRootNegateFunctions">^, √, −&#x00A0;(отрицание)</string>
+    <string name="guide_7_functions">Функции</string>
     <string name="guide_8_title">log</string>
     <string name="guide_8_text1">\tФункция log может принимать как один, так и два аргумента.
         \n\n\tЕсли передан один аргумент, то log(n) возвращает натуральный логарифм параметра:</string>
@@ -231,8 +231,8 @@
         Домашняя страница открывается сразу же после открытия приложения.
         \n\t«Побочные» могут автоматически возвращать на главную: (а) после одного нажатия на кнопку, (б)
         возвращать после двойного нажатия на кнопку или (в) не возвращать совсем.
-        \n\tТак, например, самая левая страница (с буквами латинского/греческого алфавитов)
-        будет возвращает вас на главную после двойного нажатия на любую кнопку.</string>
+        \n\tТак, например, самая левая страница (с буквами алфавитов) будет возвращает вас на главную
+        после двойного нажатия на любую кнопку.</string>
     <string name="guide_16_title">Экспоненциальная запись числа</string>
     <string name="guide_16_text1">\tЭто про «E». «E» используется для научной записи числа и обозначает
         «…умножить на 10 в степени…», или «…&#x00A0;×&#x00A0;10^…». Вот примеры:</string>
@@ -261,6 +261,10 @@
     <string name="guide_19_title">Полный список математических функций</string>
     <string name="guide_19_title_functions">Функции</string>
     <string name="guide_19_title_remark">Примечание</string>
+    <string name="guide_20_title">Комплексные числа</string>
+    <string name="guide_20_text">\tДа, они у нас тоже есть, не забывайте ;). «i» есть на левой странице
+        (с буквами латинского/греческого алфавитов).
+         \n\n\tК сожалению, «В виде дроби» пока не работает с комплексными числами.</string>
     <string name="guide_final_title">Это всё</string>
     <string name="guide_final_text">Теперь вы всё знаете о приложении.</string>
 
@@ -364,4 +368,7 @@
     <string name="keyboards_message_advancedSettingsTurnedOff_title">Расширенные настройки отключены</string>
     <string name="action_advancedSettings">Расширенные настройки</string>
     <string name="dialog_kitsUpdated_message_lookAtDefault">Взгляните на набор, доступный по умолчанию, поскольку там могут быть новые интересные функции</string>
+    <string name="pref_usePercentHelper_summary">Например, 100+10% = 110</string>
+    <string name="pref_usePercentHelper_title">Расширенные операции с процентами</string>
+    <string name="NaN">Не число</string>
 </resources>

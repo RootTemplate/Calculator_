@@ -96,7 +96,7 @@ public class HistoryContract {
             args = null;
         } else if(storingHistory < 0) { // by time
             clause = HistoryEntry.COLUMN_NAME_TIME + " < ?";
-            args = new String[] {(System.currentTimeMillis() / 1000 + storingHistory * 60) + ""};
+            args = new String[] {(System.currentTimeMillis() / 1000 + storingHistory * 60 * 60) + ""};
             // Remember: storingHistory < 0!
         } else { // by count
             Cursor maxC = mDb.getReadableDatabase().rawQuery("SELECT MAX(" + HistoryEntry._ID + ") FROM " +
@@ -156,8 +156,7 @@ public class HistoryContract {
                 values.put(HistoryEntry.COLUMN_NAME_ERROR, error);
             else
                 values.putNull(HistoryEntry.COLUMN_NAME_ERROR);
-            //if(storingHistory < 0)
-                values.put(HistoryEntry.COLUMN_NAME_TIME, System.currentTimeMillis() / 1000);
+            values.put(HistoryEntry.COLUMN_NAME_TIME, System.currentTimeMillis() / 1000);
 
             long row = db.insert(HistoryEntry.TABLE_NAME, null, values);
             if(row % 20 == 0)

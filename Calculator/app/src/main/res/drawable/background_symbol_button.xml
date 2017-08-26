@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true" android:drawable="@color/colorButtonSymbolFocused"/>
     <item android:state_focused="true" android:drawable="@color/colorButtonSymbolFocused"/>
     <item android:drawable="@color/colorButtonSymbol"/>
-</selector>
+</selector>-->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorButtonSymbol" />
+    <item>
+        <selector android:exitFadeDuration="@integer/animation_padButtonPress"
+            android:enterFadeDuration="@integer/animation_padButtonPress">
+            <item android:state_pressed="true" android:drawable="@color/colorButtonSymbolFocused"/>
+            <item android:state_focused="true" android:drawable="@color/colorButtonSymbolFocused"/>
+        </selector>
+    </item>
+</layer-list>
