@@ -373,10 +373,10 @@ public class KeyboardKits {
         
         r[29] = new Button("sin", "sin(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
         r[30] = new Button("cos", "cos(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
-        r[31] = new Button("tan", "tan(", ButtonType.BASE, 36, false, ButtonCategory.FUNCTIONS);
+        r[31] = new Button("tan", "tan(", ButtonType.BASE, 35, false, ButtonCategory.FUNCTIONS);
         r[32] = new Button("asin", "asin(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
         r[33] = new Button("acos", "acos(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
-        r[34] = new Button("atan", "atan(", ButtonType.BASE, 37, false, ButtonCategory.FUNCTIONS);
+        r[34] = new Button("atan", "atan(", ButtonType.BASE, 36, false, ButtonCategory.FUNCTIONS);
         r[35] = new Button("tg", "tg(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
         r[36] = new Button("atg", "atg(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
         r[37] = new Button("log", "log(", ButtonType.BASE, -1, false, ButtonCategory.FUNCTIONS);
