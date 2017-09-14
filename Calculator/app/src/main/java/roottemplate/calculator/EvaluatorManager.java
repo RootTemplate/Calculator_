@@ -297,7 +297,6 @@ public class EvaluatorManager {
     private void updateEvaluatorOptions(Evaluator e) {
         e.options.ANGLE_MEASURING_UNITS = mPrefs.getAMU();
         e.options.ENABLE_HASH_COMMANDS = false;
-        e.options.USE_PERCENT_HELPER = mPrefs.usePercentHelper();
     }
 
     public void clearAllNamespace() {

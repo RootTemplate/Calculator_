@@ -174,7 +174,7 @@ public class Processor {
 
                     boolean firstApp = false;
                     Named obj = namespace.getOther(var);
-                    if(obj == null || (obj instanceof Constant && ((Constant) obj).canBeOverridden()) ) {
+                    if(obj == null || (obj instanceof Constant && namespace.options.ALLOW_OVERRIDE_CONSTANTS) ) {
                         obj = new Variable(var);
                         namespace.add(obj, isStandard);
                         firstApp = true;

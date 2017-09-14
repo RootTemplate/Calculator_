@@ -30,11 +30,9 @@ import roottemplate.calculator.evaluator.Named;
 public class StandardPreevaluator extends Modifier {
     public static final String FRIENDLY_NAME = "STANDARD_MODIFIER";
 
-    private final Evaluator.Options options;
     private final Operator multiplyOp, hMultiplyOp;
 
-    public StandardPreevaluator(Evaluator.Options options, Operator multiplyOp, Operator higherMultiplyOperator) {
-        this.options = options;
+    public StandardPreevaluator(Operator multiplyOp, Operator higherMultiplyOperator) {
         this.multiplyOp = multiplyOp;
         this.hMultiplyOp = higherMultiplyOperator;
     }
@@ -42,7 +40,6 @@ public class StandardPreevaluator extends Modifier {
     @Override
     public void preevaluate(ListStruct list, Evaluator namespace) {
         ListNode cur = list.startNode;
-        boolean useHelperPercent = options.USE_PERCENT_HELPER;
         while(cur != null && cur.next != null) {
             ExpressionElement now = cur.data, next = cur.next.data;
             ListNode prev = cur.prev;
@@ -54,8 +51,7 @@ public class StandardPreevaluator extends Modifier {
                 ListNode node = new ListNode(cur, cur.next, hMultiplyOp);
                 cur.next.prev = node;
                 cur.next = node;
-            } else if(useHelperPercent && prev != null && prev.data.getElementType() == ElementType.OPERATOR &&
-                    prev.prev != null && !PercentOperator.isPercentOperator(prev.prev.data) &&
+            } else if(prev != null && prev.data.getElementType() == ElementType.OPERATOR &&
                     PercentOperator.isPercentOperator(next) && now.getElementType() == ElementType.NUMBER) {
                 Operator opn = (Operator) next, opp = (Operator) prev.data;
                 String oppName = opp.getName();

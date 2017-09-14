@@ -15,37 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Calculator_ Engine (Evaluator).  If not, see <http://www.gnu.org/licenses/>.
  */
-package roottemplate.calculator.evaluator;
 
-import roottemplate.calculator.evaluator.namespace.RealNumber;
-import roottemplate.calculator.evaluator.util.SameNumber;
+package roottemplate.calculator.evaluator.namespace;
 
-public class Constant extends SameNumber implements Named {
-    private final String name;
-    
-    public Constant(String name, double value) {
-        this(name, new RealNumber(value));
+import roottemplate.calculator.evaluator.*;
+import roottemplate.calculator.evaluator.Number;
+
+public class GCDFunction extends Function {
+    public GCDFunction(PriorityManager prManager) {
+        super(prManager, "gcd", -1);
     }
-
-    public Constant(String name, Number value) {
-        super(value);
-        if(!Evaluator.isValidName(name))
-            throw new IllegalArgumentException("Unacceptable name: " + name);
-        this.name = name;
+    private GCDFunction(GCDFunction self) {
+        super(self);
     }
 
     @Override
-    public boolean isModifiable() {
-        return false;
-    }
-    
-    @Override
-    public String getName() {
-        return name;
+    protected Number eval0(Number... numbers) throws EvaluatorException {
+        if(numbers.length < 2)
+            throw new EvaluatorException("GCD(...) takes at least 2 arguments");
+
+        Number result = numbers[0];
+        for(int i = 1; i < numbers.length; i++)
+            result = result.applyOperation("gcd", numbers[i]);
+        return result;
     }
 
     @Override
-    public String toString() {
-        return "Constant {name: " + name + ", value: " + stringValue() + "}";
+    protected Function copyForNoBrackets() {
+        return new GCDFunction(this);
     }
 }

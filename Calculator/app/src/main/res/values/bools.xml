@@ -7,6 +7,5 @@
     <bool name="pref_def_highlightE">false</bool>
     <bool name="pref_def_separateNamespace">true</bool>
     <bool name="pref_def_darkOrangeEquals">true</bool>
-    <bool name="pref_def_usePercentHelper">true</bool>
     <bool name="pref_def_digitGrouping">true</bool>
 </resources>

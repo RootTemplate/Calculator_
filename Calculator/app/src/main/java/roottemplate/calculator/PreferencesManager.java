@@ -74,11 +74,6 @@ public class PreferencesManager {
                 mResources.getBoolean(R.bool.pref_def_autoBracketClosing));
     }
 
-    public boolean usePercentHelper() {
-        return mPrefs.getBoolean("usePercentHelper",
-                mResources.getBoolean(R.bool.pref_def_usePercentHelper));
-    }
-
     public boolean doRound() {
         return mPrefs.getBoolean("doRound", mResources.getBoolean(R.bool.pref_def_doRound));
     }

@@ -118,7 +118,7 @@ public class Evaluator {
         add(new NativeFunction(prMn, "log", "ln"), true);
         add(new LogFunction(prMn), true); // log. Base-e if 1 arg. Args: "n" or "base, n"
         add(new NativeFunction(prMn, "abs"), true);
-        add(new NativeFunction(prMn, "gcd", "gcd", true), true);
+        add(new GCDFunction(prMn), true);
         add(new NativeFunction(prMn, "floor"), true);
         add(new NativeFunction(prMn, "sqrt"), true);
         add(new NativeFunction(prMn, "cbrt"), true);
@@ -133,11 +133,11 @@ public class Evaluator {
         add(new Constant("Infinity", Double.POSITIVE_INFINITY), true);
         add(new Constant("\u221E", Double.POSITIVE_INFINITY), true);
         add(new Constant("NaN", Double.NaN), true);
-        add(new Constant("i", new ComplexNumber(0, 1), true), true);
+        add(new Constant("i", new ComplexNumber(0, 1)), true);
         add(new Variable("x"), true);
         add(new Variable("y"), true);
 
-        addModifier(new StandardPreevaluator(options, multiplyOp, higherMultiplyOp), true);
+        addModifier(new StandardPreevaluator(multiplyOp, higherMultiplyOp), true);
         addModifier(new Number.NumberReader(numberManagers), true);
     }
 
@@ -543,9 +543,6 @@ public class Evaluator {
         
         public boolean ENABLE_HASH_COMMANDS = false;
 
-        /**
-         * If true, then it will replace (e.g.) "100+15%" with "100*115%".
-         */
-        public boolean USE_PERCENT_HELPER = true;
+        public boolean ALLOW_OVERRIDE_CONSTANTS = true;
     }
 }
